@@ -26,16 +26,29 @@ struct HomeScreen: View {
                 
                 Text(homeViewModel.text)
                 BLEListView(bleManager: bleManager).frame(maxWidth: 400)
+                    .navigationDestination(isPresented: $bleManager.isConnected) {
+                    MainScreen()
+                        .environmentObject(bleManager)
+                        .onAppear {
+                            bluetoothConnected = true
+                            goToMain = false
+                            bleManager.isConnecting = false
+                            bleManager.devices.removeAll()
+                        }
+                }
                 Button(bluetoothConnected ? "Start" : "Data") {
-                    if goToMainBinding.wrappedValue {
-                        goToData = true
-                        goToMain = false
-                    } else {
+                    if bluetoothConnected {
                         goToMain = true
                         goToData = false
+                    } else {
+                        goToData = true
+                        goToMain = false
                     }
+                }.navigationDestination(isPresented: $goToData) {
+                    DataScreen()
+                }.navigationDestination(isPresented: $goToMain) {
+                    MainScreen()
                 }
-                
                 Button("Setting")
                 {
                     goToSetting = true
@@ -45,49 +58,30 @@ struct HomeScreen: View {
                 {
                     bluetoothConnected = false
                     bleManager.disconnect()
+                }.navigationDestination(isPresented: $goToSetting) {
+                    SettingScreen()
                 }
             }.padding()
             
             if bleManager.isConnecting {
                 Color.black.opacity(0.4).ignoresSafeArea()
-                VStack(spacing: 20) {
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle())
-                    Text("Connecting...")
-                        .font(.subheadline)
-                        .foregroundStyle(.gray)
+                ZStack {
+                    VStack(spacing: 20) {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: .white)) // 색상도 변경 가능
+                            .scaleEffect(2.0) // 크기 2배
+                        Text("Connecting...")
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
+                    }
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity) // 전체 화면 채우기
+                .background(Color.clear) // 투명 배경
+                .ignoresSafeArea()
             }
         }.padding()// 상태 기반 Navigation
-            .navigationDestination(isPresented: $goToData) {
-                DataScreen()
-            }
-            .navigationDestination(isPresented: $goToSetting) {
-                SettingScreen()
-            }
-            .navigationDestination(isPresented: $bleManager.isConnected) {
-                MainScreen()
-                    .environmentObject(bleManager)
-                    .onAppear {
-                        bluetoothConnected = true
-                        goToMain = false
-                        bleManager.isConnecting = false
-                        bleManager.devices.removeAll()
-                        print("확인용 \(goToMainBinding.wrappedValue)")
-                    }
-            }
+            
     }
-    
-    var goToMainBinding: Binding<Bool> {
-            Binding(
-                get: { bleManager.isConnected || goToMain },
-                set: { newValue in
-                    if !newValue {
-                        goToMain = false
-                    }
-                }
-            )
-        }
 }
 
 #Preview {
