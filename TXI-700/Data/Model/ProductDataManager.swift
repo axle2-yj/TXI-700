@@ -1,5 +1,5 @@
 //
-//  ProductDataManber.swift
+//  ProductDataManager.swift
 //  TXI-700
 //
 //  Created by 서용준 on 11/27/25.
@@ -11,11 +11,9 @@ class ProductDataManager {
     static let shared = ProductDataManager()
     private let context = PersistenceController.shared.context
     
-    func addProduct(
-        id: UUID,
-        name: String) {
+    func addProduct(name: String) {
             let item = ProductInfo(context: context)
-            item.id = id
+            item.id = UUID()
             item.name = name
             save()
         }

@@ -5,3 +5,17 @@
   Created by 서용준 on 11/25/25.
   
 */
+
+"HomeScreenTitle" = "Home Screen";
+"MainScreenTitle" = "Main Screen";
+"VehicleScreenTitle" = "Vehicle Screen";
+"ProductScreenTitle" = "Product Screen";
+"ClientScreenTitle" = "Client Screen";
+"SettingsScreenTitle" = "Settings Screen";
+"SettingsDataScreenTitle" = "Settings Data Screen";
+"DataListScreenTitle" = "Data List Screen";
+"DataDetailsScreenTitle" = "Data Details Screen";
+"Region" = "지역";
+"VehicleNum" = "차량번호 입력";
+"WeightInput" = "무게 입력";
+"None" = "없음";

@@ -10,9 +10,22 @@
 		206ECF742ED5883900629291 /* TXI-700.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "TXI-700.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		2027DD002ED970640028A4E9 /* Exceptions for "TXI-700" folder in "TXI-700" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 206ECF732ED5883900629291 /* TXI-700 */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		206ECF762ED5883900629291 /* TXI-700 */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				2027DD002ED970640028A4E9 /* Exceptions for "TXI-700" folder in "TXI-700" target */,
+			);
 			path = "TXI-700";
 			sourceTree = "<group>";
 		};
@@ -258,6 +271,7 @@
 				DEVELOPMENT_TEAM = U25Y6PZ2X4;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "TXI-700/Info.plist";
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "BLE 장치와 통신하기 위해 블루투스 사용 필요";
 				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "BLE 주변 기기 연결 위해 블루투스 사용 필요";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "BLE 스캔을 위해 위치 접근 필요";
@@ -293,6 +307,7 @@
 				DEVELOPMENT_TEAM = U25Y6PZ2X4;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "TXI-700/Info.plist";
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "BLE 장치와 통신하기 위해 블루투스 사용 필요";
 				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "BLE 주변 기기 연결 위해 블루투스 사용 필요";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "BLE 스캔을 위해 위치 접근 필요";

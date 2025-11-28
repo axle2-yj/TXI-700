@@ -10,5 +10,5 @@ import Combine
 
 @MainActor
 class SettingViewModel: ObservableObject {
-    @Published var text: String = "Setting Screen 출력"
+    @Published var text: String = NSLocalizedString("SettingsScreenTitle", comment: "")
 }

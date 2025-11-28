@@ -33,6 +33,7 @@ extension BluetoothManager: CBCentralManagerDelegate {
         let device = BLEDevice(id: peripheral.identifier,
                                name: peripheral.name ?? "Unknown",
                                peripheral: peripheral)
+        
         DispatchQueue.main.async {
             if !self.devices.contains(where: { $0.id == device.id }) {
                 self.devices.append(device)
@@ -44,11 +45,11 @@ extension BluetoothManager: CBCentralManagerDelegate {
     // MARK: - 연결 성공
     func centralManager(_ central: CBCentralManager,
                         didConnect peripheral: CBPeripheral) {
-        connectedPeripheral = peripheral      // ✅ 연결된 peripheral 저장
+        connectedPeripheral = peripheral     
         isConnected = true
         isConnecting = false
         peripheral.delegate = self
-        peripheral.discoverServices(nil)
+        peripheral.discoverServices([targetServiceUUID])
         print("Connected to \(peripheral.name ?? "Unknown")")
     }
     

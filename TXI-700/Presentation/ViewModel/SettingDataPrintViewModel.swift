@@ -10,5 +10,5 @@ import Combine
 
 @MainActor
 class SettingDataPrintViewModel: ObservableObject {
-    @Published var text: String = "Setting Data Print Screen 출력"
+    @Published var text: String = NSLocalizedString("SettingsDataScreenTitle", comment: "")
 }
