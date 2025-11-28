@@ -47,7 +47,8 @@ class VehicleViewModel: ObservableObject {
     func loadRegions() -> [String] {
             if let url = Bundle.main.url(forResource: language(), withExtension: "json"),
                let data = try? Data(contentsOf: url),
-               let regions = try? JSONDecoder().decode([String].self, from: data) {                return regions
+               let regions = try? JSONDecoder().decode([String].self, from: data) {
+                return regions
             }
             return []
         }

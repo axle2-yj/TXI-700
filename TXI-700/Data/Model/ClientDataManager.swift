@@ -1,5 +1,5 @@
 //
-//  ClientDataManber.swift
+//  ClientDataManager.swift
 //  TXI-700
 //
 //  Created by 서용준 on 11/27/25.
@@ -7,15 +7,13 @@
 
 import CoreData
 
-class ClientDataManber {
-    static let shared = ClientDataManber()
+class ClientDataManager {
+    static let shared = ClientDataManager()
     private let context = PersistenceController.shared.context
     
-    func addProduct(
-        id: UUID,
-        name: String) {
+    func addClient(name: String) {
             let item = ClientInfo(context: context)
-            item.id = id
+            item.id = UUID()
             item.name = name
             save()
         }

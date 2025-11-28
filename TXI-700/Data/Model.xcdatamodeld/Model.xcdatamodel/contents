@@ -1,2 +1,24 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="24411" systemVersion="25B78" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithSwiftData="YES" userDefinedModelVersionIdentifier=""/>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="24411" systemVersion="25B78" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithSwiftData="YES" userDefinedModelVersionIdentifier="">
+    <entity name="ClientInfo" representedClassName="ClientInfo" syncable="YES" codeGenerationType="class">
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="name" optional="YES" attributeType="String" defaultValueString=""/>
+    </entity>
+    <entity name="LoadAxleInfo" representedClassName="LoadAxleInfo" syncable="YES" codeGenerationType="class">
+        <attribute name="client" optional="YES" attributeType="String" defaultValueString=""/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="loadAxleData" optional="YES" attributeType="Binary"/>
+        <attribute name="product" optional="YES" attributeType="String" defaultValueString=""/>
+        <attribute name="timestamp" optional="YES" attributeType="Date" defaultDateTimeInterval="785901720" usesScalarValueType="NO"/>
+        <attribute name="vehicle" optional="YES" attributeType="String" defaultValueString=""/>
+    </entity>
+    <entity name="ProductInfo" representedClassName="ProductInfo" syncable="YES" codeGenerationType="class">
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="name" optional="YES" attributeType="String" defaultValueString=""/>
+    </entity>
+    <entity name="VehicleInfo" representedClassName="VehicleInfo" syncable="YES" codeGenerationType="class">
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="vehicle" optional="YES" attributeType="String" defaultValueString=""/>
+        <attribute name="weight" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+    </entity>
+</model>

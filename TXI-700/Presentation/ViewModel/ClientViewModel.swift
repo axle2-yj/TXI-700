@@ -9,6 +9,25 @@ import SwiftUI
 import Combine
 
 @MainActor
-class CliantViewModel: ObservableObject {
-    @Published var text: String = "Cliant Screen 출력"
+class ClientViewModel: ObservableObject {
+    @Published var clientItems: [ClientInfo] = []
+    @Published var text: String = NSLocalizedString("CliantScreenTitle", comment: "")
+    @Published var name: String = ""
+    
+    private let clientManger = ClientDataManager.shared
+    
+    func fetchClientItems() {
+        clientItems = clientManger.fetchAll()
+    }
+    
+    func addClient() {
+        clientManger.addClient(name: name)
+        fetchClientItems()
+        name = ""
+    }
+    
+    func deleteClient(item: ClientInfo) {
+        clientManger.delete(item: item)
+        fetchClientItems()
+    }
 }

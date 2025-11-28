@@ -14,7 +14,8 @@ struct TXI_700App: App {
     var body: some Scene {
         WindowGroup {
             NavigationStack {
-                HomeScreen().environmentObject(bleManager)
+                HomeScreen().environmentObject(bleManager).onAppear{
+                }
             }
         }
     }

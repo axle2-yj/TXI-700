@@ -10,5 +10,24 @@ import Combine
 
 @MainActor
 class ProductViewModel: ObservableObject {
-    @Published var text: String = "Product Screen 출력"
+    @Published var productItems: [ProductInfo] = []
+    @Published var text: String = NSLocalizedString("ProductScreenTitle", comment: "")
+    @Published var name: String = ""
+    
+    private let productManger = ProductDataManager.shared
+    
+    func fetchProductItems() {
+        productItems = productManger.fetchAll()
+    }
+    
+    func addProdut() {
+        productManger.addProduct(name: name)
+        fetchProductItems()
+        name = ""
+    }
+    
+    func deleteProduct(item: ProductInfo) {
+        productManger.delete(item: item)
+        fetchProductItems()
+    }
 }

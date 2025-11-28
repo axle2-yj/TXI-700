@@ -5,3 +5,22 @@
   Created by 서용준 on 11/25/25.
   
 */
+
+"HomeScreenTitle" = "Home Screen";
+"MainScreenTitle" = "Main Screen";
+"VehicleScreenTitle" = "Vehicle Screen";
+"ProductScreenTitle" = "Product Screen";
+"ClientScreenTitle" = "Client Screen";
+"SettingsScreenTitle" = "Settings Screen";
+"SettingsDataScreenTitle" = "Settings Data Screen";
+"DataListScreenTitle" = "Data List Screen";
+"DataDetailsScreenTitle" = "Data Details Screen";
+
+"AuthorizationWarning" ="블루투스 또는 위치 권한이 필요합니다.";
+
+"Region" = "지역";
+"VehicleNum" = "차량번호 입력";
+"WeightInput" = "무게 입력";
+"None" = "없음";
+"SelectRegion" = "지역 선택";
+"Close" = "닫기";

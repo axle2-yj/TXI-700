@@ -1,5 +1,5 @@
 //
-//  HomeScreen.swift
+//  SettingScreen.swift
 //  TXI-700
 //
 //  Created by 서용준 on 11/24/25.

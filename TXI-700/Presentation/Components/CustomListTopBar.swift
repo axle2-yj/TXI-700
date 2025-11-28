@@ -9,41 +9,39 @@ import SwiftUI
 
 struct CustomListTopBar: View {
     @State private var isAddMode = true
+    
     var title: String
     var onBack: () -> Void
-    var onChange: () -> Void
-    
+    var onChange: (Bool) -> Void
+
     var body: some View {
         HStack {
-            // 왼쪽: 뒤로가기
-                        Button(action: onBack) {
-                            Image(systemName: "chevron.left")
-                                .font(.title2)
-                                .padding()
-                        }
+            Button(action: onBack) {
+                Image(systemName: "chevron.left")
+                    .font(.title2)
+                    .padding()
+            }
 
-                        Spacer()
+            Spacer()
 
-                        // 가운데: 타이틀
-                        Text(title)
-                            .font(.headline)
+            Text(title)
+                .font(.headline)
 
-                        Spacer()
+            Spacer()
 
-                        // 오른쪽: 설정 버튼
-                        Button(action: onChange) {
-                            Image(systemName: isAddMode ? "plus" : "xmark")
-                                            .font(.title)
-                                            .foregroundColor(isAddMode ? .blue : .red)
-                                            .padding()
-                                            .background(.gray.opacity(0.2))
-                                            .clipShape(Circle())
-                                            .animation(.spring(), value: isAddMode)
-                        }
-                    }
-                    .padding(.horizontal)
-                    .frame(height: 50)
-                    .background(Color(.systemGray6))
-
+            Button(action: {
+                isAddMode.toggle()
+                onChange(isAddMode)
+            }) {
+                Image(systemName: isAddMode ? "plus" : "xmark")
+                    .font(.title)
+                    .foregroundColor(isAddMode ? .blue : .red)
+                    .padding()
+                    .animation(.spring(), value: isAddMode)
+            }
+        }
+        .padding(.horizontal)
+        .frame(height: 50)
+        .background(Color(.systemGray6))
     }
 }

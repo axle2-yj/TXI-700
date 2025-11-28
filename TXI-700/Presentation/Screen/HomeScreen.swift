@@ -14,6 +14,7 @@ struct HomeScreen: View {
     @State private var bluetoothConnected = false
     
     @StateObject var homeViewModel = HomeViewModel()
+    
     @EnvironmentObject var bleManager: BluetoothManager
 
     var body: some View {
@@ -47,7 +48,7 @@ struct HomeScreen: View {
                 }.navigationDestination(isPresented: $goToData) {
                     DataScreen()
                 }.navigationDestination(isPresented: $goToMain) {
-                    MainScreen()
+                    MainScreen().environmentObject(bleManager)
                 }
                 Button("Setting")
                 {
@@ -80,7 +81,6 @@ struct HomeScreen: View {
                 .ignoresSafeArea()
             }
         }.padding()// 상태 기반 Navigation
-            
     }
 }
 

@@ -1,5 +1,5 @@
 //
-//  HomeScreen.swift
+//  DataSettingScreen.swift
 //  TXI-700
 //
 //  Created by 서용준 on 11/24/25.
@@ -13,6 +13,7 @@ struct DataSettingScreen: View {
     var body: some View {
         VStack {
             Text(settingDataPrintViewModel.text)
+            
         }.padding()
     }
     
