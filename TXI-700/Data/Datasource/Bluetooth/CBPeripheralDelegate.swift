@@ -67,7 +67,7 @@ extension BluetoothManager: CBPeripheralDelegate {
                     }
                 }
 
-            case targetCharctersticUUID:
+            case targetCharcterstic2UUID:
                 if let data = characteristic.value {
                     let battery = Int(data.first ?? 0)
                     DispatchQueue.main.async {
@@ -95,7 +95,7 @@ extension BluetoothManager: CBPeripheralDelegate {
 
         // 4번째 바이트 기준으로 음수/양수 판단
         let signByte = bytes[3]
-        let isNegative = (signByte == 26) // 26이면 음수, 18이면 양수
+        let isNegative = (signByte == 24 || signByte == 26)
 
         // 끝 5자리 숫자 추출
         let numericBytes = bytes[4...8]   // 48,48,48,56,48
@@ -105,8 +105,8 @@ extension BluetoothManager: CBPeripheralDelegate {
             let realValue = isNegative ? -number : number
             DispatchQueue.main.async {
                 self.receivedText = "\(realValue)"
-                self.loadAxel1 = realValue
-                self.loadAxel2 = realValue
+                self.leftLoadAxel1 = realValue
+                self.rightLoadAxel1 = realValue
             }
         }
         

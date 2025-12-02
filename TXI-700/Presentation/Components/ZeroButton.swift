@@ -18,7 +18,11 @@ struct ZeroButton: View {
     var body: some View {
         Button("ZERO") {
             print("ZERO Point Send Result: \(bleManager.sendData(zeroPointByte))")
-        }
+        }.frame(maxWidth: .infinity) // 화면 절반 차지
+            .padding()
+            .background(Color.gray.opacity(0.3))
+            .cornerRadius(6)
+            .foregroundColor(.black)
     }
 }
 

@@ -3,24 +3,41 @@
   TXI-700
 
   Created by 서용준 on 11/25/25.
-  
 */
 
-"HomeScreenTitle" = "Home Screen";
-"MainScreenTitle" = "Main Screen";
-"VehicleScreenTitle" = "Vehicle Screen";
-"ProductScreenTitle" = "Product Screen";
-"ClientScreenTitle" = "Client Screen";
-"SettingsScreenTitle" = "Settings Screen";
-"SettingsDataScreenTitle" = "Settings Data Screen";
-"DataListScreenTitle" = "Data List Screen";
-"DataDetailsScreenTitle" = "Data Details Screen";
+"HomeScreenTitle" = "MULTI LOAD INDICATOR";
+"MainScreenTitle" = "Wheel Load Indicator";
+"VehicleScreenTitle" = "Vehicle Management";
+"ProductScreenTitle" = "Item Management";
+"ClientScreenTitle" = "Client Management";
+"SettingsScreenTitle" = "SETUP";
+"SettingsDataScreenTitle" = "Print Form Edit";
+"DataListScreenTitle" = "Data Management";
+"DataDetailsScreenTitle" = "Data Detial Management";
 
 "AuthorizationWarning" ="블루투스 또는 위치 권한이 필요합니다.";
+"MoveSetting" = "설정으로 이동";
 
 "Region" = "지역";
 "VehicleNum" = "차량번호 입력";
 "WeightInput" = "무게 입력";
 "None" = "없음";
 "SelectRegion" = "지역 선택";
+
 "Close" = "닫기";
+"Cancel" = "취소";
+"Confirmation" = "확인";
+
+"StartDate" = "시작일";
+"EndDate" = "종료일";
+"SelectedPeriod" = "기간 선택";
+
+"1stWeight" = "1차 중량 : ";
+"NetWeight" = "순중량 : ";
+"Lenguge" = "언어";
+"English" = "영어";
+"Japanese" = "일본어";
+"Korean" = "한국어";
+
+"Line" = "---------------";
+"Vehicle" = "12가 3456";

@@ -6,21 +6,39 @@
   
 */
 
-"HomeScreenTitle" = "Home Screen";
-"MainScreenTitle" = "Main Screen";
-"VehicleScreenTitle" = "Vehicle Screen";
-"ProductScreenTitle" = "Product Screen";
-"ClientScreenTitle" = "Client Screen";
-"SettingsScreenTitle" = "Settings Screen";
-"SettingsDataScreenTitle" = "Settings Data Screen";
-"DataListScreenTitle" = "Data List Screen";
-"DataDetailsScreenTitle" = "Data Details Screen";
+"HomeScreenTitle" = "MULTI LOAD INDICATOR";
+"MainScreenTitle" = "Wheel Load Indicator";
+"VehicleScreenTitle" = "Vehicle Management";
+"ProductScreenTitle" = "Item Management";
+"ClientScreenTitle" = "Client Management";
+"SettingsScreenTitle" = "SETUP";
+"SettingsDataScreenTitle" = "Print Form Edit";
+"DataListScreenTitle" = "Data Management";
+"DataDetailsScreenTitle" = "Data Detial Management";
 
-"AuthorizationWarning" ="Bluetooth or location permissions are required.";
+"AuthorizationWarning" ="Bluetoothまたは位置情報の許可が必要です。";
+"MoveSetting" = "設定に移動";
 
 "Region" = "地域";
 "VehicleNum" = "車両番号を入力してください";
 "WeightInput" = "重量の入力";
 "None" = "なし";
 "SelectRegion" = "地域選択";
+
 "Close" = "閉じる";
+"Cancel" = "キャンセル";
+"Confirmation" = "確認";
+
+"StartDate" = "開始日";
+"EndDate" = "終了日";
+"SelectedPeriod" = "期間を選択";
+
+"1stWeight" = "一次重量 : ";
+"NetWeight" = "正味重量 : ";
+"Lenguge" = "言語";
+"English" = "英語";
+"Japanese" = "日本";
+"Korean" = "韓国";
+
+"Line" = "---------------";
+"Vehicle" = "品川 300 あ 12-34";

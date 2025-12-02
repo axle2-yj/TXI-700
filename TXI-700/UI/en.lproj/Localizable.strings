@@ -6,21 +6,39 @@
   
 */
 
-"HomeScreenTitle" = "Home Screen";
-"MainScreenTitle" = "Main Screen";
-"VehicleScreenTitle" = "Vehicle Screen";
-"ProductScreenTitle" = "Product Screen";
-"ClientScreenTitle" = "Client Screen";
-"SettingsScreenTitle" = "Settings Screen";
-"SettingsDataScreenTitle" = "Settings Data Screen";
-"DataListScreenTitle" = "Data List Screen";
-"DataDetailsScreenTitle" = "Data Details Screen";
+"HomeScreenTitle" = "MULTI LOAD INDICATOR";
+"MainScreenTitle" = "Wheel Load Indicator";
+"VehicleScreenTitle" = "Vehicle Management";
+"ProductScreenTitle" = "Item Management";
+"ClientScreenTitle" = "Client Management";
+"SettingsScreenTitle" = "SETUP";
+"SettingsDataScreenTitle" = "Print Form Edit";
+"DataListScreenTitle" = "Data Management";
+"DataDetailsScreenTitle" = "Data Detial Management";
 
 "AuthorizationWarning" ="Bluetooth or location permissions are required.";
+"MoveSetting" = "Go to Settings";
 
 "Region" = "Region";
 "VehicleNum" = "Enter vehicle number";
 "WeightInput" = "weight Input";
 "None" = "None";
 "SelectRegion" = "Region Selection";
+
 "Close" = "Close";
+"Cancel" = "Cancel";
+"Confirmation" = "Confirmation";
+
+"StartDate" = "Start Date";
+"EndDate" = "End Date";
+"SelectedPeriod" = "Select Period";
+
+"1stWeight" = "1st Weight : ";
+"NetWeight" = "Net Weight : ";
+"Lenguge" = "Lenguge";
+"English" = "English";
+"Japanese" = "Japane";
+"Korean" = "Korean";
+
+"Line" = "---------------";
+"Vehicle" = "ABC-1234";

@@ -14,6 +14,10 @@ struct SumButton: View {
     var body: some View {
         Button("SUM") {
             onSum()
-        }
+        }.frame(maxWidth: .infinity)
+        .padding()
+        .background(Color.gray.opacity(0.3))
+        .cornerRadius(6)
+        .foregroundColor(.black)
     }
 }

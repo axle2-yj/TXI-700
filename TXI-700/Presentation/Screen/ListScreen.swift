@@ -12,11 +12,12 @@ struct ListScreen: View {
     @State private var isAddMode = false
     @State private var selectedListType: ListType? = nil
 
-    @Environment(\.presentationMode) var presentationMode
-
     @ObservedObject var productViewModel: ProductViewModel
     @ObservedObject var clientViewModel: ClientViewModel
     @ObservedObject var vehicleViewModel: VehicleViewModel
+    @ObservedObject var printViewModel: PrintFormSettingViewModel
+    
+    @Environment(\.presentationMode) var presentationMode
 
     var onSelectProduct: ((ProductInfo) ->Void)?
     var onSelectClient: ((ClientInfo) -> Void)?
@@ -56,17 +57,20 @@ struct ListScreen: View {
             }
             
             VStack {
-                List {
+                
                     switch listType {
                     case .product:
                         if productViewModel.productItems.isEmpty {
+                            Spacer()
                             Text("No Data")
                                 .foregroundColor(.gray)
                                 .padding()
+                            Spacer()
                         }
                         else {
-                            ForEach(productViewModel.productItems) { item in
-                                HStack {
+                            List {
+                                ForEach(productViewModel.productItems) { item in
+                                    HStack {
                                         Text("\(item.name ?? "")")
                                         Spacer()
                                         if isAddMode {
@@ -85,18 +89,22 @@ struct ListScreen: View {
                                             onSelectProduct?(item)
                                         }
                                     }
+                                }
                             }
                         }
                         
                     case .cliant:
                         if clientViewModel.clientItems.isEmpty {
+                            Spacer()
                             Text("No Data")
                                 .foregroundColor(.gray)
                                 .padding()
+                            Spacer()
                         }
                         else {
-                            ForEach(clientViewModel.clientItems) { item in
-                                HStack {
+                            List {
+                                ForEach(clientViewModel.clientItems) { item in
+                                    HStack {
                                         Text("\(item.name ?? "")")
                                         Spacer()
                                         if isAddMode {
@@ -115,17 +123,21 @@ struct ListScreen: View {
                                             onSelectClient?(item)
                                         }
                                     }
+                                }
                             }
                         }
                     case .vehicle:
                         if vehicleViewModel.vehicleItems.isEmpty {
+                            Spacer()
                             Text("No Data")
                                 .foregroundColor(.gray)
                                 .padding()
+                            Spacer()
                         }
                         else {
-                            ForEach(vehicleViewModel.vehicleItems) { item in
-                                HStack {
+                            List {
+                                ForEach(vehicleViewModel.vehicleItems) { item in
+                                    HStack {
                                         Text("\(item.vehicle ?? "")")
                                         Spacer()
                                         Text("\(item.weight) kg")
@@ -145,10 +157,10 @@ struct ListScreen: View {
                                             onSelectVehicle?(item)
                                         }
                                     }
+                                }
                             }
                         }
                     }
-                }
             }
             .navigationBarBackButtonHidden(true).padding()
                 .onAppear {
