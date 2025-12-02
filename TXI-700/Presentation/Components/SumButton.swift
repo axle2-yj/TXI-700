@@ -9,11 +9,37 @@ import SwiftUI
 import Foundation
 
 struct SumButton: View {
+    @EnvironmentObject var bleManager: BluetoothManager
     var onSum: () -> Void
-    
+        
     var body: some View {
-        Button("SUM") {
-            onSum()
+        var isSum = false
+        if !isSum {
+            Button("SUM") {
+                isSum = true
+                performEnterAction()
+            }.frame(maxWidth: .infinity)
+            .padding()
+            .background(Color.gray.opacity(0.3))
+            .cornerRadius(6)
+            .foregroundColor(.black)
+            .onReceive(bleManager.$isSum) { newValue in
+                if newValue {
+                    isSum = false
+                    preformIndicatorAction()
+                } else {
+                    isSum = true
+                }
+            }
         }
+    }
+    
+    private func performEnterAction() {
+        onSum()
+        bleManager.sendSumCommand()
+    }
+    
+    private func preformIndicatorAction() {
+        onSum()
     }
 }

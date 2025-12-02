@@ -1,9 +1,12 @@
-//
-//  CustomTopBara.swift
-//  TXI-700
-//
-//  Created by 서용준 on 11/24/25.
-//
+/*
+ CustomTopBara.swift
+
+ TXI-700
+ 
+ - 이전 버튼, 타이틀, 추가 버튼 TopBar
+
+ Created by 서용준 on 11/24/25.
+*/
 
 import SwiftUI
 
@@ -15,32 +18,34 @@ struct CustomListTopBar: View {
     var onChange: (Bool) -> Void
 
     var body: some View {
-        HStack {
-            Button(action: onBack) {
-                Image(systemName: "chevron.left")
-                    .font(.title2)
-                    .padding()
-            }
-
-            Spacer()
-
+        ZStack {
+            // 가운데: 타이틀
             Text(title)
                 .font(.headline)
+                .lineLimit(1)
+            
+            HStack {
+                Button(action: onBack) {
+                    Image("return")
+                        .resizable()
+                        .frame(width: 30, height: 30)
+                }
+                                                
+                Spacer()
+                
+                Button(action: {
+                    isAddMode.toggle()
+                    onChange(isAddMode)
+                }) {
+                    Image(isAddMode ? "plus" : "cross")
+                        .resizable()
+                        .frame(width: 40, height: 40)
+                        .padding()
+                        .animation(.spring(), value: isAddMode)
+                }
+            }.padding(.horizontal)
 
-            Spacer()
-
-            Button(action: {
-                isAddMode.toggle()
-                onChange(isAddMode)
-            }) {
-                Image(systemName: isAddMode ? "plus" : "xmark")
-                    .font(.title)
-                    .foregroundColor(isAddMode ? .blue : .red)
-                    .padding()
-                    .animation(.spring(), value: isAddMode)
-            }
         }
-        .padding(.horizontal)
         .frame(height: 50)
         .background(Color(.systemGray6))
     }

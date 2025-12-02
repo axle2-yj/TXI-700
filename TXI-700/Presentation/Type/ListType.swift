@@ -7,6 +7,6 @@
 
 enum ListType {
     case product
-    case cliant
+    case client
     case vehicle
 }

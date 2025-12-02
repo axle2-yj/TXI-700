@@ -9,27 +9,46 @@ import SwiftUI
 import Foundation
 
 struct SaveButton: View {
+    let beforeSave: (() -> Void)?
     @Binding var loadAxleStatus: [LoadAxleStatus]
     var client: String
     var product: String
     var vehicle: String
+    var serialNumber: String
+    var equipmentNumber: String
+    var weightNum: String
+    var onSave: () -> Void
+    
+    @State private var isSaved: Bool = false
     
     var body: some View {
         Button("SAVE") {
+            beforeSave?()
             saveData()
-        }
+            isSaved = true
+        }.frame(maxWidth: .infinity)
         .padding()
+        .background(Color.gray.opacity(0.3))
+        .cornerRadius(6)
+        .foregroundColor(.black)
+        .disabled(isSaved)
+        .opacity(isSaved ? 0.4 : 1.0)
     }
     
-    private func saveData() {
+     private func saveData() {
+        onSave()
         for status in loadAxleStatus {
             LoadAxleDataManager.shared.addLoadAxle(
+                serialNumber: serialNumber,
+                equipmentNumber: equipmentNumber,
                 client: client,
                 product: product,
                 vehicle: vehicle,
+                weightNum: weightNum,
                 loadAxleStatus: status.loadAxlesData
             )
         }
+         print(loadAxleStatus)
         print("✅ All data saved")
     }
 }

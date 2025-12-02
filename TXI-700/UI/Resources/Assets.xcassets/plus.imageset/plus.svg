@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="_0" data-name="0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 68.03 68.03">
+  <defs>
+    <style>
+      .cls-1 {
+        stroke: #000;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: .71px;
+      }
+    </style>
+  </defs>
+  <g id="LWPOLYLINE">
+    <polygon class="cls-1" points="32.6 51.02 32.6 35.43 17.01 35.43 17.01 32.6 32.6 32.6 32.6 17.01 35.43 17.01 35.43 32.6 51.02 32.6 51.02 35.43 35.43 35.43 35.43 51.02 32.6 51.02"/>
+  </g>
+  <g id="LWPOLYLINE-2" data-name="LWPOLYLINE">
+    <polygon class="cls-1" points="32.24 55.28 32.24 35.79 12.76 35.79 12.76 32.24 32.24 32.24 32.24 12.76 35.79 12.76 35.79 32.24 55.28 32.24 55.28 35.79 35.79 35.79 35.79 55.28 32.24 55.28"/>
+  </g>
+</svg>

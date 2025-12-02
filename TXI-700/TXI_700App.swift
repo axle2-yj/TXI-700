@@ -10,13 +10,17 @@ import SwiftUI
 @main
 struct TXI_700App: App {
     @StateObject var bleManager = BluetoothManager()
+    @StateObject var languageManager = LanguageManager()
 
     var body: some Scene {
         WindowGroup {
             NavigationStack {
-                HomeScreen().environmentObject(bleManager).onAppear{
-                }
+                HomeScreen()
             }
+            .environmentObject(bleManager)
+            .environmentObject(languageManager)
+            .environment(\.locale, languageManager.locale)
+
         }
     }
 }

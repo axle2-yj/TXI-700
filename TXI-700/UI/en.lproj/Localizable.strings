@@ -6,21 +6,80 @@
   
 */
 
-"HomeScreenTitle" = "Home Screen";
-"MainScreenTitle" = "Main Screen";
-"VehicleScreenTitle" = "Vehicle Screen";
-"ProductScreenTitle" = "Product Screen";
-"ClientScreenTitle" = "Client Screen";
-"SettingsScreenTitle" = "Settings Screen";
-"SettingsDataScreenTitle" = "Settings Data Screen";
-"DataListScreenTitle" = "Data List Screen";
-"DataDetailsScreenTitle" = "Data Details Screen";
+"HomeScreenTitle" = "MULTI LOAD INDICATOR";
+"MainScreenTitle" = "Wheel Load Indicator";
+"VehicleScreenTitle" = "Vehicle Management";
+"ProductScreenTitle" = "Item Management";
+"ClientScreenTitle" = "Client Management";
+"SettingsScreenTitle" = "SETUP";
+"SettingsDataScreenTitle" = "Print Form Edit";
+"DataListScreenTitle" = "Data Management";
+"DataDetailsScreenTitle" = "Data Detial Management";
 
 "AuthorizationWarning" ="Bluetooth or location permissions are required.";
+"MoveSetting" = "Go to Settings";
 
 "Region" = "Region";
 "VehicleNum" = "Enter vehicle number";
 "WeightInput" = "weight Input";
 "None" = "None";
 "SelectRegion" = "Region Selection";
+
 "Close" = "Close";
+"Cancel" = "Cancel";
+"Confirmation" = "Confirmation";
+"Delete" = "Delete";
+"Print" = "Print";
+"Send" = "Send";
+
+"StartDate" = "Start Date";
+"EndDate" = "End Date";
+"SelectedPeriod" = "Select Period";
+
+"1stWeight" = "1st Weight";
+"NetWeight" = "Net Weight : ";
+"Lenguge" = "Lenguge";
+"English" = "English";
+"Japanese" = "Japane";
+"Korean" = "Korean";
+"ModeChange" = "Mode Change";
+"PrintForm" = "Print Form";
+"PrintHeadline" = "Print Headline";
+"ActivateButton" = "Activate Button";
+"WeightingMathod" = "Weighting Mathod";
+
+"Line" = "------------------------------";
+//"Line" = "= = = = = = = = = = = = = = =";
+"Vehicle" = "ABC-1234";
+
+"EmptyDelteData" = "There is no data to delete.";
+"IndexOutOfRange" = "The selected index is incorrect.";
+"Unknown" = "An unknown error has occurred.";
+"TodayNoDeleteData" = "There is no data for today that can be deleted.";
+"EmptyPrintData" = "There is no data to output.";
+"TodayNoPrintData" = "There is no printable data for today.";
+"EmptySendData" = "There is no data to send.";
+"TodayNoSendData" = "There is no data available for transmission today.";
+"WantDelete" = "Do you want to delete it?";
+"WantPrint" = "Would you like to print?";
+"WantSend" = "Would you like to send it?";
+
+"SuccessSelectedDelete" = "The selected data has been deleted.";
+"SuccessTodayDelete" = "Today's data has been deleted.";
+"SuccessAllDelete" = "All data has been deleted.";
+"SuccessSelectedPrint" = "The selected data has been output.";
+"SuccessTodayPrint" = "Today's data has been output.";
+"SuccessAllPrint" = "All data has been output.";
+"SuccessSelectedSend" = "The selected data has been sent.";
+"SuccessTodaySend" = "Today's data has been transmitted.";
+"SuccessAllSend" = "All data has been transmitted.";
+
+"error1" = "An error occurred while connecting to Axleload1.";
+"error2" = "An error occurred while connecting to Axleload2.";
+"error3" = "Load data cannot be less than zero.";
+"batteryError1" = "The Print function cannot be used when the battery level is 20% or lower.";
+
+"PrintOutputSetting" = "Print Output Setting";
+"One" = "1 page";
+"Two" = "2 page";
+"Three" = "3 page";

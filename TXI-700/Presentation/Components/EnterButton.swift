@@ -9,86 +9,89 @@ import SwiftUI
 import Foundation
 
 struct EnterButton: View {
+    @ObservedObject var viewModel: SettingViewModel
     @EnvironmentObject var bleManager: BluetoothManager
     @Binding var loadAxleStatus: [LoadAxleStatus]
     
     @State private var hasChanged: Bool = false
+    @State private var lastTotal: Int = 0  // Enter 누른 시점의 합 저장
+    @State private var everExceeded100: Bool = false  // ← 한 번이라도 100kg 이상 차이 발생
+    var onEnter: () -> Void
+    var onEnterMassege: () -> Void
+    let EnterByte: [UInt8] = [
+        0x42, 0x54, 0x45
+    ]
     
     var body: some View {
-        Button("ENTER") {
-            appendAxleData()
-            hasChanged = false
-        }
-        .disabled(!hasChanged)
-        .opacity(hasChanged ? 1.0 : 0.4)
-        .onChange(of: bleManager.loadAxel1) {
-            detectChange()
-        }
-        .onChange(of: bleManager.loadAxel2) {
-            detectChange()
-        }
-        .onChange(of: bleManager.loadAxel3) {
-            detectChange()
-        }
-        .onChange(of: bleManager.loadAxel4) {
-            detectChange()
+        VStack {
+            Button("ENTER") {
+                if (bleManager.leftLoadAxel1 ?? 0) < 0 || (bleManager.rightLoadAxel1 ?? 0) < 0 {
+                    onEnterMassege()
+                    return
+                }
+                print("Enter Send Result: \(bleManager.sendData(EnterByte))")
+                onEnter()
+            }.frame(maxWidth: .infinity)
+            .padding()
+            .background(Color.gray.opacity(0.3))
+            .cornerRadius(6)
+            .foregroundColor(.black)
+            .disabled(viewModel.modeName == "Auto Inmotion" || !hasChanged)
+            .opacity(viewModel.modeName == "Auto Inmotion" ? 0.4 :(hasChanged ? 1.0 : 0.4))
+            .onChange(of: bleManager.leftLoadAxel1) { _, _ in detectChange() }
+            .onChange(of: bleManager.rightLoadAxel1) { _, _ in detectChange() }
+        }.onReceive(bleManager.$isEnter) { newValue in
+            if newValue {
+                performEnterAction()
+                onEnter()
+            }
         }
     }
     
-    // MARK: - 데이터 추가
+    private func performEnterAction() {
+        appendAxleData()
+        hasChanged = false
+        // Enter 누른 시점 Left, right, Axle 임시 저장
+        lastTotal = (bleManager.leftLoadAxel1 ?? 0) + (bleManager.rightLoadAxel1 ?? 0)
+        everExceeded100 = false
+    }
+
     private func appendAxleData() {
         let currentAxles = [
-            bleManager.loadAxel1 ?? 0,
-            bleManager.loadAxel2 ?? 0,
-            bleManager.loadAxel3 ?? 0,
-            bleManager.loadAxel4 ?? 0
+            bleManager.leftLoadAxel1 ?? 0,
+            bleManager.rightLoadAxel1 ?? 0
         ]
         
-        if let last = loadAxleStatus.last, last.loadAxlesData.count < 4 {
-            // 마지막 항목에 이어서 저장
-            var updatedAxles = last.loadAxlesData
-            
-            // 4개까지 이어서 채움
+        if var last = loadAxleStatus.last {
             for axle in currentAxles {
-                if updatedAxles.count < 4 {
-                    updatedAxles.append(axle)
+                if last.loadAxlesData.count < 20 {
+                    last.loadAxlesData.append(axle)
                 }
             }
-            
-            let updated = LoadAxleStatus(
-                id: last.id,
-                loadAxlesData: updatedAxles,
-                total: updatedAxles.reduce(0, +)
-            )
-            
-            loadAxleStatus[loadAxleStatus.count - 1] = updated
+            last.total = last.loadAxlesData.reduce(0, +)
+            loadAxleStatus[loadAxleStatus.count - 1] = last
         } else {
-            // 새 항목 생성
             let newStatus = LoadAxleStatus(
-                id: loadAxleStatus.count + 1,
-                loadAxlesData: currentAxles.prefix(4).map { $0 }, // 최대 4개
-                total: currentAxles.prefix(4).reduce(0, +)
+                id: 1,
+                loadAxlesData: currentAxles,
+                total: currentAxles.reduce(0, +)
             )
             loadAxleStatus.append(newStatus)
         }
-        
-        // BLE 값 초기화
-        bleManager.loadAxel1 = 0
-        bleManager.loadAxel2 = 0
-        bleManager.loadAxel3 = 0
-        bleManager.loadAxel4 = 0
     }
 
-    
-    // MARK: - 변화 감지
     private func detectChange() {
-        let currentTotal = (bleManager.loadAxel1 ?? 0) + (bleManager.loadAxel2 ?? 0)
-        guard let last = loadAxleStatus.last else {
-            hasChanged = true
-            return
+        let currentTotal = (bleManager.leftLoadAxel1 ?? 0) + (bleManager.rightLoadAxel1 ?? 0)
+        let diff = abs(currentTotal - lastTotal)
+        
+        if diff >= 100 {
+                everExceeded100 = true
+            }
+        if currentTotal == 0 {
+                everExceeded100 = false
         }
-        if currentTotal != last.total {
-            hasChanged = true
-        }
+        hasChanged = everExceeded100
+
     }
 }
+

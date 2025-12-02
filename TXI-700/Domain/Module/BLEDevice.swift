@@ -9,7 +9,8 @@ import Foundation
 import CoreBluetooth
 
 struct BLEDevice: Identifiable {
-    let id: UUID
-    let name: String
-    let peripheral: CBPeripheral
+    var id: UUID
+    var mac: String { id.uuidString }
+    var name: String
+    var peripheral: CBPeripheral
 }

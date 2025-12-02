@@ -3,24 +3,82 @@
   TXI-700
 
   Created by 서용준 on 11/25/25.
-  
 */
 
-"HomeScreenTitle" = "Home Screen";
-"MainScreenTitle" = "Main Screen";
-"VehicleScreenTitle" = "Vehicle Screen";
-"ProductScreenTitle" = "Product Screen";
-"ClientScreenTitle" = "Client Screen";
-"SettingsScreenTitle" = "Settings Screen";
-"SettingsDataScreenTitle" = "Settings Data Screen";
-"DataListScreenTitle" = "Data List Screen";
-"DataDetailsScreenTitle" = "Data Details Screen";
+"HomeScreenTitle" = "MULTI LOAD INDICATOR";
+"MainScreenTitle" = "Wheel Load Indicator";
+"VehicleScreenTitle" = "Vehicle Management";
+"ProductScreenTitle" = "Item Management";
+"ClientScreenTitle" = "Client Management";
+"SettingsScreenTitle" = "SETUP";
+"SettingsDataScreenTitle" = "Print Form Edit";
+"DataListScreenTitle" = "Data Management";
+"DataDetailsScreenTitle" = "Data Detial Management";
 
 "AuthorizationWarning" ="블루투스 또는 위치 권한이 필요합니다.";
+"MoveSetting" = "설정으로 이동";
 
 "Region" = "지역";
 "VehicleNum" = "차량번호 입력";
 "WeightInput" = "무게 입력";
 "None" = "없음";
 "SelectRegion" = "지역 선택";
+
 "Close" = "닫기";
+"Cancel" = "취소";
+"Confirmation" = "확인";
+"Delete" = "삭제";
+"Print" = "프린트";
+"Send" = "전송";
+
+"StartDate" = "시작일";
+"EndDate" = "종료일";
+"SelectedPeriod" = "기간 선택";
+
+"1stWeight" = "1차 중량";
+"NetWeight" = "순중량 ";
+"Lenguge" = "언어";
+"English" = "영어";
+"Japanese" = "일본어";
+"Korean" = "한국어";
+"ModeChange" = "모드 변경";
+"PrintForm" = "프린트 양식";
+"PrintHeadline" = "프린트 헤드라인";
+"ActivateButton" = "버튼 활성화";
+"WeightingMathod" = "가중치 부여 방법";
+
+"Line" = "------------------------------";
+//"Line" = "= = = = = = = = = = = = = = =";
+"Vehicle" = "12가 3456";
+
+"EmptyDelteData" = "삭제할 데이터가 없습니다.";
+"IndexOutOfRange" = "선택한 인덱스가 잘못되었습니다.";
+"Unknown" = "알 수 없는 오류가 발생했습니다.";
+"TodayNoDeleteData" = "삭제 가능한 오늘 데이터가 없습니다.";
+"EmptyPrintData" = "출력할 데이터가 없습니다.";
+"TodayNoPrintData" = "프린트 가능한 오늘 데이터가 없습니다.";
+"EmptySendData" = "전송할 데이터가 없습니다.";
+"TodayNoSendData" = "전송 가능한 오늘 데이터가 없습니다.";
+"WantDelete" = "삭제 하시겠습니까?";
+"WantPrint" = "프린트 하시겠습니까?";
+"WantSend" = "전송 하시겠습니까?";
+
+"SuccessSelectedDelete" = "선택한 데이터가 삭제되었습니다.";
+"SuccessTodayDelete" = "오늘의 데이터가 삭제되었습니다.";
+"SuccessAllDelete" = "전체 데이터가 삭제되었습니다.";
+"SuccessSelectedPrint" = "선택한 데이터가 출력되었습니다.";
+"SuccessTodayPrint" = "오늘의 데이터가 출력되었습니다.";
+"SuccessAllPrint" = "전체 데이터가 출력되었습니다.";
+"SuccessSelectedSend" = "선택한 데이터가 전송되었습니다.";
+"SuccessTodaySend" = "오늘의 데이터가 전송되었습니다.";
+"SuccessAllSend" = "전체 데이터가 전송되었습니다.";
+"batteryError1" = "Indicator 배터리가 20%이하에서는 Print 기능을 사용할 수 없습니다.";
+
+"error1" = "Axisload1에 연결하는 동안 오류가 발생했습니다.";
+"error2" = "Axisload2에 연결하는 동안 오류가 발생했습니다.";
+"error3" = "하중 데이터가 0보다 작을 수 없습니다.";
+
+"PrintOutputSetting" = "Print 출력 설정";
+"One" = "1장";
+"Two" = "2장";
+"Three" = "3장";

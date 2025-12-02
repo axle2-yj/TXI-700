@@ -11,15 +11,19 @@ class ProductDataManager {
     static let shared = ProductDataManager()
     private let context = PersistenceController.shared.context
     
-    func addProduct(name: String) {
+    func addProduct(name: String, num: Int16) {
             let item = ProductInfo(context: context)
             item.id = UUID()
             item.name = name
+            item.num = num
             save()
         }
     
     func fetchAll() -> [ProductInfo] {
         let request: NSFetchRequest<ProductInfo> = ProductInfo.fetchRequest()
+        request.sortDescriptors = [
+                NSSortDescriptor(key: "num", ascending: true)
+            ]
         do {
             return try context.fetch(request)
         } catch {
@@ -30,8 +34,22 @@ class ProductDataManager {
     
     func save() {
         if context.hasChanges {
-            try? context.save()
+            do {
+                try context.save()
+            } catch {
+                print("Save error: \(error)")
+            }
         }
+    }
+    
+    func updateProduct(
+        item: ProductInfo,
+        name: String,
+        num: Int16
+    ) {
+        item.name = name
+        item.num = num
+        save()
     }
     
     func delete(item: ProductInfo) {

@@ -14,10 +14,12 @@ class VehicleViewModel: ObservableObject {
     @Published var text: String = NSLocalizedString("VehicleScreenTitle", comment: "")
     @Published var vehicle: String = ""
     @Published var weight: String = ""
+    @Published var num: Int16 = 0
     @Published var items: [String] = []
     @Published var selectedRegion: String = ""
     @Published var searchText: String = ""
-    let lang = Locale.current.language.languageCode?.identifier ?? "en"
+    @Published var selectedVehicle: VehicleInfo? = nil
+    var lang = Locale.current.language.languageCode?.identifier ?? "en"
 
     private let vehicleManger = VehicleDataManager.shared
 
@@ -29,19 +31,52 @@ class VehicleViewModel: ObservableObject {
         vehicleItems = vehicleManger.fetchAll()
     }
     
-    func addVehicleItem() {
-        let totalWeight = Int64(weight) ?? 0
-        let vehicleName = selectedRegion+vehicle.replacingOccurrences(of: " ", with: "")
-        
-        vehicleManger.addVehicle(vehicle: vehicleName, weight: totalWeight)
+    func saveOrUpdateVehicleItem() {
+        print(selectedRegion+vehicle.replacingOccurrences(of: " ", with: ""))
+        if let vehicleinfo = selectedVehicle {
+            vehicleManger.updateVehicle(
+                // UPDATE
+                item: vehicleinfo,
+                vehicle: selectedRegion+vehicle.replacingOccurrences(of: " ", with: ""),
+                weight: Int64(weight) ?? 0,
+                num: vehicleinfo.num)
+        } else {
+            // ADD
+            let nextNum = Int16(vehicleItems.count)
+            vehicleManger.addVehicle(vehicle: selectedRegion+vehicle.replacingOccurrences(of: " ", with: ""), weight: Int64(weight) ?? 0, num: nextNum)
+        }
         fetchVehicleItems()
-        vehicle = ""
-        weight = ""
+        clearSelection()
     }
     
     func deleteVehicleItem(item: VehicleInfo) {
         vehicleManger.delete(item: item)
         fetchVehicleItems()
+    }
+    
+    func moveVechile(from source: IndexSet, to destination: Int) {
+        vehicleItems.move(fromOffsets: source, toOffset: destination)
+        reorderNum()
+    }
+    
+    private func reorderNum() {
+        for index in vehicleItems.indices {
+            vehicleItems[index].num = Int16(index)
+        }
+        vehicleManger.save()
+    }
+    
+    func selectVehicle(_ vehicleInfo: VehicleInfo) {
+        self.selectedVehicle = vehicleInfo
+        self.vehicle = String(vehicleInfo.vehicle ?? "")
+        self.weight = String(vehicleInfo.weight)
+    }
+    
+    func clearSelection() {
+        selectedVehicle = nil
+        vehicle = ""
+        weight = ""
+        selectedRegion = ""
     }
     
     func loadRegions() -> [String] {
@@ -67,4 +102,8 @@ class VehicleViewModel: ObservableObject {
         items = loadRegions()
     }
     
+    func updateLanguage(_ lang: String) {
+        self.lang = lang
+        self.items = loadRegions()
+    }
 }
