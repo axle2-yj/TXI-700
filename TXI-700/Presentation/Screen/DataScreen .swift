@@ -8,57 +8,106 @@
 import SwiftUI
 
 struct DataScreen: View {
-    @State private var goToDetail = false
-    
     @StateObject var viewModel = DataViewModel()
+    @StateObject var datePickerViewModel = DatePickerViewModel()
     
-    // Timestamp Formatter
-        let timestampFormatter: DateFormatter = {
-            let f = DateFormatter()
-            f.dateFormat = "yyyy-MM-dd HH:mm"
-            return f
-        }()
+    @State private var goToDetail = false
+    @State private var selectedItem: LoadAxleInfo? = nil
+    @State private var selectedItemIndex : Int?
+    @State private var showFilterBar = true
+
+    @Environment(\.presentationMode) var presentationMode
+    @ObservedObject var printViewModel: PrintFormSettingViewModel
+
+    // 필터 적용 후 그룹화된 데이터
+    private var groupedItems: [String: [LoadAxleInfo]] {
+        Dictionary(grouping: viewModel.filteredItems) { item in
+            if let date = item.timestamp {
+                return viewModel.dateFormatter.string(from: date)
+            }
+            return "Unknown Date"
+        }
+    }
     
     var body: some View {
-        VStack {
-            Text("Data Screen")
-            Button("Data Detail Screen")
-            {
-                goToDetail = true
-            }.navigationDestination(isPresented: $goToDetail){
-                DataDetailScreen()
-            }
-            if viewModel.loadAxleItems.isEmpty {
-                            Text("No Data")
-                                .foregroundColor(.gray)
-                                .padding()
-                        } else {
-                            List(viewModel.loadAxleItems, id: \.self) { item in
-                                VStack(alignment: .leading) {
-                                    Text("Timestamp: \(item.timestamp.map { timestampFormatter.string(from: $0) } ?? "N/A")")
-                                    Text("Vehicle: \(item.vehicle ?? "N/A")")
-                                    Text("Client: \(item.client ?? "N/A")")
-                                    Text("Product: \(item.product ?? "N/A")")
-                                    
-                                    if let data = item.loadAxleData,
-                                       let loadAxles = try? JSONDecoder().decode([Int].self, from: data) {
-                                        Text("Load Axles1: \(loadAxles.indices.contains(0) ? String(loadAxles[0]) : "0"), " +
-                                             "\(loadAxles.indices.contains(1) ? String(loadAxles[1]) : "0")")
-                                        Text("Load Axles2: \(loadAxles.indices.contains(2) ? String(loadAxles[2]) : "0"), " +
-                                             "\(loadAxles.indices.contains(3) ? String(loadAxles[3]) : "0")")
-                                    }
+        VStack(spacing: 0) {
+            CustomTopBar(title: viewModel.title, onBack: {
+                presentationMode.wrappedValue.dismiss()
+            })
+            VStack {
+                if viewModel.filteredItems.isEmpty {
+                    Spacer()
+                    Text("No Data")
+                        .foregroundColor(.gray)
+                        .padding()
+                    Spacer()
+                } else {
+                    List {
+                        ForEach(groupedItems.keys.sorted(by: >), id: \.self) { dateKey in
+                            Section(header: Text(dateKey).font(.headline)) {
+                                ForEach(items(for: dateKey)) { item in
+                                    LoadAxleRow(item: item, timestampFormatter: viewModel.timeFormatter)
+                                        .onTapGesture {
+                                            selectedItem = item
+                                            selectedItemIndex = viewModel.filteredItems.firstIndex(of: item)
+                                            goToDetail = true
+                                        }
                                 }
-                                .padding(4)
                             }
                         }
-        }.padding()
+                    }
+                    .navigationDestination(isPresented: $goToDetail) {
+                        if let item = selectedItem,
+                           let index = selectedItemIndex{
+                            DataDetailScreen(currentIndex: index,
+                                             loadAxleItem: item,
+                                             viewModel: viewModel,
+                                             printViewModel: printViewModel)
+                        }
+                    }
+                    
+                    Spacer()
+                    
+                }
+                // Toggle 버튼
+                Button(action: { showFilterBar.toggle() }) {
+                    HStack {
+                        Image(systemName: showFilterBar ? "chevron.down" : "chevron.up")
+                    }
+                    .padding()
+                }
+                if showFilterBar {
+                    DataSerchBottomBar(viewModel: datePickerViewModel, dataViewModel: viewModel)
+                        .transition(.move(edge: .top).combined(with: .opacity))
+                        .animation(.easeInOut(duration: 0.3), value: showFilterBar)
+                }
+            }
+            .padding()
             .onAppear {
-            viewModel.fetchLoadAxleItems()
+                viewModel.fetchLoadAxleItems()
+            }
+        }.navigationBarBackButtonHidden(true)
+    }
+    
+    // 특정 날짜의 항목 정렬
+    private func items(for dateKey: String) -> [LoadAxleInfo] {
+        (groupedItems[dateKey] ?? []).sorted {
+            ($0.timestamp ?? Date.distantPast) > ($1.timestamp ?? Date.distantPast)
         }
     }
 }
 
-#Preview {
-    DataScreen()
+// LoadAxleRow를 안전하게 재사용하도록 수정
+struct LoadAxleRow: View {
+    let item: LoadAxleInfo
+    let timestampFormatter: DateFormatter
+    
+    var body: some View {
+        HStack {
+            Text("\(item.timestamp.map { timestampFormatter.string(from: $0) } ?? "N/A")")
+            Text("No : \(item.vehicle ?? "N/A")")
+            Text("\(item.product ?? "N/A")")
+        }
+        .padding(4)
+    }
 }
-

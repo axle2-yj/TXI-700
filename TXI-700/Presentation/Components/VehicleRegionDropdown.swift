@@ -8,10 +8,12 @@
 import SwiftUI
 
 struct VehicleRegionDropdown: View {
-    
-    @ObservedObject var viewModel: VehicleViewModel
     @State private var showSheet: Bool = false
+
+    @ObservedObject var viewModel: VehicleViewModel
     
+    @EnvironmentObject var languageManager: LanguageManager
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             
@@ -25,7 +27,7 @@ struct VehicleRegionDropdown: View {
                     }) {
                         HStack {
                             HStack {
-                                Text(viewModel.selectedRegion.isEmpty ? NSLocalizedString("Region", comment: "") : viewModel.selectedRegion)
+                                Text(viewModel.selectedRegion.isEmpty ? String("Region").localized(languageManager.selectedLanguage) : viewModel.selectedRegion)
                                     .foregroundColor(viewModel.selectedRegion.isEmpty ? .gray : .black)
                                 Spacer()
                                 Image(systemName: "chevron.down")
@@ -37,16 +39,14 @@ struct VehicleRegionDropdown: View {
                             .background(Color.gray.opacity(0.2))
                             .cornerRadius(6)
                             
-                            
                             // 차량번호 입력
-                            TextField(NSLocalizedString("VehicleNum", comment: ""), text: $viewModel.vehicle)
+                            TextField("VehicleNum", text: $viewModel.vehicle)
                                 .textFieldStyle(RoundedBorderTextFieldStyle())
                         }
                     }
                     
-                    
                     // 무게 입력
-                    TextField(NSLocalizedString("WeightInput", comment: ""), text: $viewModel.weight)
+                    TextField("WeightInput", text: $viewModel.weight)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .keyboardType(.numberPad)
                 }
@@ -54,6 +54,7 @@ struct VehicleRegionDropdown: View {
                 // 저장 버튼
                 Button("Save") {
                     viewModel.addVehicleItem()
+                    viewModel.selectedRegion = ""
                 }
                 .padding(.horizontal, 12)
                 .padding(.vertical, 8)
@@ -106,13 +107,20 @@ struct VehicleRegionDropdown: View {
                         }
                     }
                 }
-                .navigationTitle("\(NSLocalizedString("SelectRegion", comment: ""))")
+                .navigationTitle("SelectRegion")
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) {
-                        Button("\(NSLocalizedString("Close", comment: ""))") { showSheet = false }
+                        Button("Close") {
+                            showSheet = false
+                        }
                     }
                 }
             }
+        }.onChange(of: languageManager.selectedLanguage) { _, _ in
+            viewModel.updateLanguage(languageManager.selectedLanguage)
+        }
+        .onAppear {
+            viewModel.updateLanguage(languageManager.selectedLanguage)
         }
     }
 }

@@ -23,11 +23,6 @@ extension BluetoothManager: CBPeripheralDelegate {
             
             // 모든 서비스에서 characteristics 탐색
             peripheral.discoverCharacteristics(nil, for: service)
-            
-            // 배터리 서비스일 경우 배터리 레벨 characteristics 탐색
-            if service.uuid == targetServiceUUID {
-                peripheral.discoverCharacteristics([targetServiceUUID], for: service)
-            }
         }
     }
 
@@ -45,44 +40,27 @@ extension BluetoothManager: CBPeripheralDelegate {
                 peripheral.readValue(for: characteristic)
             }
             
-            if characteristic.properties.contains(.write) || characteristic.properties.contains(.writeWithoutResponse) {
-                print("Write characteristic found: \(characteristic.uuid)")
+            if characteristic.uuid == targetCharctersticUUID {
+                // FFF1 → Notify
+                print("Notify characteristic found: FFF1")
+                peripheral.setNotifyValue(true, for: characteristic)
+            }
+
+            if characteristic.uuid == targetCharcterstic2UUID {
+                // FFF2 → Write
+                print("Write characteristic found: FFF2")
                 self.targetCharacteristic = characteristic
             }
+            
             
             print("Characteristic found: \(characteristic.uuid)")
             
             if let error = error {
                     print("Data write failed: \(error.localizedDescription)")
-                } else {
-                    print("Data write succeeded for characteristic: \(characteristic.uuid)")
-                }
-            
-            switch characteristic.uuid {
-            case targetCharctersticUUID:
-                if let data = characteristic.value {
-                    let battery = Int(data.first ?? 0)
-                    DispatchQueue.main.async {
-                        self.loadAxle1BatteryLevel = battery
-                    }
-                }
-
-            case targetCharctersticUUID:
-                if let data = characteristic.value {
-                    let battery = Int(data.first ?? 0)
-                    DispatchQueue.main.async {
-                        self.loadAxle2BatteryLevel = battery
-                    }
-                }
-            case targetServiceUUID:
-                if let data = characteristic.value {
-                    let battery = Int(data.first ?? 0)
-                    DispatchQueue.main.async {
-                        self.indicatorBatteryLevel = battery
-                    }
-                }
-            default:
-                break
+            } else {
+                print("Data write succeeded for characteristic: \(characteristic.uuid)")
+                sendInitialModeCallCommand()
+                sendInitialSNCallCommand()
             }
         }
     }
@@ -91,32 +69,184 @@ extension BluetoothManager: CBPeripheralDelegate {
         if let error = error { print("Value update error: \(error)"); return }
         guard let data = characteristic.value else { return }
         let bytes = [UInt8](data)
-        guard bytes.count >= 9 else { return } // 최소 9바이트 이상이어야 함
 
+        parseBSNResponse(bytes)
+        
+        guard bytes.count >= 9 else { return } // 최소 9바이트 이상이어야 함
         // 4번째 바이트 기준으로 음수/양수 판단
-        let signByte = bytes[3]
-        let isNegative = (signByte == 26) // 26이면 음수, 18이면 양수
+        let signByte = bytes[5]
+        let isNegative = signByte == 32//(signByte == 24 || signByte == 26)
 
         // 끝 5자리 숫자 추출
-        let numericBytes = bytes[4...8]   // 48,48,48,56,48
+        let numericBytes = bytes[8...12]   // 48,48,48,56,48
         let numericString = numericBytes.compactMap { String(UnicodeScalar($0)) }.joined()
 
         if let number = Int(numericString) {
             let realValue = isNegative ? -number : number
             DispatchQueue.main.async {
-                self.receivedText = "\(realValue)"
-                self.loadAxel1 = realValue
-                self.loadAxel2 = realValue
+                switch bytes[2] {
+                case 1:
+                    self.leftLoadAxel1 = realValue
+                case 2:
+                    self.rightLoadAxel1 = realValue
+                case 3:
+                    self.leftLoadAxel2 = realValue
+                case 4:
+                    self.rightLoadAxel2 = realValue
+                default :
+                    break
+                }
             }
         }
         
         if characteristic.uuid == targetCharctersticUUID {
             if let value = characteristic.value {
-                    let battery = value.first ?? 0
+                    let battery = Int(data[7])
                     DispatchQueue.main.async {
-                        self.loadAxle1BatteryLevel = Int(battery)
+                        switch value[2] {
+                        case 1:
+                            self.loadAxle1BatteryLevel = battery
+                        case 2:
+                            self.loadAxle2BatteryLevel = battery
+                        case 3:
+                            self.loadAxle3BatteryLevel = battery
+                        case 4:
+                            self.loadAxle4BatteryLevel = battery
+                        default :
+                            break
+                        }
                     }
                 }
+        }
+    }
+    
+    func parseBSNResponse(_ bytes: [UInt8]) {
+        if bytes.count < 3 { return }
+        
+        if bytes.count >= 3,
+           bytes[0] == 0x42,   // 'B'
+           bytes[1] == 0x54,   // 'T'
+           bytes[2] == 0x45 {  // 'E'
+            isEnter = true
+            print("🔥 BTE result → ENTER" )
+        }
+        
+        if bytes.count >= 3,
+           bytes[0] == 0x42,   // 'B'
+           bytes[1] == 0x54,   // 'T'
+           bytes[2] == 0x53 {  // 'S'
+            
+            if isSum {
+                print("🔥 BTN result → PRINT")
+                isSum = false
+            } else {
+                print("🔥 BTN result → SUM")
+                isSum = true
+                isEnter = false
+            }
+            
+        }
+        
+        if bytes.count >= 3,
+           bytes[0] == 0x42,   // 'B'
+           bytes[1] == 0x53,   // 'S'
+           bytes[2] == 0x4E {  // 'N'
+            print("🔥 BSN result → S/N")
+            
+            // 예: String 변환
+//            let resultString = result.map { String(format: "%02X", $0) }.joined(separator: " ")
+//            DispatchQueue.main.async {
+//                print("🔥 BSN result →", resultString)
+//                self.bsnResult = resultString
+//            }
+        }
+        
+        if bytes.count >= 3,
+           bytes[0] == 0x57,   // 'W'
+           bytes[1] == 0x4D {  // 'M'
+            switch bytes[2] {
+            case 0x53:
+                print("🔥 WMS result → Static")                         // Mode Static
+                modeChangeResponse = true
+                modeChangeInt = 0
+            case 0x57:
+                print("🔥 WMS result → Inmotion")                       // Mode Inmotion
+                modeChangeResponse = true
+                modeChangeInt = 1
+            case 0x41:
+                print("🔥 WMS result → Auto Inmotion")                  // Mode Auto Inmotion
+                modeChangeResponse = true
+                modeChangeInt = 2
+            default:
+                break
+                
+            }
+        }
+        
+        if bytes.count >= 3,
+           bytes[0] == 0x53,
+            bytes[1] == 0x4E{
+            let result = bytes.dropFirst(2)
+            print("🔥 SN result → \(result)")                           // S/N 정보
+        }
+        
+        if bytes.count >= 3,
+           bytes[0] == 0x42,
+            bytes[1] == 0x41{
+            let result = bytes.dropFirst(2)
+            DispatchQueue.main.async {
+                self.indicatorBatteryLevel = Int(result.first ?? 0)     // Indecator 배터리 잔량
+            }
+        }
+        
+        if bytes.count >= 3,
+           bytes[0] == 0x50,
+            bytes[1] == 0x54{
+            switch bytes[2] {
+            case 0x53:
+                printResponse = "Print Send Success"
+                print("🔥 PTS result → Print Send Success")              // 프린터 수신완료
+            case 0x45:
+                printResponse = "Print Error(Communication)"
+                print("🔥 PTE result → Print Error(Communication)")      // 프린터 에러(통신 에러)
+            case 0x49:
+                printResponse = "Printers among"
+                print("🔥 PTI result → Printers among")                    // 프린터 중
+            case 0x50:
+                printResponse = "Print Error(No Paper))"
+                print("🔥 PTP result → Print Error(No Paper)")          // 프린터 에러(용지 없음)
+            case 0x43:
+                printResponse = "Print Success"
+                print("🔥 PTC result → Print Success")                  // 프린터 정상완료
+            default:
+                break
+            }
+        }
+        
+        
+        if bytes.count >= 3,
+           bytes[0] == 0x42,   // 'B'
+           bytes[1] == 0x54,   // 'T'
+           bytes[2] == 0x44 {  // 'D'
+            //            let result = bytes.dropFirst(3)
+            isDelete = true
+            print("🔥 BTD result → HadLine Title Delete")               // HeadLine Title 삭제
+
+            // 예: String 변환
+            //            let resultString = result.map { String(format: "%02X", $0) }.joined(separator: " ")
+            //            DispatchQueue.main.async {
+            //                print("🔥 BTM result →", resultString)
+            //                self.bsnResult = resultString  // SwiftUI 업데이트용
+            //            }
+        }
+        
+        if bytes.count >= 3,
+           bytes[0] == 0x42,   // 'B'
+           bytes[1] == 0x54,   // 'T'
+           bytes[2] == 0x48 {  // 'H'
+//            let result = bytes.dropFirst(3)
+            isDelete = false
+            print("🔥 BTH result → HadLine Title Success")               // HeadLine Title 저장 성공
         }
     }
 }

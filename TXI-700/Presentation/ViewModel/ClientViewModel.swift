@@ -1,5 +1,5 @@
 //
-//  CliantViewModel.swift
+//  ClientViewModel.swift
 //  TXI-700
 //
 //  Created by 서용준 on 11/24/25.
@@ -11,7 +11,7 @@ import Combine
 @MainActor
 class ClientViewModel: ObservableObject {
     @Published var clientItems: [ClientInfo] = []
-    @Published var text: String = NSLocalizedString("CliantScreenTitle", comment: "")
+    @Published var text: String = NSLocalizedString("ClientScreenTitle", comment: "")
     @Published var name: String = ""
     
     private let clientManger = ClientDataManager.shared

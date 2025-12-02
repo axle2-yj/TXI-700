@@ -12,32 +12,47 @@ import Combine
 @MainActor
 class MainViewModel: ObservableObject {
     @Published var text: String = NSLocalizedString("MainScreenTitle", comment: "")
-    
     @Published var savedMac: String? = nil
     @Published var saveProduct: String? = nil
-    @Published var saveCliant: String? = nil
-
-    func saveDeviceMac(_ mac: String) {
-        StorageManager.shared.saveMacAddress(mac)
-        // 저장 후 바로 로컬 변수에 반영
-        savedMac = mac
-    }
-
+    @Published var saveClient: String? = nil
+    private var batteryTimer: Timer?
+    // Mac Address 호출
     func loadDeviceMac() {
         savedMac = StorageManager.shared.loadMacAddress()
     }
     
+    // Mac Address  초기화
     func clearMac() {
         StorageManager.shared.clearMacAddress()
         savedMac = nil
     }
     
+    // Product명 호출
     func loadProduct() {
-        saveProduct = StorageManager.shared.loadProdoctTitle()
+        saveProduct = StorageManager.shared.loadProductTitle()
     }
     
+    // Client명 호출
     func loadClient() {
-        saveCliant = StorageManager.shared.loadClientTitle()
+        saveClient = StorageManager.shared.loadClientTitle()
     }
     
+    // Indicator 베터리 출력 30초 마다 호출
+    func startTimer(bleManager: BluetoothManager) {
+        batteryTimer?.invalidate()
+        batteryTimer = nil
+        
+        // 0.5초 후에 1회 실행
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            Task { @MainActor in
+                bleManager.sendInitialBatteryCheckCommand()
+            }
+        }
+        batteryTimer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { _ in
+               Task { @MainActor in
+                   bleManager.sendInitialBatteryCheckCommand()
+               }
+           }
+    }
 }
+

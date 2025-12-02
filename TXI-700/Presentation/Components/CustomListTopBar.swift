@@ -1,9 +1,12 @@
-//
-//  CustomTopBara.swift
-//  TXI-700
-//
-//  Created by 서용준 on 11/24/25.
-//
+/*
+ CustomTopBara.swift
+
+ TXI-700
+ 
+ - 이전 버튼, 타이틀, 추가 버튼 TopBar
+
+ Created by 서용준 on 11/24/25.
+*/
 
 import SwiftUI
 

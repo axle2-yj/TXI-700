@@ -17,7 +17,7 @@ class VehicleViewModel: ObservableObject {
     @Published var items: [String] = []
     @Published var selectedRegion: String = ""
     @Published var searchText: String = ""
-    let lang = Locale.current.language.languageCode?.identifier ?? "en"
+    var lang = Locale.current.language.languageCode?.identifier ?? "en"
 
     private let vehicleManger = VehicleDataManager.shared
 
@@ -67,4 +67,8 @@ class VehicleViewModel: ObservableObject {
         items = loadRegions()
     }
     
+    func updateLanguage(_ lang: String) {
+        self.lang = lang
+        self.items = loadRegions()
+    }
 }

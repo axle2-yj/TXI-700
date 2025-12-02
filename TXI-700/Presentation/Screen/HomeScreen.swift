@@ -12,13 +12,15 @@ struct HomeScreen: View {
     @State private var goToMain = false
     @State private var goToSetting = false
     @State private var bluetoothConnected = false
-    
+
     @StateObject var homeViewModel = HomeViewModel()
+    @StateObject var settingViewModel = SettingViewModel()
+    @StateObject var printViewModel = PrintFormSettingViewModel()
     
     @EnvironmentObject var bleManager: BluetoothManager
+    @EnvironmentObject var languageManager: LanguageManager
 
     var body: some View {
-
         ZStack {
             VStack(spacing: 20) {
                 Image(systemName: "globe")
@@ -26,10 +28,15 @@ struct HomeScreen: View {
                     .foregroundStyle(.tint)
                 
                 Text(homeViewModel.text)
-                BLEListView(bleManager: bleManager).frame(maxWidth: 400)
+                BLEListView(bleManager: bleManager,
+                            homeViewModel: homeViewModel,
+                            autoConnectEnabled: $homeViewModel.autoConnectEnabled,
+                            savedMAC: $homeViewModel.savedMAC
+                ).frame(maxWidth: 400)
                     .navigationDestination(isPresented: $bleManager.isConnected) {
                     MainScreen()
                         .environmentObject(bleManager)
+                        .environmentObject(languageManager)
                         .onAppear {
                             bluetoothConnected = true
                             goToMain = false
@@ -46,23 +53,44 @@ struct HomeScreen: View {
                         goToMain = false
                     }
                 }.navigationDestination(isPresented: $goToData) {
-                    DataScreen()
+                    DataScreen(printViewModel: printViewModel)
                 }.navigationDestination(isPresented: $goToMain) {
                     MainScreen().environmentObject(bleManager)
-                }
-                Button("Setting")
-                {
-                    goToSetting = true
-                }
+                }.frame(maxWidth: .infinity)
+                .padding()
+                .background(Color.gray.opacity(0.3))
+                .cornerRadius(6)
+                .foregroundColor(.black)
                 
-                Button("DisConnect")
-                {
-                    bluetoothConnected = false
-                    bleManager.disconnect()
-                }.navigationDestination(isPresented: $goToSetting) {
-                    SettingScreen()
+                if bluetoothConnected {
+                    Button("Setting")
+                    {
+                        goToSetting = true
+                    }.frame(maxWidth: .infinity)
+                    .environmentObject(languageManager)
+                    .padding()
+                    .background(Color.gray.opacity(0.3))
+                    .cornerRadius(6)
+                    .foregroundColor(.black)
+                    
+                    Button("DisConnect")
+                    {
+                        bluetoothConnected = false
+                        bleManager.disconnect()
+                    }.navigationDestination(isPresented: $goToSetting) {
+                        SettingScreen(viewModel: settingViewModel, printViewModel: printViewModel)
+                    }.frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.gray.opacity(0.3))
+                    .cornerRadius(6)
+                    .foregroundColor(.black)
                 }
             }.padding()
+                .onAppear{
+                    if homeViewModel.autoConnectEnabled {
+                        bleManager.savedMac = homeViewModel.savedMAC
+                    }
+                }
             
             if bleManager.isConnecting {
                 Color.black.opacity(0.4).ignoresSafeArea()
@@ -80,7 +108,18 @@ struct HomeScreen: View {
                 .background(Color.clear) // 투명 배경
                 .ignoresSafeArea()
             }
-        }.padding()// 상태 기반 Navigation
+        }.padding()
+        .onAppear {
+            homeViewModel.loadDeviceMac()
+            homeViewModel.loadAutoConnectState()
+            homeViewModel.setBleManager(bleManager)
+            if homeViewModel.autoConnectEnabled {
+                homeViewModel.startAutoConnect()
+            }
+        }
+        .onDisappear {
+            homeViewModel.stopAutoConnect()
+        }
     }
 }
 

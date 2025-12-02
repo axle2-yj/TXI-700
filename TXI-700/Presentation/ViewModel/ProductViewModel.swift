@@ -13,7 +13,7 @@ class ProductViewModel: ObservableObject {
     @Published var productItems: [ProductInfo] = []
     @Published var text: String = NSLocalizedString("ProductScreenTitle", comment: "")
     @Published var name: String = ""
-    
+
     private let productManger = ProductDataManager.shared
     
     func fetchProductItems() {
