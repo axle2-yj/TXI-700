@@ -35,6 +35,7 @@ class BluetoothManager: NSObject, ObservableObject {
     @Published var loadAxle3BatteryLevel: Int? = nil
     @Published var loadAxle4BatteryLevel: Int? = nil
     @Published var indicatorBatteryLevel: Int? = nil
+    @Published var inmotion: Int = 0
     
     @Published var savedMac: String? = nil
     @Published var autoConnectEnabled: Bool = false
@@ -57,6 +58,7 @@ class BluetoothManager: NSObject, ObservableObject {
     private var centralManager: CBCentralManager!
     private var locationManager: CLLocationManager!
     
+
     // MARK: - BLE Characteristic
     internal var targetCharacteristic: CBCharacteristic?
     

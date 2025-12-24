@@ -51,28 +51,11 @@ struct VehicleRegionDropdown: View {
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .keyboardType(.numberPad)
                 }
-                let vehicleNum: Int = {
-                    if let num = viewModel.selectedVehicle?.num {
-                        return Int(num)
-                    } else {
-                        return viewModel.vehicleItems.count
-                    }
-                }()
                 
                 // 저장 버튼
                 SaveOrUpdateButton(
                     text: viewModel.selectedVehicle == nil ? "Save" : "Update",
                     onButton:{
-                        let region = viewModel.selectedRegion
-                        let vehicle = viewModel.vehicle
-                        let type: BLEItemType = .vechicle
-                        
-                        let bytes = makePacket(
-                            type: type,
-                            num: vehicleNum + 1,
-                            name: region+vehicle
-                        )
-                        print("Vehicle save send : \(bleManager.sendData(bytes))")
                         viewModel.saveOrUpdateVehicleItem()
                     }
                 )

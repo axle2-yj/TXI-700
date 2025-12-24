@@ -67,27 +67,6 @@ struct DataScreen: View {
                     }
                                     
                 }
-                // MARK: - Bottom Bar
-                Spacer()
-                
-                VStack(spacing: 0) {
-                    // Toggle 버튼
-                    Button(action: { showFilterBar.toggle() }) {
-                        HStack {
-                            Image("return")
-                                .resizable()
-                                .frame(width: 30, height: 30)
-                                .rotationEffect(.degrees(showFilterBar ? 270 : 90))
-                                .animation(.easeInOut(duration: 0.2), value: showFilterBar)
-                        }
-                        .padding()
-                    }
-                    if showFilterBar {
-                        DataSerchBottomBar(viewModel: datePickerViewModel, dataViewModel: viewModel)
-                            .transition(.move(edge: .top).combined(with: .opacity))
-                            .animation(.easeInOut(duration: 0.3), value: showFilterBar)
-                    }
-                }
             }
             .padding()
             .onAppear {
@@ -99,6 +78,24 @@ struct DataScreen: View {
             CustomTopBar(title: viewModel.title, onBack: {
                 presentationMode.wrappedValue.dismiss()
             })
+        }.safeAreaInset(edge: .bottom) {
+            VStack {
+                // MARK: - Bottom Bar
+                Button(action: { showFilterBar.toggle() }) {
+                    HStack {
+                        Image("return")
+                            .resizable()
+                            .frame(width: 30, height: 30)
+                            .rotationEffect(.degrees(showFilterBar ? 270 : 90))
+                            .animation(.easeInOut(duration: 0.2), value: showFilterBar)
+                    }.frame(height: 30)
+                }
+                if showFilterBar {
+                    DataSerchBottomBar(viewModel: datePickerViewModel, dataViewModel: viewModel)
+                        .transition(.move(edge: .top).combined(with: .opacity))
+                        .animation(.easeInOut(duration: 0.3), value: showFilterBar)
+                }
+            }.padding(.horizontal, 15)
         }.navigationBarBackButtonHidden(true)
     }
     

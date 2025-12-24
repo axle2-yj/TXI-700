@@ -26,7 +26,7 @@ struct SaveButton: View {
             beforeSave?()
             saveData()
             isSaved = true
-        }.frame(maxWidth: .infinity)
+        }.frame(maxWidth: .infinity, maxHeight: 50)
         .padding()
         .background(Color.gray.opacity(0.3))
         .cornerRadius(6)

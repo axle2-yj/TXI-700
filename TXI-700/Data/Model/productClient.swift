@@ -49,7 +49,7 @@ func makePacket(
         print(num)
         let numByte = numTo2ByteAscii(num)
         let nameBytes = name.toAsciiBytes(maxLength: 10)
-        let packet = header + numByte + nameBytes + [0x0A]
+        let packet = header + nameBytes + [0x0A]
         print(packet)
         return packet
     } else {

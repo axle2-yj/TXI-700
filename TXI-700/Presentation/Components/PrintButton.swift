@@ -22,8 +22,6 @@ struct PrintButton: View {
     @ObservedObject var settingViewModel: SettingViewModel
 
     @Binding var printResponse: String
-//    @Binding var printTotal: Int
-//    @Binding var printingNumber: Int
     
     let lines: [String]
     var onPrint: () -> Void
@@ -33,19 +31,18 @@ struct PrintButton: View {
         VStack {
 
             Button("PRINT") {
-                guard bleManager.indicatorBatteryLevel ?? 0 > 2 else {
+                guard Int(bleManager.indicatorBatteryLevel ?? 0) > 2 else {
                     printAlert = true
                     return
                 }
                 printAlert = false
                 
                 if isMain {
-                    onPrint()
                     printMain()
                 } else {
                     startPrintWithCopies()
                 }
-            }.frame(maxWidth: .infinity)
+            }.frame(maxWidth: .infinity, maxHeight: 50)
                 .padding()
                 .background(
                     isMain
@@ -65,6 +62,9 @@ struct PrintButton: View {
         }.onReceive(bleManager.$printResponse){ newVelue in
             DispatchQueue.main.async {
                 printResponse = newVelue
+                if newVelue == "Print Send Success" {
+                    offPrint()
+                }
             }
         }.alert("", isPresented: $printAlert, actions: {
             Button("Confirmation", role: .cancel) {}
@@ -75,6 +75,7 @@ struct PrintButton: View {
     
     func printMain() {
         if settingViewModel.weightingMethod == 0 {
+            onPrint()
             print("Print Send Result: \(bleManager.sendData(printDataByte))")
         } else {
             startPrintWithCopies()
@@ -232,104 +233,6 @@ struct PrintButton: View {
             completion()
         }
     }
-    
-    //    func printNotIndicator() {
-    //        onPrint()
-    //        switch seletedType {
-    //            case 0:
-    //                // 현재 선택된 1건 (이미 lines로 내려온 상태)
-    //                printLineData(lines: lines)
-    //                print("case 0")
-    //            case 1:
-    //                // 오늘 데이터
-    //                print("case 1")
-    //                printLoadAxleInfos(infos: viewModel.todayLoadAxleItems)
-    //
-    //            case 2:
-    //                // 전체 데이터
-    //                print("case 2")
-    //                printLoadAxleInfos(infos: viewModel.loadAxleItems)
-    //            default:
-    //                offPrint()
-    //            }
-    //    }
-    //    func printLineData(lines: [String]) {
-    //        if lines.isEmpty {
-    //            offPrint()
-    //            return
-    //        }
-    //
-    //        let delay: Double = 0.6
-    //        let lastIndex = lines.count - 1
-    //
-    //        for (index, line) in lines.enumerated() {
-    //            DispatchQueue.main.asyncAfter(deadline: .now() + delay * Double(index)) {
-    //                var packet: [UInt8]
-    //
-    //                switch index {
-    //                case 0:
-    //                    packet = [0x57, 0x50, 0x53]   // W P S (START)
-    //                case lastIndex:
-    //                    packet = [0x57, 0x50, 0x54]   // W P T (END)
-    //                default:
-    //                    packet = [0x57, 0x50, 0x45]   // W P E (MIDDLE)
-    //                }
-    //
-    //                let ascii = Array(line.utf8)
-    //                packet.append(contentsOf: ascii)
-    //                packet.append(contentsOf: [0x0D, 0x0A])
-    //
-    //                print("Send[\(index)] after \(delay * Double(index))s → \(packet)")
-    //                print("Content Result: \(bleManager.sendData(packet))")
-    //            }
-    //        }
-    //        DispatchQueue.main.asyncAfter(
-    //            deadline: .now() + delay * Double(lines.count)
-    //        ) {
-    //            let endLinePacket: [UInt8] = [
-    //                0x57, 0x50, 0x54,   // W P T
-    //                0x0D, 0x0A          // ENTER
-    //            ]
-    //
-    //            print("Send[END-NEWLINE] after \(delay * Double(lines.count))s → \(endLinePacket)")
-    //            print("End Result: \(bleManager.sendData(endLinePacket))")
-    //            offPrint()
-    //        }
-    //    }
-    //    func printLoadAxleInfos(
-    //        infos: [LoadAxleInfo]
-    //    ) {
-    //        guard !infos.isEmpty else { return }
-    //
-    //        sendNext(index: 0, infos: infos)
-    //    }
-    //    private func sendNext(
-    //        index: Int,
-    //        infos: [LoadAxleInfo]
-    //    ) {
-    //        guard index < infos.count else {
-    //            print("✅ 전체 출력 완료")
-    //            offPrint()
-    //            return
-    //        }
-    //
-    //        let info = infos[index]
-    //
-    //        print("🖨 출력 중: \(index + 1) / \(infos.count)")
-    //        printTotal = infos.count
-    //        printingNumber = index + 1
-    //
-    //        let lines = PrintLineBuilder.buildLines(
-    //            info: info,
-    //            dataViewModel: viewModel,
-    //            printViewModel: printViewModel
-    //        )
-    //
-    //        sendLines(lines) {
-    //            // ⏭ 다음 LoadAxleInfo
-    //            self.sendNext(index: index + 1, infos: infos)
-    //        }
-    //    }
 }
 
 

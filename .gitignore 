@@ -1,0 +1,20 @@
+# ===== Xcode user-specific files =====
+xcuserdata/
+*.xcuserstate
+
+# ===== Derived data =====
+DerivedData/
+.build/
+
+# ===== Build products =====
+build/
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# ===== Swift Package Manager =====
+.swiftpm/
+
+# ===== macOS =====
+.DS_Store
+

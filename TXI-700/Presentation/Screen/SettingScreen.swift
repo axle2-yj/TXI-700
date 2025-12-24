@@ -209,6 +209,10 @@ extension SettingScreen {
         Button(action: {
             viewModel.weightToggleChanged(to: tag)
             viewModel.saveWeightingMethod(tag)
+            if tag == 0 {
+               optionProduct = true
+               optionClient = true
+            }
         }) {
             Text(title.localized(languageManager.selectedLanguage))
                 .frame(maxWidth: .infinity)

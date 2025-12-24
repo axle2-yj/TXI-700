@@ -74,28 +74,37 @@ extension BluetoothManager: CBPeripheralDelegate {
         parseResponse(bytes)
 //        print ("\(bytes)")
         guard bytes.count >= 9 else { return } // 최소 9바이트 이상이어야 함
+        
+        let sequence = bytes[3]
+
+           if sequence != 0 {
+            inmotion = Int(sequence)
+           }
+        
         // 4번째 바이트 기준으로 음수/양수 판단
         let signByte = bytes[5]
         let isNegative = signByte == 32//(signByte == 24 || signByte == 26)
-
         // 끝 5자리 숫자 추출
-        let numericBytes = bytes[8...12]   // 48,48,48,56,48
-        let numericString = numericBytes.compactMap { String(UnicodeScalar($0)) }.joined()
+//        print(bytes)
+        if bytes.count > 13 {
+            let numericBytes = bytes[8...12]   // 48,48,48,56,48
+            let numericString = numericBytes.compactMap { String(UnicodeScalar($0)) }.joined()
 
-        if let number = Int(numericString) {
-            let realValue = isNegative ? -number : number
-            DispatchQueue.main.async {
-                switch bytes[2] {
-                case 1:
-                    self.leftLoadAxel1 = realValue
-                case 2:
-                    self.rightLoadAxel1 = realValue
-                case 3:
-                    self.leftLoadAxel2 = realValue
-                case 4:
-                    self.rightLoadAxel2 = realValue
-                default :
-                    break
+            if let number = Int(numericString) {
+                let realValue = isNegative ? -number : number
+                DispatchQueue.main.async {
+                    switch bytes[2] {
+                    case 1:
+                        self.leftLoadAxel1 = realValue
+                    case 2:
+                        self.rightLoadAxel1 = realValue
+                    case 3:
+                        self.leftLoadAxel2 = realValue
+                    case 4:
+                        self.rightLoadAxel2 = realValue
+                    default :
+                        break
+                    }
                 }
             }
         }
@@ -328,9 +337,9 @@ extension BluetoothManager: CBPeripheralDelegate {
         }
         
         if bytes.count >= 3,
-           bytes[0] == 0x42,
-           bytes[1] == 0x54,
-           bytes[2] == 0x49 {
+           bytes[0] == 0x42,    // B
+           bytes[1] == 0x54,    // T
+           bytes[2] == 0x49 {   // I
             let result = bytes.dropFirst(3)
             //  String 변환
             let resultString = result.map { String(format: "%02X", $0) }.joined(separator: " ")
@@ -340,9 +349,9 @@ extension BluetoothManager: CBPeripheralDelegate {
         }
         
         if bytes.count >= 3,
-           bytes[0] == 0x42,
-           bytes[1] == 0x54,
-           bytes[2] == 0x41 {
+           bytes[0] == 0x42,    // B
+           bytes[1] == 0x54,    // T
+           bytes[2] == 0x41 {   // A
             let result = bytes.dropFirst(3)
             //  String 변환
             let resultString = result.map { String(format: "%02X", $0) }.joined(separator: " ")
@@ -352,9 +361,9 @@ extension BluetoothManager: CBPeripheralDelegate {
         }
         
         if bytes.count >= 3,
-           bytes[0] == 0x42,
-           bytes[1] == 0x54,
-           bytes[2] == 0x43 {
+           bytes[0] == 0x42,    // B
+           bytes[1] == 0x54,    // T
+           bytes[2] == 0x43 {   // C
             let result = bytes.dropFirst(3)
             //  String 변환
             let resultString = result.map { String(format: "%02X", $0) }.joined(separator: " ")

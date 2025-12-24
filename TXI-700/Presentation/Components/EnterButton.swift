@@ -31,7 +31,7 @@ struct EnterButton: View {
                 }
                 print("Enter Send Result: \(bleManager.sendData(EnterByte))")
                 onEnter()
-            }.frame(maxWidth: .infinity)
+            }.frame(maxWidth: .infinity, maxHeight: 50)
             .padding()
             .background(Color.gray.opacity(0.3))
             .cornerRadius(6)
@@ -40,6 +40,13 @@ struct EnterButton: View {
             .opacity(viewModel.modeName == "Auto Inmotion" ? 0.4 :(hasChanged ? 1.0 : 0.4))
             .onChange(of: bleManager.leftLoadAxel1) { _, _ in detectChange() }
             .onChange(of: bleManager.rightLoadAxel1) { _, _ in detectChange() }
+            .onReceive(bleManager.$inmotion) { newValue in
+                if newValue == 0 {
+                    return
+                }
+//                performEnterAction()
+//                onEnter()
+            }
         }.onReceive(bleManager.$isEnter) { newValue in
             if newValue {
                 performEnterAction()
@@ -79,19 +86,25 @@ struct EnterButton: View {
             loadAxleStatus.append(newStatus)
         }
     }
-
+    
     private func detectChange() {
-        let currentTotal = (bleManager.leftLoadAxel1 ?? 0) + (bleManager.rightLoadAxel1 ?? 0)
-        let diff = abs(currentTotal - lastTotal)
-        
-        if diff >= 100 {
-                everExceeded100 = true
-            }
-        if currentTotal == 0 {
-                everExceeded100 = false
-        }
-        hasChanged = everExceeded100
+        let currentTotal =
+            (bleManager.leftLoadAxel1 ?? 0) +
+            (bleManager.rightLoadAxel1 ?? 0)
 
+        let wasZero = lastTotal == 0
+        let isZero = currentTotal == 0
+        let isValidWeight = currentTotal > 100
+
+        if wasZero && !isZero {
+            hasChanged = true
+        }
+
+        if isZero {
+            hasChanged = false
+        }
+
+        lastTotal = currentTotal
     }
 }
 

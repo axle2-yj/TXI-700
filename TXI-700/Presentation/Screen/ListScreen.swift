@@ -97,9 +97,10 @@ struct ListScreen: View {
                                     .foregroundColor(.red)
                                 }
                     case .vehicle:
-                        VehicleRegionDropdown(viewModel: vehicleViewModel).onAppear {
-                            vehicleViewModel.loadItems()
-                        }
+                        VehicleRegionDropdown(viewModel: vehicleViewModel)
+                            .onAppear {
+                                vehicleViewModel.loadItems()
+                            }
                     }
                 }.padding(5)
             }
