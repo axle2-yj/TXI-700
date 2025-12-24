@@ -30,6 +30,8 @@
 "Delete" = "삭제";
 "Print" = "프린트";
 "Send" = "전송";
+"Save" = "저장";
+"Update" = "업데이트";
 
 "StartDate" = "시작일";
 "EndDate" = "종료일";
@@ -47,8 +49,8 @@
 "ActivateButton" = "버튼 활성화";
 "WeightingMathod" = "가중치 부여 방법";
 
-"Line" = "------------------------------";
-//"Line" = "= = = = = = = = = = = = = = =";
+//"Line" = "------------------------------";
+"Line" = "= = = = = = = = = = = = = = =";
 "Vehicle" = "12가 3456";
 
 "EmptyDelteData" = "삭제할 데이터가 없습니다.";
@@ -72,11 +74,14 @@
 "SuccessSelectedSend" = "선택한 데이터가 전송되었습니다.";
 "SuccessTodaySend" = "오늘의 데이터가 전송되었습니다.";
 "SuccessAllSend" = "전체 데이터가 전송되었습니다.";
-"batteryError1" = "Indicator 배터리가 20%이하에서는 Print 기능을 사용할 수 없습니다.";
 
 "error1" = "Axisload1에 연결하는 동안 오류가 발생했습니다.";
 "error2" = "Axisload2에 연결하는 동안 오류가 발생했습니다.";
 "error3" = "하중 데이터가 0보다 작을 수 없습니다.";
+"batteryError1" = "Indicator 배터리가 20%이하에서는 Print 기능을 사용할 수 없습니다.";
+"ProductError" = "상품명은 필수입니다.";
+"ClientError" = "고객명은 필수입니다.";
+"VehicleError" = "차량번호는 필수입니다.";
 
 "PrintOutputSetting" = "Print 출력 설정";
 "One" = "1장";

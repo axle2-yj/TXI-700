@@ -31,7 +31,9 @@ struct MainScreen: View {
     @State private var selectNum = 0
     @State private var enterError = ""
     @State private var isAlertShowing: Bool = false
-
+    @State private var vehicleNum = ""
+    @State private var saveValue = 0
+    
     @StateObject var productViewModel = ProductViewModel()
     @StateObject var clientViewModel = ClientViewModel()
     @StateObject var vehicleViewModel = VehicleViewModel()
@@ -53,9 +55,9 @@ struct MainScreen: View {
     
     var body: some View {
         ZStack {
-            VStack {
+            VStack(spacing: 3) {
                 ClockView(currentTime: $clockManager.currentTime)
-                VStack {
+                VStack(spacing: 3) {
                     if settingViewModel.weightingMethod == 3 {
                         VStack {
                             HStack {
@@ -118,7 +120,7 @@ struct MainScreen: View {
                         .font(.system(size: 25))
                         .padding(.vertical, 6)
                         .background(Color.gray.opacity(0.1))
-
+                        
                         ScrollView {
                             if !loadAxleStatus.isEmpty {
                                 ForEach(loadAxleStatus) { loadAxle in
@@ -148,6 +150,14 @@ struct MainScreen: View {
                             }
                         }
                     } else {
+                        WeightBalanceView(
+                                left1: CGFloat(bleManager.leftLoadAxel1 ?? 0),
+                                right1: CGFloat(bleManager.rightLoadAxel1 ?? 0),
+                                left2: CGFloat(bleManager.leftLoadAxel2 ?? 0),
+                                right2: CGFloat(bleManager.rightLoadAxel2 ?? 0)
+                        )
+                        .frame(height: 300)
+                        .padding()
                         
                     }
                 }.padding()
@@ -179,279 +189,311 @@ struct MainScreen: View {
                 
             }
             .safeAreaInset(edge: .bottom, alignment: .center) {
-                VStack {
-                    VStack {
-                        HStack {
-                            Text("S/N : \(mainViewModel.sn)")
-                            Spacer()
-                            Text("TOTAL : \(totalSumValue) kg")
-                        }.padding(.horizontal, 20)
-                        
-                        HStack {
-                            let weighting1stvalue = selectedVehicle?.weight == nil ? weighting1stData : 0
-                            if settingViewModel.weightingMethod == 2 {
-                                Text("1stWeight")
-                                    .lineLimit(1)
-                                    .truncationMode(.tail)
-                                Text(" : ")
-                                Text(String(weighting1stvalue))
-                                    .lineLimit(1)
-                                Text("kg")
+                VStack(spacing: 3){
+                    if settingViewModel.weightingMethod != 3 {
+                        VStack {
+                            HStack {
+                                Text("S/N : \(mainViewModel.sn)")
                                 Spacer()
-                                Text("NetWeight").lineLimit(1)
-                                    .truncationMode(.tail)
-                                Text(String(netWeightData)).lineLimit(1)
-                                Text("kg")
-                            }
-                        }.padding(.horizontal, 20)
-                    }
-                    
-                    HStack {
-                        Button("Car.no") {
-                            selectedListType = .vehicle
-                            goToList = true
-                        }.padding()
-                            .background(Color.gray.opacity(0.3))
-                            .cornerRadius(6)
-                            .foregroundColor(.black)
+                                Text("TOTAL : \(totalSumValue) kg")
+                            }.padding(.horizontal, 20)
+                                .font(Font.system(size: 25, weight: .bold, design: .default))
+                            
+                            HStack {
+                                let weighting1stvalue = selectedVehicle?.weight == nil ? weighting1stData : 0
+                                if settingViewModel.weightingMethod == 2 {
+                                    Text("1stWeight")
+                                        .lineLimit(1)
+                                        .truncationMode(.tail)
+                                    Text(" : ")
+                                    Text(String(weighting1stvalue))
+                                        .lineLimit(1)
+                                    Text("kg")
+                                    Spacer()
+                                    Text("NetWeight").lineLimit(1)
+                                        .truncationMode(.tail)
+                                    Text(String(netWeightData)).lineLimit(1)
+                                    Text("kg")
+                                }
+                            }.padding(.horizontal, 20)
+                                .font(Font.system(size: 25, weight: .bold, design: .default))
+                        }
                         
-                        TextField("Car Number", text: .constant("\(selectedVehicle?.vehicle ?? "")"))
-                            .textFieldStyle(.roundedBorder)
-                        
-                        Button(settingViewModel.weightingMethod != 2 ? "Send" : "1stWeight") {
-                            if settingViewModel.weightingMethod == 2 {
-                                let total = loadAxleStatus.reduce(0) { $0 + $1.total }
-                                loadAxleStatus[0].loadAxlesData = [total]
-                                twoStepLoadAxleStatus = loadAxleStatus
-                                weighting1stData = loadAxleStatus.reduce(0) { $0 + $1.total }
-                                isTwoStep = true
-                                isMainSum = false
-                                okButtonAction()
-                            } else {
-                                
-                            }
-                        }.padding()
-                            .background(Color.gray.opacity(0.3))
-                            .cornerRadius(6)
-                            .foregroundColor(.black)
-                            .disabled(!isMainSum || isTwoStep)
-                            .opacity(isMainSum ? 1.0 : 0.4)
-                        
-                    }
-                    
-                    HStack {
-                        if settingViewModel.checkedProduct {
-                            Button("\(selectedProduct?.name ?? mainViewModel.saveProduct ?? "ITEM <<")") {
-                                selectedListType = .product
+                        HStack {
+                            Button("Car.no") {
+                                selectedListType = .vehicle
                                 goToList = true
-                            }.frame(maxWidth: .infinity) // 화면 절반 차지
-                                .padding()
+                            }.padding()
                                 .background(Color.gray.opacity(0.3))
                                 .cornerRadius(6)
                                 .foregroundColor(.black)
+                            
+                            TextField("Car Number", text: $vehicleNum)
+                                .textFieldStyle(.roundedBorder)
+                                .onChange(of: selectedVehicle) { newValue, _ in
+                                    vehicleNum = newValue?.vehicle ?? ""
+                                }
+                            
+                            
+                            Button(settingViewModel.weightingMethod != 2 ? "Send" : "1stWeight") {
+                                if settingViewModel.weightingMethod == 2 {
+                                    let total = loadAxleStatus.reduce(0) { $0 + $1.total }
+                                    loadAxleStatus[0].loadAxlesData = [total]
+                                    twoStepLoadAxleStatus = loadAxleStatus
+                                    weighting1stData = loadAxleStatus.reduce(0) { $0 + $1.total }
+                                    isTwoStep = true
+                                    isMainSum = false
+                                    okButtonAction()
+                                } else if settingViewModel.weightingMethod == 0{
+                                    let type: BLEItemType = .vechicle
+                                    
+                                    let bytes = makePacket(
+                                        type: type,
+                                        num: 0,
+                                        name: vehicleNum
+                                    )
+                                    print("Vehicle save send : \(bleManager.sendData(bytes))")
+                                }
+                            }.padding()
+                                .background(Color.gray.opacity(0.3))
+                                .cornerRadius(6)
+                                .foregroundColor(.black)
+                                .disabled(
+                                    (!isMainSum &&
+                                     isTwoStep) ||
+                                    vehicleNum.isEmpty
+                                )
+                                .opacity(
+                                    (isMainSum && isTwoStep) || !vehicleNum.isEmpty
+                                    ? 1.0
+                                    : 0.4
+                                )
                         }
                         
-                        if settingViewModel.checkedClient {
-                            Button("\(selectedClient?.name ?? mainViewModel.saveClient ?? "CLIENT <<")") {
-                                selectedListType = .client
-                                goToList = true
+                        HStack {
+                            if settingViewModel.checkedProduct {
+                                Button("\(selectedProduct?.name ?? mainViewModel.saveProduct ?? "ITEM <<")") {
+                                    selectedListType = .product
+                                    goToList = true
+                                }.frame(maxWidth: .infinity) // 화면 절반 차지
+                                    .padding()
+                                    .background(Color.gray.opacity(0.3))
+                                    .cornerRadius(6)
+                                    .foregroundColor(.black)
+                            }
+                            
+                            if settingViewModel.checkedClient {
+                                Button("\(selectedClient?.name ?? mainViewModel.saveClient ?? "CLIENT <<")") {
+                                    selectedListType = .client
+                                    goToList = true
+                                }.frame(maxWidth: .infinity)
+                                    .padding()
+                                    .background(Color.gray.opacity(0.3))
+                                    .cornerRadius(6)
+                                    .foregroundColor(.black)
+                            }
+                        }
+                        
+                        HStack {
+                            ZeroButton()
+                            Button("DATA") {
+                                goToData = true
+                                bleManager.sendInitialSaveDataCommand()
                             }.frame(maxWidth: .infinity)
                                 .padding()
                                 .background(Color.gray.opacity(0.3))
                                 .cornerRadius(6)
                                 .foregroundColor(.black)
+                            if isMainSum {
+                                Button("CANCEL") {
+                                    okButtonAction()
+                                }.frame(maxWidth: .infinity)
+                                    .padding()
+                                    .background(Color.gray.opacity(0.3))
+                                    .cornerRadius(6)
+                                    .foregroundColor(.black)
+                            }
                         }
-                    }
-                    
-                    HStack {
-                        ZeroButton()
-                        if !isMainSum {
-                            let isSumEnabled = (loadAxleStatus.last?.loadAxlesData.indices.contains(1) ?? false) && (loadAxleStatus.last?.loadAxlesData[1] ?? 0) != 0
-                            EnterButton(
-                                viewModel: settingViewModel,
-                                loadAxleStatus: $loadAxleStatus,
-                                onEnter: {
-                                    let weighting1stvalue = selectedVehicle?.weight == nil ? weighting1stData : 0
-                                    if settingViewModel.weightingMethod == 2 {
-                                        totalSumValue = loadAxleStatus.reduce(0) { $0 + $1.total }
-                                        netWeightData = totalSumValue - weighting1stvalue
-                                    }
-                                },
-                                onEnterMassege: {
-                                    if !isAlertShowing {
-                                        isAlertShowing = true
-                                        activeAlert = .error("error3".localized(languageManager.selectedLanguage))
-                                    }
-                                }
-                            )
-                            if settingViewModel.weightingMethod == 2 {
-                                TwoStepSumButton(onSum: {
-                                    totalSumValue = loadAxleStatus.reduce(0) { $0 + $1.total }
-                                }).disabled(!isSumEnabled)
-                                    .opacity(isSumEnabled ? 1.0 : 0.4)
-                            } else {
-                                SumButton(onSum: {
-                                    totalSumValue = loadAxleStatus.reduce(0) { $0 + $1.total }
-                                }).disabled(!isSumEnabled)
-                                    .opacity(isSumEnabled ? 1.0 : 0.4)
-                            }
-                        } else {
-                            let weightingMethodInt = settingViewModel.weightingMethod
-                            let lines: [String] = if weightingMethodInt == 0 {
-                                []
-                            } else if weightingMethodInt == 2{
-                                PrintLineBuilder.buildThird(
-                                    weighting1st: weighting1stData,
-                                    weighting2nd: totalSumValue,
-                                    netWeight: netWeightData,
-                                    dataViewModel: dataViewModel,
-                                    printViewModel: printViewModel,
-                                    timeStamp: Date(),
-                                    item: selectedProduct?.name ?? mainViewModel.saveProduct ?? "N/A",
-                                    client : selectedClient?.name ?? mainViewModel.saveClient ?? "N/A",
-                                    vehicle : selectedVehicle?.vehicle ?? "N/A",
-                                    serialNumber: String(mainViewModel.sn),
-                                    selectedType: weightingMethodInt
-                                )
-                            } else {
-                                PrintLineBuilder.buildSecond(
-                                    loadAxleItem: loadAxleStatus,
-                                    dataViewModel: dataViewModel,
-                                    printViewModel: printViewModel,
-                                    timeStamp: Date(),
-                                    item: selectedProduct?.name ?? mainViewModel.saveProduct ?? "N/A",
-                                    client : selectedClient?.name ?? mainViewModel.saveClient ?? "N/A",
-                                    vehicle : selectedVehicle?.vehicle ?? "N/A",
-                                    serialNumber: String(mainViewModel.sn),
-                                    selectedType: weightingMethodInt
-                                )
-                            }
-                            
-                            PrintButton(
-                                isMain: true,
-                                seletedType: $selectNum,
-                                viewModel: dataViewModel,
-                                printViewModel: printViewModel,
-                                settingViewModel: settingViewModel,
-                                printResponse: $printResponse,
-                                lines: lines,
-                                onPrint: {
-                                    isPrinting = true
-                                },
-                                offPrint: {
-                                    if weightingMethodInt == 2 {
-                                        twoStepLoadAxleStatus[0].loadAxlesData.append(loadAxleStatus[0].total)
-                                        twoStepLoadAxleStatus[0].total = twoStepLoadAxleStatus[0].total + loadAxleStatus[0].total
-                                        print(twoStepLoadAxleStatus)
-                                        if !isSave {
-                                            LoadAxleSaveService.printSaveData(
-                                                serialNumber: String(mainViewModel.sn),
-                                                equipmentNumber: String(bleManager.equipmentNumber),
-                                                client: selectedClient?.name ?? mainViewModel.saveClient ?? "N/A",
-                                                product: selectedProduct?.name ?? mainViewModel.saveProduct ?? "N/A",
-                                                vehicle: selectedVehicle?.vehicle ?? "N/A",
-                                                weightNum: String(weightingMethodInt),
-                                                loadAxleStatus: twoStepLoadAxleStatus
-                                            ) {
-                                                isPrinting = false
-                                                netWeightData = 0
-                                                weighting1stData = 0
-                                                isTwoStep = false
-                                                printInitial()
-                                            }
-                                        } else {
-                                            isPrinting = false
-                                            netWeightData = 0
-                                            weighting1stData = 0
-                                            printInitial()
-                                        }
-                                        
-                                    } else {
-                                        if !isSave {
-                                            LoadAxleSaveService.printSaveData(
-                                                serialNumber: String(mainViewModel.sn),
-                                                equipmentNumber: String(bleManager.equipmentNumber),
-                                                client: selectedClient?.name ?? mainViewModel.saveClient ?? "N/A",
-                                                product: selectedProduct?.name ?? mainViewModel.saveProduct ?? "N/A",
-                                                vehicle: selectedVehicle?.vehicle ?? "N/A",
-                                                weightNum: String(weightingMethodInt),
-                                                loadAxleStatus: loadAxleStatus
-                                            ) {
-                                                isPrinting = false
-                                                netWeightData = 0
-                                                weighting1stData = 0
-                                                printInitial()
-                                            }
-                                        } else {
-                                            isPrinting = false
-                                            netWeightData = 0
-                                            weighting1stData = 0
-                                            printInitial()
-                                        }
-                                    }
-                                }
-                            )
-                            .disabled(isPrint)
-                            .opacity(isPrint ? 0.4 : 1.0)
-//                            .onChange(of: printResponse) {
-//                                print("main : \($0)")
-//                            }
-                            
-                            if settingViewModel.weightingMethod == 2 {
-                                SaveButton(
-                                    beforeSave: {
-                                        guard
-                                            !twoStepLoadAxleStatus.isEmpty,
-                                            !loadAxleStatus.isEmpty
-                                        else { return }
-                                        twoStepLoadAxleStatus[0].loadAxlesData.append(contentsOf: loadAxleStatus[0].loadAxlesData)
-                                        twoStepLoadAxleStatus[0].total = twoStepLoadAxleStatus[0].total + loadAxleStatus[0].total
-                                    },
-                                    loadAxleStatus: $twoStepLoadAxleStatus,
-                                    client: "\(selectedClient?.name ?? "N/A")",
-                                    product: "\(selectedProduct?.name ?? "N/A")",
-                                    vehicle: "\(selectedVehicle?.vehicle ?? "N/A")",
-                                    serialNumber : "\(mainViewModel.sn)",// 시리얼 넘버 비교 저장 필요
-                                    equipmentNumber : bleManager.equipmentNumber,       // 장치 고유번호 정식 번호 저장 필요
-                                    weightNum : String(settingViewModel.weightingMethod),
-                                    onSave: {
-                                        isTwoStep = false
-                                    }
-                                )
-                            } else {
-                                SaveButton(
-                                    beforeSave: {
-                                        print("beforSave")
-                                    },
+                        
+                        HStack {
+                            if !isMainSum {
+                                let isSumEnabled = (loadAxleStatus.last?.loadAxlesData.indices.contains(1) ?? false) && (loadAxleStatus.last?.loadAxlesData[1] ?? 0) != 0
+                                EnterButton(
+                                    viewModel: settingViewModel,
                                     loadAxleStatus: $loadAxleStatus,
-                                    client: "\(selectedClient?.name ?? "N/A")",
-                                    product: "\(selectedProduct?.name ?? "N/A")",
-                                    vehicle: "\(selectedVehicle?.vehicle ?? "N/A")",
-                                    serialNumber : "\(mainViewModel.sn)",          // 시리얼 넘버 비교 저장 필요
-                                    equipmentNumber : bleManager.equipmentNumber,       // 장치 고유번호 정식 번호 저장 필요
-                                    weightNum : String(settingViewModel.weightingMethod),
-                                    onSave: {}
+                                    onEnter: {
+                                        let weighting1stvalue = selectedVehicle?.weight == nil ? weighting1stData : 0
+                                        if settingViewModel.weightingMethod == 2 {
+                                            totalSumValue = loadAxleStatus.reduce(0) { $0 + $1.total }
+                                            netWeightData = totalSumValue - weighting1stvalue
+                                        }
+                                    },
+                                    onEnterMassege: {
+                                        if !isAlertShowing {
+                                            isAlertShowing = true
+                                            activeAlert = .error("error3".localized(languageManager.selectedLanguage))
+                                        }
+                                    }
                                 )
+                                if settingViewModel.weightingMethod == 2 {
+                                    TwoStepSumButton(onSum: {
+                                        totalSumValue = loadAxleStatus.reduce(0) { $0 + $1.total }
+                                    }).disabled(!isSumEnabled)
+                                        .opacity(isSumEnabled ? 1.0 : 0.4)
+                                } else {
+                                    SumButton(onSum: {
+                                        totalSumValue = loadAxleStatus.reduce(0) { $0 + $1.total }
+                                    }).disabled(!isSumEnabled)
+                                        .opacity(isSumEnabled ? 1.0 : 0.4)
+                                }
+                            } else {
+                                let weightingMethodInt = settingViewModel.weightingMethod
+                                let lines: [String] = if weightingMethodInt == 0 {
+                                    []
+                                } else if weightingMethodInt == 2{
+                                    PrintLineBuilder.buildThird(
+                                        weighting1st: weighting1stData,
+                                        weighting2nd: totalSumValue,
+                                        netWeight: netWeightData,
+                                        dataViewModel: dataViewModel,
+                                        printViewModel: printViewModel,
+                                        timeStamp: Date(),
+                                        item: selectedProduct?.name ?? mainViewModel.saveProduct ?? "N/A",
+                                        client : selectedClient?.name ?? mainViewModel.saveClient ?? "N/A",
+                                        vehicle : selectedVehicle?.vehicle ?? "N/A",
+                                        serialNumber: String(mainViewModel.sn),
+                                        selectedType: weightingMethodInt
+                                    )
+                                } else {
+                                    PrintLineBuilder.buildSecond(
+                                        loadAxleItem: loadAxleStatus,
+                                        dataViewModel: dataViewModel,
+                                        printViewModel: printViewModel,
+                                        timeStamp: Date(),
+                                        item: selectedProduct?.name ?? mainViewModel.saveProduct ?? "N/A",
+                                        client : selectedClient?.name ?? mainViewModel.saveClient ?? "N/A",
+                                        vehicle : selectedVehicle?.vehicle ?? "N/A",
+                                        serialNumber: String(mainViewModel.sn),
+                                        selectedType: weightingMethodInt
+                                    )
+                                }
+                                
+                                PrintButton(
+                                    isMain: true,
+                                    seletedType: $selectNum,
+                                    viewModel: dataViewModel,
+                                    printViewModel: printViewModel,
+                                    settingViewModel: settingViewModel,
+                                    printResponse: $printResponse,
+                                    lines: lines,
+                                    onPrint: {
+                                        isPrinting = true
+                                        if weightingMethodInt != 0 {
+                                            let type: BLEItemType = .vechicle
+                                            
+                                            let bytes = makePacket(
+                                                type: type,
+                                                num: 0,
+                                                name: vehicleNum
+                                            )
+                                            print("Vehicle save send : \(bleManager.sendData(bytes))")
+                                        }
+                                    },
+                                    offPrint: {
+                                        if weightingMethodInt == 2 {
+                                            twoStepLoadAxleStatus[0].loadAxlesData.append(loadAxleStatus[0].total)
+                                            twoStepLoadAxleStatus[0].total = twoStepLoadAxleStatus[0].total + loadAxleStatus[0].total
+                                            print(twoStepLoadAxleStatus)
+                                            if !isSave {
+                                                LoadAxleSaveService.printSaveData(
+                                                    serialNumber: String(mainViewModel.sn),
+                                                    equipmentNumber: String(bleManager.equipmentNumber),
+                                                    client: selectedClient?.name ?? mainViewModel.saveClient ?? "N/A",
+                                                    product: selectedProduct?.name ?? mainViewModel.saveProduct ?? "N/A",
+                                                    vehicle: selectedVehicle?.vehicle ?? "N/A",
+                                                    weightNum: String(weightingMethodInt),
+                                                    loadAxleStatus: twoStepLoadAxleStatus
+                                                ) {
+                                                    isPrinting = false
+                                                    netWeightData = 0
+                                                    weighting1stData = 0
+                                                    isTwoStep = false
+                                                    printInitial()
+                                                }
+                                            } else {
+                                                isPrinting = false
+                                                netWeightData = 0
+                                                weighting1stData = 0
+                                                printInitial()
+                                            }
+                                            
+                                        } else {
+                                            if !isSave {
+                                                print("print save 실행")
+                                                LoadAxleSaveService.printSaveData(
+                                                    serialNumber: String(mainViewModel.sn),
+                                                    equipmentNumber: String(bleManager.equipmentNumber),
+                                                    client: selectedClient?.name ?? mainViewModel.saveClient ?? "N/A",
+                                                    product: selectedProduct?.name ?? mainViewModel.saveProduct ?? "N/A",
+                                                    vehicle: selectedVehicle?.vehicle ?? "N/A",
+                                                    weightNum: String(weightingMethodInt),
+                                                    loadAxleStatus: loadAxleStatus
+                                                ) {
+                                                    isPrinting = false
+                                                    netWeightData = 0
+                                                    weighting1stData = 0
+                                                    printInitial()
+                                                }
+                                            } else {
+                                                print("print save 미실행")
+                                                isPrinting = false
+                                                netWeightData = 0
+                                                weighting1stData = 0
+                                                printInitial()
+                                            }
+                                        }
+                                    }
+                                )
+                                .disabled(isPrint)
+                                .opacity(isPrint ? 0.4 : 1.0)
+                                
+                                if settingViewModel.weightingMethod == 2 {
+                                    SaveButton(
+                                        beforeSave: {
+                                            guard
+                                                !twoStepLoadAxleStatus.isEmpty,
+                                                !loadAxleStatus.isEmpty
+                                            else { return }
+                                            twoStepLoadAxleStatus[0].loadAxlesData.append(contentsOf: loadAxleStatus[0].loadAxlesData)
+                                            twoStepLoadAxleStatus[0].total = twoStepLoadAxleStatus[0].total + loadAxleStatus[0].total
+                                        },
+                                        loadAxleStatus: $twoStepLoadAxleStatus,
+                                        client: "\(selectedClient?.name ?? "N/A")",
+                                        product: "\(selectedProduct?.name ?? "N/A")",
+                                        vehicle: "\(selectedVehicle?.vehicle ?? "N/A")",
+                                        serialNumber : "\(mainViewModel.sn)",               // 시리얼 넘버 비교 저장 필요
+                                        equipmentNumber : bleManager.equipmentNumber,       // 추후 진짜 장치 고유번호 정식 번호 저장 필요
+                                        weightNum : String(settingViewModel.weightingMethod),
+                                        onSave: {
+                                            isTwoStep = false
+                                        }
+                                    )
+                                } else {
+                                    SaveButton(
+                                        beforeSave: {
+                                            print("beforSave")
+                                        },
+                                        loadAxleStatus: $loadAxleStatus,
+                                        client: "\(selectedClient?.name ?? "N/A")",
+                                        product: "\(selectedProduct?.name ?? "N/A")",
+                                        vehicle: "\(selectedVehicle?.vehicle ?? "N/A")",
+                                        serialNumber : "\(mainViewModel.sn)",               // 시리얼 넘버 비교 저장 필요
+                                        equipmentNumber : bleManager.equipmentNumber,       // 추후 진짜 장치 고유번호 정식 번호 저장 필요
+                                        weightNum : String(settingViewModel.weightingMethod),
+                                        onSave: {}
+                                    )
+                                }
                             }
-                        }
-                    }
-                    
-                    HStack {
-                        Button("DATA") {
-                            goToData = true
-                        }.frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.gray.opacity(0.3))
-                            .cornerRadius(6)
-                            .foregroundColor(.black)
-                        if isMainSum {
-                            Button("CANCEL") {
-                                okButtonAction()
-                            }.frame(maxWidth: .infinity)
-                                .padding()
-                                .background(Color.gray.opacity(0.3))
-                                .cornerRadius(6)
-                                .foregroundColor(.black)
                         }
                     }
                 }
@@ -485,30 +527,32 @@ struct MainScreen: View {
                             activeAlert = nil
                             netWeightData = 0
                             weighting1stData = 0
+                            vehicleNum.removeAll()
+                            printInitial()
                         }
                     )
                 )
             }.onDisappear {
-                //                selectedProduct = nil
-                //                selectedClient = nil
-                //                selectedVehicle = nil
-                //                loadAxleStatus = []
-                //                twoStepLoadAxleStatus = []
-                //                totalSumValue = 0
-                //                isMainSum = false
-                //                isTwoStep = false
-                //                isPrint = false
-                //                isSave = false
-                //                printResponse = ""
-                //                selectedListType = nil
                 activeAlert = nil
                 isAlertShowing = false
-                //                isPrinting = false
-                //                weighting1stData = 0
-                //                netWeightData = 0
-                //                vehicleNumber = ""
-                //                selectNum = 0
-                //                enterError = ""
+//                selectedProduct = nil
+//                selectedClient = nil
+//                selectedVehicle = nil
+//                loadAxleStatus = []
+//                twoStepLoadAxleStatus = []
+//                totalSumValue = 0
+//                isMainSum = false
+//                isTwoStep = false
+//                isPrint = false
+//                isSave = false
+//                printResponse = ""
+//                selectedListType = nil
+//                isPrinting = false
+//                weighting1stData = 0
+//                netWeightData = 0
+//                vehicleNumber = ""
+//                selectNum = 0
+//                enterError = ""
             }.onReceive(bleManager.$printResponse) { newValue in
                 guard !newValue.isEmpty else { return }
                 if !isAlertShowing {
@@ -538,13 +582,22 @@ struct MainScreen: View {
                 guard newSn > 0 else { return }
                 mainViewModel.saveSn(newSn)
                 mainViewModel.loadSn()
+            }.onReceive(bleManager.$inmotion) { newValue in
+                guard newValue != 0, saveValue != newValue , newValue != 49 else { return }
+                saveValue = newValue
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    mainViewModel.handleInmotion(
+                        loadAxleStatus: &loadAxleStatus,
+                        left: bleManager.leftLoadAxel1 ?? 0,
+                        right: bleManager.rightLoadAxel1 ?? 0
+                    )
+                }
             }
             
             if isPrinting {
                 Color.black.opacity(0.3)
                     .ignoresSafeArea()
                     .allowsHitTesting(true)
-                
                 VStack(spacing: 12) {
                     ProgressView()
                         .scaleEffect(1.3)
@@ -570,6 +623,7 @@ struct MainScreen: View {
         isMainSum = false
         isPrint = false
         totalSumValue = 0
+        saveValue = 0
         bleManager.sendCancelCommand()
     }
     
@@ -579,6 +633,7 @@ struct MainScreen: View {
         isMainSum = false
         isPrint = false
         totalSumValue = 0
+        saveValue = 0
     }
 }
 

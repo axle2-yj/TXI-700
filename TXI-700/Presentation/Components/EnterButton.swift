@@ -15,7 +15,6 @@ struct EnterButton: View {
     
     @State private var hasChanged: Bool = false
     @State private var lastTotal: Int = 0  // Enter 누른 시점의 합 저장
-    @State private var everExceeded100: Bool = false  // ← 한 번이라도 100kg 이상 차이 발생
     var onEnter: () -> Void
     var onEnterMassege: () -> Void
     let EnterByte: [UInt8] = [
@@ -31,7 +30,7 @@ struct EnterButton: View {
                 }
                 print("Enter Send Result: \(bleManager.sendData(EnterByte))")
                 onEnter()
-            }.frame(maxWidth: .infinity)
+            }.frame(maxWidth: .infinity, maxHeight: 50)
             .padding()
             .background(Color.gray.opacity(0.3))
             .cornerRadius(6)
@@ -53,7 +52,6 @@ struct EnterButton: View {
         hasChanged = false
         // Enter 누른 시점 Left, right, Axle 임시 저장
         lastTotal = (bleManager.leftLoadAxel1 ?? 0) + (bleManager.rightLoadAxel1 ?? 0)
-        everExceeded100 = false
     }
 
     private func appendAxleData() {
@@ -79,19 +77,24 @@ struct EnterButton: View {
             loadAxleStatus.append(newStatus)
         }
     }
-
+    
     private func detectChange() {
-        let currentTotal = (bleManager.leftLoadAxel1 ?? 0) + (bleManager.rightLoadAxel1 ?? 0)
-        let diff = abs(currentTotal - lastTotal)
-        
-        if diff >= 100 {
-                everExceeded100 = true
-            }
-        if currentTotal == 0 {
-                everExceeded100 = false
-        }
-        hasChanged = everExceeded100
+        let currentTotal =
+            (bleManager.leftLoadAxel1 ?? 0) +
+            (bleManager.rightLoadAxel1 ?? 0)
 
+        let wasZero = lastTotal == 0
+        let isZero = currentTotal == 0
+
+        if wasZero && !isZero {
+            hasChanged = true
+        }
+
+        if isZero {
+            hasChanged = false
+        }
+
+        lastTotal = currentTotal
     }
 }
 

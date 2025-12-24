@@ -17,7 +17,10 @@ struct PrintLineBuilder {
     ) -> [String] {
 
         var lines: [String] = []
-
+        
+        lines.append("  ")
+        lines.append("  ")
+        
         if printViewModel.isOn(0) { lines.append(String(localized: "Line")) }
         if printViewModel.isOn(1) { lines.append(printViewModel.printHeadLineText ?? "Print Head Line") }
         if printViewModel.isOn(2) { lines.append(String(localized: "Line")) }
@@ -113,8 +116,7 @@ struct PrintLineBuilder {
         
         if printViewModel.isOn(15) { lines.append(String(localized: "Line")) }
         if printViewModel.isOn(16) { lines.append("Inspector :     \(inspector)") }
-        if printViewModel.isOn(17) { lines.append("Driver :           ____________") }
-        lines.append("  ")
+        if printViewModel.isOn(17) { lines.append("Driver :        ____________") }
         lines.append("  ")
         lines.append("  ")
 
@@ -135,7 +137,10 @@ struct PrintLineBuilder {
     -> [String] {
 
         var lines: [String] = []
-
+        
+        lines.append("  ")
+        lines.append("  ")
+        
         if printViewModel.isOn(0) { lines.append(String(localized: "Line")) }
         if printViewModel.isOn(1) { lines.append(printViewModel.printHeadLineText ?? "Print Head Line") }
         if printViewModel.isOn(2) { lines.append(String(localized: "Line")) }
@@ -232,8 +237,7 @@ struct PrintLineBuilder {
             : "____________"
         if printViewModel.isOn(15) { lines.append(String(localized: "Line")) }
         if printViewModel.isOn(16) { lines.append("Inspector :     \(inspector)") }
-        if printViewModel.isOn(17) { lines.append("Driver :         ____________") }
-        lines.append("  ")
+        if printViewModel.isOn(17) { lines.append("Driver :        ____________") }
         lines.append("  ")
         lines.append("  ")
         
@@ -256,7 +260,10 @@ struct PrintLineBuilder {
     -> [String] {
 
         var lines: [String] = []
-
+        
+        lines.append("  ")
+        lines.append("  ")
+        
         if printViewModel.isOn(0) { lines.append(String(localized: "Line")) }
         if printViewModel.isOn(1) { lines.append(printViewModel.printHeadLineText ?? "Print Head Line") }
         if printViewModel.isOn(2) { lines.append(String(localized: "Line")) }
@@ -309,8 +316,7 @@ struct PrintLineBuilder {
             : "____________"
         if printViewModel.isOn(15) { lines.append(String(localized: "Line")) }
         if printViewModel.isOn(16) { lines.append("Inspector :     \(inspector)") }
-        if printViewModel.isOn(17) { lines.append("Driver :         ____________") }
-        lines.append("  ")
+        if printViewModel.isOn(17) { lines.append("Driver :        ____________") }
         lines.append("  ")
         lines.append("  ")
         
@@ -324,7 +330,9 @@ struct PrintLineBuilder {
     ) -> [String] {
 
         var lines: [String] = []
-
+        
+        lines.append("  ")
+        lines.append("  ")
         if printViewModel.isOn(0) { lines.append(String(localized: "Line")) }
         if printViewModel.isOn(1) { lines.append(printViewModel.printHeadLineText ?? "Print Head Line") }
         if printViewModel.isOn(2) { lines.append(String(localized: "Line")) }
@@ -385,8 +393,7 @@ struct PrintLineBuilder {
         
         if printViewModel.isOn(15) { lines.append(String(localized: "Line")) }
         if printViewModel.isOn(16) { lines.append("Inspector :     \(inspector)") }
-        if printViewModel.isOn(17) { lines.append("Driver :           ____________") }
-        lines.append("  ")
+        if printViewModel.isOn(17) { lines.append("Driver :         ____________") }
         lines.append("  ")
         lines.append("  ")
 
@@ -408,7 +415,9 @@ struct PrintLineBuilder {
 
             // 🔔 진행률 알림
             onProgress(index + 1, totalCount)
-
+            
+            lines.append("  ")
+            lines.append("  ")
             if printViewModel.isOn(0) { lines.append(String(localized: "Line")) }
             if printViewModel.isOn(1) { lines.append(printViewModel.printHeadLineText ?? "Print Head Line") }
             if printViewModel.isOn(2) { lines.append(String(localized: "Line")) }
@@ -520,8 +529,7 @@ struct PrintLineBuilder {
             
             if printViewModel.isOn(15) { lines.append(String(localized: "Line")) }
             if printViewModel.isOn(16) { lines.append("Inspector :     \(inspector)") }
-            if printViewModel.isOn(17) { lines.append("Driver :           ____________") }
-            lines.append("  ")
+            if printViewModel.isOn(17) { lines.append("Driver :      ____________") }
             lines.append("  ")
             lines.append("  ")
         }
@@ -547,7 +555,8 @@ struct PrintLineBuilder {
     ) -> [String] {
 
         var lines: [String] = []
-
+        lines.append("  ")
+        lines.append("  ")
         if printViewModel.isOn(0) { lines.append(String(localized: "Line")) }
         if printViewModel.isOn(1) { lines.append(printViewModel.printHeadLineText ?? "") }
         if printViewModel.isOn(2) { lines.append(String(localized: "Line")) }
@@ -649,7 +658,6 @@ struct PrintLineBuilder {
         if printViewModel.isOn(15) { lines.append(String(localized: "Line")) }
         if printViewModel.isOn(16) { lines.append("Inspector :     \(inspector)") }
         if printViewModel.isOn(17) { lines.append("Driver :         ____________") }
-        lines.append("  ")
         lines.append("  ")
         lines.append("  ")
 

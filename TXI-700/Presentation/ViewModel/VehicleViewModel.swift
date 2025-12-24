@@ -19,6 +19,9 @@ class VehicleViewModel: ObservableObject {
     @Published var selectedRegion: String = ""
     @Published var searchText: String = ""
     @Published var selectedVehicle: VehicleInfo? = nil
+    @State private var activeAlert: ActiveListAlert?
+    
+    @EnvironmentObject var languageManager: LanguageManager
     var lang = Locale.current.language.languageCode?.identifier ?? "en"
 
     private let vehicleManger = VehicleDataManager.shared
@@ -32,18 +35,20 @@ class VehicleViewModel: ObservableObject {
     }
     
     func saveOrUpdateVehicleItem() {
-        print(selectedRegion+vehicle.replacingOccurrences(of: " ", with: ""))
+        
+        let vehicleContent = (selectedRegion+vehicle).replacingOccurrences(of: " ", with: "")
+        guard !vehicleContent.isEmpty else {return}
         if let vehicleinfo = selectedVehicle {
             vehicleManger.updateVehicle(
                 // UPDATE
                 item: vehicleinfo,
-                vehicle: selectedRegion+vehicle.replacingOccurrences(of: " ", with: ""),
+                vehicle: vehicleContent,
                 weight: Int64(weight) ?? 0,
                 num: vehicleinfo.num)
         } else {
             // ADD
             let nextNum = Int16(vehicleItems.count)
-            vehicleManger.addVehicle(vehicle: selectedRegion+vehicle.replacingOccurrences(of: " ", with: ""), weight: Int64(weight) ?? 0, num: nextNum)
+            vehicleManger.addVehicle(vehicle: vehicleContent, weight: Int64(weight) ?? 0, num: nextNum)
         }
         fetchVehicleItems()
         clearSelection()

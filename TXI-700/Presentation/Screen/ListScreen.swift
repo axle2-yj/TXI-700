@@ -11,6 +11,7 @@ struct ListScreen: View {
     let listType: ListType
     @State private var isAddMode = false
     @State private var selectedListType: ListType? = nil
+    @State private var activeAlert: ActiveListAlert?
 
     @ObservedObject var productViewModel: ProductViewModel
     @ObservedObject var clientViewModel: ClientViewModel
@@ -21,6 +22,7 @@ struct ListScreen: View {
     @Environment(\.editMode) private var editMode
     
     @EnvironmentObject var bleManager: BluetoothManager
+    @EnvironmentObject var languageManager: LanguageManager
     
     var onSelectProduct: ((ProductInfo) ->Void)?
     var onSelectClient: ((ClientInfo) -> Void)?
@@ -43,16 +45,22 @@ struct ListScreen: View {
                         }()
                         
                         SaveOrUpdateButton(
-                            text: productViewModel.selectedProduct == nil ? "Save" : "Update",
+                            title: productViewModel.selectedProduct == nil ? "Save".localized(languageManager.selectedLanguage) : "Update".localized(languageManager.selectedLanguage),
                             onButton:{
                                 let name = productViewModel.name
                                 let type: BLEItemType = .product
+                                
+                                guard !name.isEmpty else {
+                                    activeAlert = .error("ProductError".localized(languageManager.selectedLanguage))
+                                    return
+                                }
                                 
                                 let bytes = makePacket(
                                     type: type,
                                     num: productNum + 1,
                                     name: name
                                 )
+                                
                                 print("Product name : \(name)")
                                 print("Product save send : \(bleManager.sendData(bytes))")
                                 
@@ -76,10 +84,15 @@ struct ListScreen: View {
                             }
                         }()
                         SaveOrUpdateButton(
-                            text: clientViewModel.selectedClient == nil ? "Save" : "Update",
+                            title: clientViewModel.selectedClient == nil ? "Save".localized(languageManager.selectedLanguage) : "Update".localized(languageManager.selectedLanguage),
                             onButton:{
                                 let name = clientViewModel.name
                                 let type: BLEItemType = .client
+                                
+                                guard !name.isEmpty else {
+                                    activeAlert = .error("ClientError".localized(languageManager.selectedLanguage))
+                                    return
+                                }
                                 
                                 let bytes = makePacket(
                                     type: type,
@@ -97,15 +110,15 @@ struct ListScreen: View {
                                     .foregroundColor(.red)
                                 }
                     case .vehicle:
-                        VehicleRegionDropdown(viewModel: vehicleViewModel).onAppear {
-                            vehicleViewModel.loadItems()
-                        }
+                        VehicleRegionDropdown(viewModel: vehicleViewModel, activeAlert: $activeAlert)
+                            .onAppear {
+                                vehicleViewModel.loadItems()
+                            }
                     }
                 }.padding(5)
             }
             
             VStack {
-                
                 switch listType {
                 case .product:
                     if productViewModel.productItems.isEmpty {
@@ -150,7 +163,9 @@ struct ListScreen: View {
                                     }
                                 }
                             }.onMove { from, to in
-                                productViewModel.moveProduct(from: from, to: to)
+                                if isAddMode {
+                                    productViewModel.moveProduct(from: from, to: to)
+                                }
                             }
                         }
                     }
@@ -193,10 +208,14 @@ struct ListScreen: View {
                                             num: Int(item.num+1)
                                         )
                                         onSelectClient?(item)
+                                    } else {
+                                        clientViewModel.selectClient(item)
                                     }
                                 }
                             }.onMove { from, to in
-                                clientViewModel.moveClient(from: from, to: to)
+                                if isAddMode {
+                                    clientViewModel.moveClient(from: from, to: to)
+                                }
                             }
                         }
                     }
@@ -210,7 +229,7 @@ struct ListScreen: View {
                     }
                     else {
                         List {
-                            ForEach(vehicleViewModel.vehicleItems) { item in
+                            ForEach(vehicleViewModel.vehicleItems.sorted { $0.num < $1.num }) { item in
                                 HStack {
                                     Text("\(item.num+1)")
                                     Spacer()
@@ -236,10 +255,14 @@ struct ListScreen: View {
                                 .onTapGesture {
                                     if !isAddMode {
                                         onSelectVehicle?(item)
+                                    } else {
+                                        vehicleViewModel.selectVehicle(item)
                                     }
                                 }
                             }.onMove { from, to in
-                                vehicleViewModel.moveVechile(from: from, to: to)
+                                if isAddMode {
+                                    vehicleViewModel.moveVechile(from: from, to: to)
+                                }
                             }
                         }
                     }
@@ -268,6 +291,14 @@ struct ListScreen: View {
             }.onDisappear {
                 clientViewModel.clearSelection()
                 productViewModel.clearSelection()
+                vehicleViewModel.clearSelection()
+                activeAlert = nil
+            }.alert(item: $activeAlert) { alertType in
+                Alert(
+                    title: Text(""),
+                    message: Text(alertType.message),
+                    dismissButton: .default(Text("Confirmation"))
+                )
             }
         }
     }

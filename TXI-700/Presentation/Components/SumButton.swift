@@ -18,7 +18,7 @@ struct SumButton: View {
             Button("SUM") {
                 isSum = true
                 performEnterAction()
-            }.frame(maxWidth: .infinity)
+            }.frame(maxWidth: .infinity, maxHeight: 50)
             .padding()
             .background(Color.gray.opacity(0.3))
             .cornerRadius(6)

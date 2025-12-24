@@ -9,13 +9,12 @@ import SwiftUI
 import Foundation
 
 struct SaveOrUpdateButton: View {
-    @State var text: String? = nil
-    @EnvironmentObject var bleManager: BluetoothManager
+    let title: String
     
     var onButton: () -> Void
     
     var body: some View {
-        Button(text ?? "Save") {
+        Button(title) {
             onButton()
         }
     }

@@ -155,7 +155,6 @@ extension BluetoothManager: CBCentralManagerDelegate {
         var bytes: [UInt8] = [0x42, 0x54, 0x51]      // 'B', 'T', 'Q'
         let numBytes = numTo2ByteAscii(num)
         bytes.append(contentsOf: numBytes)
-        print("출력 확인 : \(num), \(numBytes)")
         print("ItemCheck : \(sendData(bytes))")
     }
     

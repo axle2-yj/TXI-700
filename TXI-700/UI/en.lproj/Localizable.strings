@@ -31,6 +31,9 @@
 "Delete" = "Delete";
 "Print" = "Print";
 "Send" = "Send";
+"Save" = "Save";
+"Update" = "Update";
+
 
 "StartDate" = "Start Date";
 "EndDate" = "End Date";
@@ -48,8 +51,8 @@
 "ActivateButton" = "Activate Button";
 "WeightingMathod" = "Weighting Mathod";
 
-"Line" = "------------------------------";
-//"Line" = "= = = = = = = = = = = = = = =";
+//"Line" = "------------------------------";
+"Line" = "= = = = = = = = = = = = = = =";
 "Vehicle" = "ABC-1234";
 
 "EmptyDelteData" = "There is no data to delete.";
@@ -78,6 +81,9 @@
 "error2" = "An error occurred while connecting to Axleload2.";
 "error3" = "Load data cannot be less than zero.";
 "batteryError1" = "The Print function cannot be used when the battery level is 20% or lower.";
+"ProductError" = "The product name is required.";
+"ClientError" = "Client name is required.";
+"VehicleError" = "The vehicle number is required.";
 
 "PrintOutputSetting" = "Print Output Setting";
 "One" = "1 page";

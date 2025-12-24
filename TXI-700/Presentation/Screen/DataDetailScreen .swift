@@ -34,7 +34,7 @@ struct DataDetailScreen: View {
     
     var body: some View {
         ZStack {
-            VStack(spacing: 0) {
+            VStack {
                 // MARK: -Top Bar
                 CustomTopBar(title: viewModel.dataDatilTitle) {
                     presentationMode.wrappedValue.dismiss()
@@ -71,6 +71,7 @@ struct DataDetailScreen: View {
                 .frame(height: 36)
                 .background(Color.gray.opacity(0.2))
                 .cornerRadius(8)
+                Spacer()
                 
                 // MARK: -Delete / Print / Send 버튼
                 HStack {
@@ -120,11 +121,9 @@ struct DataDetailScreen: View {
                         }
                     )
                 }
-                .padding(.top, 4)
-                
-                Spacer()
+                .frame(height: 25)
+                .padding(.top, 10)
             }
-            
             // MARK: - BLE 프린트 응답 팝업
             .onReceive(bleManager.$printResponse) { newValue in
                 guard !newValue.isEmpty else { return }
@@ -133,7 +132,6 @@ struct DataDetailScreen: View {
                     activeAlert = .printResponse(newValue)
                 }
             }
-            
             // MARK: - 데이터 이동 시 Axle 업데이트
             .onChange(of: currentIndex) { newIndex, _ in
                 if items.indices.contains(newIndex) {
@@ -149,14 +147,14 @@ struct DataDetailScreen: View {
                     return Alert(
                         title: Text(""),
                         message: Text(msg),
-                        dismissButton: .default(Text("OK"))
+                        dismissButton: .default(Text("Confirmation"))
                     )
                     
                 case .error(let msg):
                     return Alert(
                         title: Text(""),
                         message: Text(msg),
-                        dismissButton: .default(Text("OK"))
+                        dismissButton: .default(Text("Confirmation"))
                     )
                     
                 case .deleteConfirm:
@@ -193,8 +191,11 @@ struct DataDetailScreen: View {
                                     activeAlert = .error(viewModel.deleteErrorMessage(err))
                                 }
                             }
+                            isAlertShowing = false
                         },
-                        secondaryButton: .cancel()
+                        secondaryButton: .destructive(Text("Cancel")) {
+                            isAlertShowing = false
+                        }
                     )
                     
                 case .printConfirm:
@@ -202,8 +203,11 @@ struct DataDetailScreen: View {
                         title: Text("WantPrint"),
                         primaryButton: .default(Text("Print")) {
                             print("프린트 실행")
+                            isAlertShowing = false
                         },
-                        secondaryButton: .cancel()
+                        secondaryButton: .destructive(Text("Cancel")) {
+                            isAlertShowing = false
+                        }
                     )
                     
                 case .sendConfirm:
@@ -249,14 +253,18 @@ struct DataDetailScreen: View {
                                     activeAlert = .error(viewModel.sendErrorMessage(err))
                                 }
                             }
+                            
+                            isAlertShowing = false
                         },
-                        secondaryButton: .cancel()
+                        secondaryButton: .destructive(Text("Cancel")) {
+                            isAlertShowing = false
+                        }
                     )
                 case .printResponse(let msg):
                     return Alert(
                         title: Text(""),
                         message: Text(msg),
-                        dismissButton: .default(Text("OK"), action: {
+                        dismissButton: .default(Text("Confirmation"), action: {
                             activeAlert = nil
                             isAlertShowing = false
                         })

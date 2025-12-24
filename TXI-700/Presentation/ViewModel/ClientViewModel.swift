@@ -23,17 +23,21 @@ class ClientViewModel: ObservableObject {
     }
     
     func saveOrUpdateClient() {
+        guard !name.isEmpty else {
+            print("고객명은 필수입니다.")
+            return
+        }
         if let client = selectedClient {
                 // UPDATE
                 clientManager.updateClient(
                     item: client,
-                    name: name,
+                    name: name.replacingOccurrences(of: " ", with: ""),
                     num: client.num
                 )
             } else {
                 // ADD
                 let nextNum = Int16(clientItems.count)
-                clientManager.addClient(name: name, num: nextNum)
+                clientManager.addClient(name: name.replacingOccurrences(of: " ", with: ""), num: nextNum)
             }
 
             fetchClientItems()

@@ -174,6 +174,10 @@ struct SettingScreen: View {
                 optionProduct = viewModel.checkedProduct
                 optionClient = viewModel.checkedClient
             }
+        }.safeAreaInset(edge: .bottom, alignment: .center) {
+            HStack {
+                Text("Indecator Ver. : \(bleManager.equipmentVer)").opacity(0.4)
+            }
         }
     }
 }
@@ -209,6 +213,10 @@ extension SettingScreen {
         Button(action: {
             viewModel.weightToggleChanged(to: tag)
             viewModel.saveWeightingMethod(tag)
+            if tag == 0 {
+               optionProduct = true
+               optionClient = true
+            }
         }) {
             Text(title.localized(languageManager.selectedLanguage))
                 .frame(maxWidth: .infinity)

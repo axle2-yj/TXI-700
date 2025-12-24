@@ -9,8 +9,9 @@ import SwiftUI
 
 struct VehicleRegionDropdown: View {
     @State private var showSheet: Bool = false
-
+    
     @ObservedObject var viewModel: VehicleViewModel
+    @Binding var activeAlert: ActiveListAlert?
     
     @EnvironmentObject var languageManager: LanguageManager
     @EnvironmentObject var bleManager: BluetoothManager
@@ -51,32 +52,19 @@ struct VehicleRegionDropdown: View {
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .keyboardType(.numberPad)
                 }
-                let vehicleNum: Int = {
-                    if let num = viewModel.selectedVehicle?.num {
-                        return Int(num)
-                    } else {
-                        return viewModel.vehicleItems.count
-                    }
-                }()
                 
                 // 저장 버튼
                 SaveOrUpdateButton(
-                    text: viewModel.selectedVehicle == nil ? "Save" : "Update",
+                    title: viewModel.selectedVehicle == nil ? "Save".localized(languageManager.selectedLanguage) : "Update".localized(languageManager.selectedLanguage),
                     onButton:{
-                        let region = viewModel.selectedRegion
-                        let vehicle = viewModel.vehicle
-                        let type: BLEItemType = .vechicle
-                        
-                        let bytes = makePacket(
-                            type: type,
-                            num: vehicleNum + 1,
-                            name: region+vehicle
-                        )
-                        print("Vehicle save send : \(bleManager.sendData(bytes))")
+                        guard !viewModel.vehicle.isEmpty else {
+                            activeAlert = .error("VehicleError".localized(languageManager.selectedLanguage))
+                            return
+                        }
                         viewModel.saveOrUpdateVehicleItem()
                     }
                 )
-                if viewModel.selectedVehicle == nil {
+                if viewModel.selectedVehicle != nil {
                     Button("Cancel") {
                         viewModel.clearSelection()
                     }

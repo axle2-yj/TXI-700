@@ -35,7 +35,7 @@ struct DataSerchBottomBar: View {
                 }
             }
             HStack {
-                Text("Vehicle No")
+                Text("Car No")
                     .frame(width: 80, alignment: .leading)
                 TextField("차량번호 검색", text: $dataViewModel.filterVehicle)
                     .textFieldStyle(.roundedBorder)

@@ -106,7 +106,7 @@ struct HomeScreen: View {
                     Alert(
                         title: Text(""),
                         message: Text(alert.message),
-                        dismissButton: .default(Text("OK"))
+                        dismissButton: .default(Text("Confirmation"))
                     )
                 }
             if bleManager.isConnecting {

@@ -90,5 +90,29 @@ class MainViewModel: ObservableObject {
                }
            }
     }
+    
+    func handleInmotion(
+            loadAxleStatus: inout [LoadAxleStatus],
+            left: Int,
+            right: Int
+    ) {
+        let currentAxles = [left, right]
+        
+        if var last = loadAxleStatus.last {
+            for axle in currentAxles where last.loadAxlesData.count < 20 {
+                last.loadAxlesData.append(axle)
+            }
+            last.total = last.loadAxlesData.reduce(0, +)
+            loadAxleStatus[loadAxleStatus.count - 1] = last
+        } else {
+            loadAxleStatus.append(
+                LoadAxleStatus(
+                    id: 1,
+                    loadAxlesData: currentAxles,
+                    total: currentAxles.reduce(0, +)
+                )
+            )
+        }
+    }
 }
 

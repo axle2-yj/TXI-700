@@ -8,6 +8,24 @@
 import SwiftUI
 import Combine
 
+enum ActiveListAlert: Identifiable {
+    case error(String)
+    
+    var id: String {
+        switch self {
+            case .error(let message):
+            return message
+        }
+    }
+    
+    var message: String {
+        switch self {
+        case .error(let message):
+            return message
+        }
+    }
+}
+
 @MainActor
 class ProductViewModel: ObservableObject {
     @Published var productItems: [ProductInfo] = []
@@ -23,17 +41,21 @@ class ProductViewModel: ObservableObject {
     }
     
     func saveOrUpdateProcduct() {
+        guard !name.isEmpty else {
+            print("상품 이름은 필수입니다.")
+            return
+        }
         if let product = selectedProduct {
                 // UPDATE
                 productManager.updateProduct(
                     item: product,
-                    name: name,
+                    name: name.replacingOccurrences(of: " ", with: ""),
                     num: product.num
                 )
             } else {
                 // ADD
                 let nextNum = Int16(productItems.count)
-                productManager.addProduct(name: name, num: nextNum)
+                productManager.addProduct(name: name.replacingOccurrences(of: " ", with: ""), num: nextNum)
             }
 
             fetchProductItems()

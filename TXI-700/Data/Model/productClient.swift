@@ -46,18 +46,13 @@ func makePacket(
         header = [0x42, 0x54, 0x43] // "BTC"
     }
     if type == .vechicle {
-        print(num)
-        let numByte = numTo2ByteAscii(num)
         let nameBytes = name.toAsciiBytes(maxLength: 10)
-        let packet = header + numByte + nameBytes + [0x0A]
-        print(packet)
+        let packet = header + nameBytes + [0x0A]
         return packet
     } else {
-        print(num)
         let numByte = numTo2ByteAscii(num)
         let nameBytes = name.toAsciiBytes(maxLength: 20)
         let packet = header + numByte + nameBytes + [0x0A]
-        print(packet)
         return packet
     }
 }

@@ -15,7 +15,7 @@ struct TwoStepSumButton: View {
     var body: some View {
         Button("SUM") {
             performEnterAction()
-        }.frame(maxWidth: .infinity)
+        }.frame(maxWidth: .infinity, maxHeight: 50)
         .padding()
         .background(Color.gray.opacity(0.3))
         .cornerRadius(6)
