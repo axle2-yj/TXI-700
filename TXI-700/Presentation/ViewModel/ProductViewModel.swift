@@ -10,10 +10,13 @@ import Combine
 
 enum ActiveListAlert: Identifiable {
     case error(String)
+    case success(String)
     
     var id: String {
         switch self {
-            case .error(let message):
+        case .error(let message):
+            return message
+        case .success(let message):
             return message
         }
     }
@@ -21,6 +24,8 @@ enum ActiveListAlert: Identifiable {
     var message: String {
         switch self {
         case .error(let message):
+            return message
+        case .success(let message):
             return message
         }
     }
@@ -31,9 +36,12 @@ class ProductViewModel: ObservableObject {
     @Published var productItems: [ProductInfo] = []
     @Published var text: String = NSLocalizedString("ProductScreenTitle", comment: "")
     @Published var name: String = ""
-    @Published var num: Int16 = 0
     @Published var selectedProduct: ProductInfo? = nil
-
+    @Published var saveSuccessMessage: String? = nil
+    @Published var saveFailedMessage: String? = nil
+    
+    @EnvironmentObject var languageManager: LanguageManager
+    
     private let productManager = ProductDataManager.shared
     
     func fetchProductItems() {
@@ -42,28 +50,38 @@ class ProductViewModel: ObservableObject {
     
     func saveOrUpdateProcduct() {
         guard !name.isEmpty else {
-            print("상품 이름은 필수입니다.")
+            saveFailedMessage = "pleaseEnterProductName"
             return
         }
+        
+        // 중복 체크
+        if productItems.contains(where: { $0.name == name && $0.id != selectedProduct?.id}) {
+            saveFailedMessage = "registeredProductName"
+            return
+        }
+        
         if let product = selectedProduct {
-                // UPDATE
-                productManager.updateProduct(
-                    item: product,
-                    name: name.replacingOccurrences(of: " ", with: ""),
-                    num: product.num
-                )
-            } else {
-                // ADD
-                let nextNum = Int16(productItems.count)
-                productManager.addProduct(name: name.replacingOccurrences(of: " ", with: ""), num: nextNum)
-            }
-
-            fetchProductItems()
-            clearSelection()
+            // UPDATE
+            productManager.updateProduct(
+                item: product,
+                name: name.replacingOccurrences(of: " ", with: ""),
+                num: product.num,
+                shortcutNum: product.shortcutNum
+            )
+        } else {
+            // ADD
+            let nextNum = Int16(productItems.count)
+            let netxShortcutNum = Int16(productItems.count)
+            productManager.addProduct(name: name.replacingOccurrences(of: " ", with: ""), num: nextNum, shortcutNum: netxShortcutNum)
+        }
+        
+        fetchProductItems()
+        clearSelection()
+        saveSuccessMessage = "saved"
     }
     
-    func updateProduct(item: ProductInfo, name: String, num: Int16) {
-        productManager.updateProduct(item: item, name: name, num: num)
+    func updateProduct(item: ProductInfo, name: String, num: Int16, shortcutNum: Int16) {
+        productManager.updateProduct(item: item, name: name, num: num, shortcutNum: shortcutNum)
         fetchProductItems()
     }
     
@@ -89,7 +107,7 @@ class ProductViewModel: ObservableObject {
         selectedProduct = product
         name = product.name ?? ""
     }
-
+    
     func clearSelection() {
         selectedProduct = nil
         name = ""

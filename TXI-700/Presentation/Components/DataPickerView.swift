@@ -16,9 +16,9 @@ struct DatePickerView: View {
     @State private var tempEnd: Date
     
     init(viewModel: DatePickerViewModel) {
-            self.viewModel = viewModel
-            self._tempStart = State(initialValue: viewModel.startDate)
-            self._tempEnd = State(initialValue: viewModel.endDate)
+        self.viewModel = viewModel
+        self._tempStart = State(initialValue: viewModel.startDate)
+        self._tempEnd = State(initialValue: viewModel.endDate)
     }
     
     var body: some View {

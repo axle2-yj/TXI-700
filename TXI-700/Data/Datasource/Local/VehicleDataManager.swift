@@ -22,7 +22,7 @@ class VehicleDataManager {
         item.num = num
         save()
     }
-        
+    
     func fetchAll() -> [VehicleInfo] {
         let request: NSFetchRequest<VehicleInfo> = VehicleInfo.fetchRequest()
         do {

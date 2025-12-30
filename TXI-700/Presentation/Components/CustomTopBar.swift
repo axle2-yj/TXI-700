@@ -11,6 +11,12 @@ struct CustomTopBar: View {
     var title: String
     var onBack: () -> Void
     
+    @Environment(\.colorScheme) var colorScheme
+    
+    private var returnImage: String {
+        colorScheme == .dark ? "return_dark" : "return"
+    }
+    
     var body: some View {
         ZStack {
             // 가운데 타이틀
@@ -21,7 +27,7 @@ struct CustomTopBar: View {
             HStack {
                 // 왼쪽: 뒤로가기 버튼
                 Button(action: onBack) {
-                    Image("return")
+                    Image(returnImage)
                         .resizable()
                         .frame(width: 30, height: 30)
                 }

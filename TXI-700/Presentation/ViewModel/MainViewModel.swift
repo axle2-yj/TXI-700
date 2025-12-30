@@ -12,25 +12,33 @@ import Combine
 enum ActiveMainAlert: Identifiable {
     case printResponse(String)
     case success(String)
+    case saveSuccess(String)
+    case saveError(String)
     case error(String)
-
+    
     var id: String {
         switch self {
         case .printResponse(let msg):
             return "\(msg)"
         case .success:
             return "success"
+        case .saveSuccess(let msg):
+            return "\(msg)"
+        case .saveError(let msg):
+            return "\(msg)"
         case .error:
             return "error"
         }
     }
-
+    
     /// Alert에 표시할 메시지
     var message: String {
         switch self {
         case .printResponse(let msg),
-             .success(let msg),
-             .error(let msg):
+                .success(let msg),
+                .saveSuccess(let msg),
+                .saveError(let msg),
+                .error(let msg):
             return msg
         }
     }
@@ -81,20 +89,20 @@ class MainViewModel: ObservableObject {
         // 0.5초 후에 1회 실행
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             Task { @MainActor in
-                bleManager.sendInitialBatteryCheckCommand()
+                bleManager.sendCommand(.btb, log: "BatteryCheck start")
             }
         }
         batteryTimer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { _ in
-               Task { @MainActor in
-                   bleManager.sendInitialBatteryCheckCommand()
-               }
-           }
+            Task { @MainActor in
+                bleManager.sendCommand(.btb, log: "BatteryCheck")
+            }
+        }
     }
     
     func handleInmotion(
-            loadAxleStatus: inout [LoadAxleStatus],
-            left: Int,
-            right: Int
+        loadAxleStatus: inout [LoadAxleStatus],
+        left: Int,
+        right: Int
     ) {
         let currentAxles = [left, right]
         
@@ -114,5 +122,42 @@ class MainViewModel: ObservableObject {
             )
         }
     }
+    
+    func handleLoadAxleState(
+        loadAxleStatus: inout [LoadAxleStatus],
+        left: Int,
+        right: Int
+    ) {
+        handleBalance(
+            loadAxleStatus: &loadAxleStatus,
+            axles: [left, right]
+        )
+    }
+    
+    func handleBalance(
+        loadAxleStatus: inout [LoadAxleStatus],
+        axles: [Int]
+    ) {
+        guard !axles.isEmpty else { return }
+        
+        let sum = axles.reduce(0, +)
+        
+        if var last = loadAxleStatus.last {
+            // 데이터 개수 제한이 필요하다면 여기서 처리
+            last.loadAxlesData.append(contentsOf: axles)
+            last.total += sum
+            
+            loadAxleStatus[loadAxleStatus.count - 1] = last
+        } else {
+            loadAxleStatus.append(
+                LoadAxleStatus(
+                    id: 1,
+                    loadAxlesData: axles,
+                    total: sum
+                )
+            )
+        }
+    }
+    
 }
 

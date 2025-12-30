@@ -13,9 +13,12 @@ class ClientViewModel: ObservableObject {
     @Published var clientItems: [ClientInfo] = []
     @Published var text: String = NSLocalizedString("ClientScreenTitle", comment: "")
     @Published var name: String = ""
-    @Published var num: Int16 = 0
     @Published var selectedClient: ClientInfo? = nil
-
+    @Published var saveSuccessMessage: String? = nil
+    @Published var saveFailedMessage: String? = nil
+    
+    @EnvironmentObject var languageManager: LanguageManager
+    
     private let clientManager = ClientDataManager.shared
     
     func fetchClientItems() {
@@ -24,28 +27,38 @@ class ClientViewModel: ObservableObject {
     
     func saveOrUpdateClient() {
         guard !name.isEmpty else {
-            print("고객명은 필수입니다.")
+            saveFailedMessage = "pleaseEnterClientName"
             return
         }
+        
+        // 중복 체크
+        if clientItems.contains(where: { $0.name == name && $0.id != selectedClient?.id}) {
+            saveFailedMessage = "registeredClientName"
+            return
+        }
+        
         if let client = selectedClient {
-                // UPDATE
-                clientManager.updateClient(
-                    item: client,
-                    name: name.replacingOccurrences(of: " ", with: ""),
-                    num: client.num
-                )
-            } else {
-                // ADD
-                let nextNum = Int16(clientItems.count)
-                clientManager.addClient(name: name.replacingOccurrences(of: " ", with: ""), num: nextNum)
-            }
-
-            fetchClientItems()
-            clearSelection()
+            // UPDATE
+            clientManager.updateClient(
+                item: client,
+                name: name.replacingOccurrences(of: " ", with: ""),
+                num: client.num,
+                shortcutNum: client.shortcutNum
+            )
+        } else {
+            // ADD
+            let nextNum = Int16(clientItems.count)
+            let netxShortcutNum = Int16(clientItems.count)
+            clientManager.addClient(name: name.replacingOccurrences(of: " ", with: ""), num: nextNum, shortcutNum: netxShortcutNum)
+        }
+        
+        fetchClientItems()
+        clearSelection()
+        saveSuccessMessage = "saved"
     }
     
-    func updateClient(item: ClientInfo, name: String, num: Int16) {
-        clientManager.updateClient(item: item, name: name, num: num)
+    func updateClient(item: ClientInfo, name: String, num: Int16, shortcutNum: Int16) {
+        clientManager.updateClient(item: item, name: name, num: num, shortcutNum: shortcutNum)
         fetchClientItems()
     }
     
@@ -71,7 +84,7 @@ class ClientViewModel: ObservableObject {
         selectedClient = client
         name = client.name ?? ""
     }
-
+    
     func clearSelection() {
         selectedClient = nil
         name = ""

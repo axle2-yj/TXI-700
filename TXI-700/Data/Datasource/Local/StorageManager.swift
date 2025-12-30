@@ -10,7 +10,7 @@ import Foundation
 class StorageManager {
     static let shared = StorageManager()
     private init() {}
-
+    
     private let macKey = "saved_mac_address"
     private let productTitle = "ITEM <<"
     private let clientTitel = "CLIENT <<"
@@ -25,17 +25,21 @@ class StorageManager {
     private let clientChecked = "clientChecked"
     private let serialNumber = "serialNumber"
     private let printOutputCount = "printOutputCount"
-    
+    private let balanceAxisNuberCount = "balanceAxisNuberCount"
+    private let balanceWeightBool = "balanceWeightBool"
+    private let dangerousNumber = "dangerousNumber"
+    private let cautionNumber = "cautionNumber"
+    private let safetyNumber = "safetyNumber"
     // MAC 저장
     func saveMacAddress(_ mac: String) {
         UserDefaults.standard.set(mac, forKey: macKey)
     }
-
+    
     // MAC 읽기
     func loadMacAddress() -> String? {
         return UserDefaults.standard.string(forKey: macKey)
-    } 
-
+    }
+    
     // MAC 삭제
     func clearMacAddress() {
         UserDefaults.standard.removeObject(forKey: macKey)
@@ -88,7 +92,7 @@ class StorageManager {
     func saveModeChange(_ mode: Int) {
         UserDefaults.standard.set(mode, forKey: modeChange)
     }
-      
+    
     func loadModeChange() -> Int? {
         return UserDefaults.standard.integer(forKey: modeChange)
     }
@@ -155,5 +159,45 @@ class StorageManager {
     
     func loadPrintOutputCount() -> Int {
         return UserDefaults.standard.integer(forKey: printOutputCount)
+    }
+    
+    func saveBalanceAxisNuberCount(_ count: Int) {
+        UserDefaults.standard.set(count, forKey: balanceAxisNuberCount)
+    }
+    
+    func loadBalanceAxisNuberCount() -> Int {
+        return UserDefaults.standard.integer(forKey: balanceAxisNuberCount)
+    }
+    
+    func saveBalanceWeightBool(_ bool: Int) {
+        UserDefaults.standard.set(bool, forKey: balanceWeightBool)
+    }
+    
+    func loadBalanceWeightBool() -> Int {
+        return UserDefaults.standard.integer(forKey: balanceWeightBool)
+    }
+    
+    func saveDangerousNumber(_ number: Int) {
+        UserDefaults.standard.set(number, forKey: dangerousNumber)
+    }
+    
+    func loadDangerousNumber() -> Int {
+        return UserDefaults.standard.integer(forKey: dangerousNumber)
+    }
+    
+    func saveCautionNumber(_ number: Int) {
+        UserDefaults.standard.set(number, forKey: cautionNumber)
+    }
+    
+    func loadCautionNumber() -> Int {
+        return UserDefaults.standard.integer(forKey: cautionNumber)
+    }
+    
+    func saveSafetyNumber(_ number: Int) {
+        UserDefaults.standard.set(number, forKey: safetyNumber)
+    }
+    
+    func loadSafetyNumber() -> Int {
+        return UserDefaults.standard.integer(forKey: safetyNumber)
     }
 }

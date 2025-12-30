@@ -23,6 +23,11 @@
 "WeightInput" = "무게 입력";
 "None" = "없음";
 "SelectRegion" = "지역 선택";
+"VehicleNumSearch" = "차량번호 검색";
+"ClientSearch" = "고객 검색";
+"ProductSearch" = "품목 검색";
+"Input" = "입력";
+"InspectorInput" = "검사관 이름 입력";
 
 "Close" = "닫기";
 "Cancel" = "취소";
@@ -50,7 +55,8 @@
 "WeightingMathod" = "가중치 부여 방법";
 
 //"Line" = "------------------------------";
-"Line" = "= = = = = = = = = = = = = = =";
+"Line" = "- - - - - - - - - - - - - - - -";
+//"Line" = "= = = = = = = = = = = = = = =";
 "Vehicle" = "12가 3456";
 
 "EmptyDelteData" = "삭제할 데이터가 없습니다.";
@@ -87,3 +93,27 @@
 "One" = "1장";
 "Two" = "2장";
 "Three" = "3장";
+"BalanceAxisNumberSetting" = "차량 축 수 설정";
+"BlanceWeightSetting" = "수직/수평 방향의 합계와 가중치 설정";
+"Invisible" = "숨김";
+"Visible" = "보임";
+"number4" = "2축";
+"number6" = "3축";
+"number8" = "4축";
+
+"existingVehicleNumber" = "기존 차량 번호입니다.";
+"registeredProductName"="등록된 상품명 입니다.";
+"registeredClientName"="등록된 고객사명 입니다.";
+"saved"="저장되었습니다.";
+"pleaseEnterProductName." = "상품명을 입력해주세요.";
+"pleaseEnterClientName" = "고객사명을 입력해주세요.";
+"pleaseEnterVehicleNum" = "차량번호를 입력해주세요.";
+
+"balanceValueSetting"="Balance 값 설정";
+"dangerousValueSetting"="위험 범위";
+"cautionValueSetting"="주의 범위";
+"safetyValueSetting"="안전 범위";
+
+"endProcess" = "종료하시겠습니까?";
+"AppEnd" = "App 종료";
+"AllEnd" = "전체 종료";

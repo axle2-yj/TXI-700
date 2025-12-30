@@ -20,10 +20,15 @@
 "MoveSetting" = "Go to Settings";
 
 "Region" = "Region";
-"VehicleNum" = "Enter vehicle number";
+"VehicleNum" = "vehicle number";
 "WeightInput" = "weight Input";
 "None" = "None";
 "SelectRegion" = "Region Selection";
+"VehicleNumSearch" = "Vehicle Number Search";
+"ClientSearch" = "Client Search";
+"ProductSearch" = "Item Search";
+"Input" = "Input";
+"InspectorInput" = "Inspector Name";
 
 "Close" = "Close";
 "Cancel" = "Cancel";
@@ -52,7 +57,8 @@
 "WeightingMathod" = "Weighting Mathod";
 
 //"Line" = "------------------------------";
-"Line" = "= = = = = = = = = = = = = = =";
+"Line" = "- - - - - - - - - - - - - - - -";
+//"Line" = "= = = = = = = = = = = = = = =";
 "Vehicle" = "ABC-1234";
 
 "EmptyDelteData" = "There is no data to delete.";
@@ -89,3 +95,27 @@
 "One" = "1 page";
 "Two" = "2 page";
 "Three" = "3 page";
+"BalanceAxisNumberSetting" = "Vehicle Axle Number Setting";
+"BlanceWeightSetting" = "Vertical/Horizontal Sum and Weight Settings";
+"Invisible" = "Invisible";
+"Visible" = "Visible";
+"number4" = "2 axle";
+"number6" = "3 axle";
+"number8" = "4 axle";
+
+"existingVehicleNumber" = "This is the existing vehicle number.";
+"registeredProductName"="This is the registered product name.";
+"registeredClientName"="This is the name of the registered client company.";
+"saved"="Saved.";
+"pleaseEnterProductName." = "Please enter the product name..";
+"pleaseEnterClientName" = "Please enter the customer company name..";
+"pleaseEnterVehicleNum" = "Please enter your vehicle number..";
+
+"balanceValueSetting"="Balance Value Setting";
+"dangerousValueSetting"="Hazard Range";
+"cautionValueSetting"="Caution Range";
+"safetyValueSetting"="Safety Range";
+
+"endProcess" = "Are you sure you want to exit?";
+"AppEnd" = "App End";
+"AllEnd" = "All End";

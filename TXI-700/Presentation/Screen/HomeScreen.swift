@@ -12,15 +12,25 @@ struct HomeScreen: View {
     @State private var goToMain = false
     @State private var goToSetting = false
     @State private var bluetoothConnected = false
-
+    @State private var showAlert = false
+    @State private var activeAlert: ActiveHomeAlert?
+    
     @StateObject var homeViewModel = HomeViewModel()
     @StateObject var settingViewModel = SettingViewModel()
     @StateObject var printViewModel = PrintFormSettingViewModel()
     
     @EnvironmentObject var bleManager: BluetoothManager
     @EnvironmentObject var languageManager: LanguageManager
-    @State private var activeAlert: ActiveHomeAlert?
-
+    @Environment(\.colorScheme) var colorScheme
+    
+    private var tint: Color {
+        colorScheme == .dark ? .white : .black
+    }
+    
+    private var oppositionTint: Color {
+        colorScheme == .dark ? .black : .white
+    }
+    
     var body: some View {
         ZStack {
             VStack {
@@ -29,7 +39,7 @@ struct HomeScreen: View {
                 Image("TXI_700")
                     .resizable()
                     .frame(width: 300, height: 300)
-                    
+                
                 BLEListView(bleManager: bleManager,
                             homeViewModel: homeViewModel,
                             autoConnectEnabled: $homeViewModel.autoConnectEnabled,
@@ -62,21 +72,19 @@ struct HomeScreen: View {
                     .padding()
                     .background(Color.gray.opacity(0.3))
                     .cornerRadius(6)
-                    .foregroundColor(.black)
+                    .foregroundColor(tint)
                 
                 if bluetoothConnected {
-                    Button("Setting")
-                    {
+                    Button("Setting") {
                         goToSetting = true
                     }.frame(maxWidth: .infinity)
                         .environmentObject(languageManager)
                         .padding()
                         .background(Color.gray.opacity(0.3))
                         .cornerRadius(6)
-                        .foregroundColor(.black)
+                        .foregroundColor(tint)
                     
-                    Button("DisConnect")
-                    {
+                    Button("DisConnect") {
                         bluetoothConnected = false
                         bleManager.disconnect()
                     }.navigationDestination(isPresented: $goToSetting) {
@@ -85,9 +93,16 @@ struct HomeScreen: View {
                         .padding()
                         .background(Color.gray.opacity(0.3))
                         .cornerRadius(6)
-                        .foregroundColor(.black)
+                        .foregroundColor(tint)
                 }
-            }.onReceive(bleManager.$rf) { value in
+                Button("End") {
+                    showAlert = true
+                }.frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.gray.opacity(0.3))
+                    .cornerRadius(6)
+                    .foregroundColor(tint)
+            }.onReceive(bleManager.$rfMassage) { value in
                 if value.isEmpty { return }
                 switch value {
                 case "01":
@@ -114,30 +129,92 @@ struct HomeScreen: View {
                     .ignoresSafeArea()
                     .allowsHitTesting(true)
                 VStack(spacing: 12) {
-                        ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                            .scaleEffect(1.3)
-                        Text("Connecting...")
-                            .font(.subheadline)
-                            .foregroundColor(.gray)
-                    }
-                .padding(24)
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                        .scaleEffect(1.3)
+                    Text("Connecting...")
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+                }
                 .background(Color.clear) // 투명 배경
                 .ignoresSafeArea()
                 .cornerRadius(12)
             }
-        }.padding()
-            .onAppear {
-                homeViewModel.loadDeviceMac()
-                homeViewModel.loadAutoConnectState()
-                homeViewModel.setBleManager(bleManager)
-                if homeViewModel.autoConnectEnabled {
-                    homeViewModel.startAutoConnect()
+            if showAlert {
+                Color.black.opacity(0.4)
+                    .ignoresSafeArea()
+                    .onTapGesture {
+                        showAlert = false
+                    }
+                
+                VStack(spacing: 20) {
+                    Text("endProcess".localized(languageManager.selectedLanguage))
+                        .font(.headline)
+                    if bleManager.isDisconnected {
+                        Button("AppEnd".localized(languageManager.selectedLanguage)) {
+                            showAlert = false
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                UIApplication.shared.perform(#selector(NSXPCConnection.suspend))
+                            }
+                            bleManager.disconnect()
+                        }.frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.gray.opacity(0.3))
+                            .cornerRadius(6)
+                            .foregroundColor(tint)
+                    } else {
+                        HStack {
+                            Button("AllEnd".localized(languageManager.selectedLanguage)) {
+                                showAlert = false
+                                bleManager.sendCommand(.btp, log: "Power Off Send")
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                    UIApplication.shared.perform(#selector(NSXPCConnection.suspend))
+                                }
+                            }.frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color.gray.opacity(0.3))
+                                .cornerRadius(6)
+                                .foregroundColor(tint)
+                            
+                            Button("AppEnd".localized(languageManager.selectedLanguage)) {
+                                showAlert = false
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                    UIApplication.shared.perform(#selector(NSXPCConnection.suspend))
+                                }
+                                bleManager.disconnect()
+                            }.frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color.gray.opacity(0.3))
+                                .cornerRadius(6)
+                                .foregroundColor(tint)
+                        }
+                    }
                 }
+                .frame(maxWidth: 250, maxHeight: 150)
+                .padding(.horizontal, 20)
+                .background(oppositionTint)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                )
             }
-            .onDisappear {
-                homeViewModel.stopAutoConnect()
+        }.onAppear {
+            homeViewModel.loadDeviceMac()
+            homeViewModel.loadAutoConnectState()
+            homeViewModel.setBleManager(bleManager)
+            if homeViewModel.autoConnectEnabled && !bluetoothConnected{
+                homeViewModel.startAutoConnect()
             }
+        }
+        .onDisappear {
+            homeViewModel.stopAutoConnect()
+        }
+        .onReceive(bleManager.$isDisconnected) { disconnected in
+            if disconnected {
+                bluetoothConnected = false
+            }
+        }
+        
     }
 }
 

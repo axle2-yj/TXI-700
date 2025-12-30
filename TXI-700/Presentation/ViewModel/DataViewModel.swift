@@ -56,14 +56,14 @@ class DataViewModel: ObservableObject {
     @Published var inputVehicle: String = ""
     @Published var inputClient: String = ""
     @Published var inputProduct: String = ""
-
+    
     // Detail 화면 UI 설정
     @Published var showSections: [Bool?] = Array(repeating: true, count: 18)
     @Published var clientTitle: String? = nil
     @Published var productTitle: String? = nil
     
     @Published var selectedType: Int? = nil
-
+    
     @Published var csvURL: URL? = nil
     
     @Published var currentEquipmentNumber: String = ""
@@ -89,7 +89,7 @@ class DataViewModel: ObservableObject {
         formatter.dateFormat = "HH:mm:ss"   // 시:분:초
         return formatter
     }()
-        
+    
     var todayLoadAxleItems: [LoadAxleInfo] {
         loadAxleItems.filter { item in
             guard let date = item.timestamp else { return false }
@@ -101,7 +101,7 @@ class DataViewModel: ObservableObject {
     func fetchLoadAxleItems() {
         loadAxleItems = dataManager.fetchAll()
     }
-
+    
     // MARK: - Add
     func addLoadAxle(serialNumber: String,
                      equipmentNumber: String,
@@ -121,7 +121,7 @@ class DataViewModel: ObservableObject {
         )
         fetchLoadAxleItems()
     }
-
+    
     // MARK: - 삭제 실행
     func selectedDeleteLoadAxle(at index: Int) -> Bool {
         guard loadAxleItems.indices.contains(index) else { return false }
@@ -130,14 +130,14 @@ class DataViewModel: ObservableObject {
         fetchLoadAxleItems()
         return true
     }
-
+    
     func todayDeleteLoadAxle() -> Bool {
         let beforeCount = loadAxleItems.count
         dataManager.deleteToday()
         fetchLoadAxleItems()
         return loadAxleItems.count < beforeCount
     }
-
+    
     func allDeleteLoadAxle() -> Bool {
         dataManager.deleteAll()
         fetchLoadAxleItems()
@@ -164,7 +164,7 @@ class DataViewModel: ObservableObject {
         csvURL = result
         return true
     }
-
+    
     // MARK: - Filtered result
     var filteredItems: [LoadAxleInfo] {
         loadAxleItems.filter { item in
@@ -181,25 +181,25 @@ class DataViewModel: ObservableObject {
                 }
                 return true
             }()
-
+            
             // 텍스트 필터
             let matchesVehicle = filterVehicle.isEmpty || (item.vehicle?.contains(filterVehicle) ?? false)
             let matchesClient  = filterClient.isEmpty  || (item.client?.contains(filterClient) ?? false)
             let matchesProduct = filterProduct.isEmpty || (item.product?.contains(filterProduct) ?? false)
-
+            
             // 🔥 장비 번호 필터 (핵심)
             let matchesEquipment =
-                currentEquipmentNumber.isEmpty ||
-                item.equipmentNumber == currentEquipmentNumber
-
+            currentEquipmentNumber.isEmpty ||
+            item.equipmentNumber == currentEquipmentNumber
+            
             return inDateRange
-                && matchesVehicle
-                && matchesClient
-                && matchesProduct
-                && matchesEquipment
+            && matchesVehicle
+            && matchesClient
+            && matchesProduct
+            && matchesEquipment
         }
     }
-
+    
     func applyFilters(startDate: Date?, endDate: Date?) {
         filterStartDate = startDate
         filterEndDate = endDate
@@ -207,14 +207,14 @@ class DataViewModel: ObservableObject {
         filterClient = inputClient
         filterProduct = inputProduct
     }
-
+    
     func clearFilters() {
         filterStartDate = nil
         filterEndDate = nil
         filterVehicle = ""
         filterClient = ""
         filterProduct = ""
-
+        
         inputVehicle = ""
         inputClient = ""
         inputProduct = ""
@@ -246,11 +246,11 @@ class DataViewModel: ObservableObject {
             if loadAxleItems.isEmpty {
                 return .failure(error: .emptyData)
             }
-
+            
             guard loadAxleItems.indices.contains(selectedIndex) else {
                 return .failure(error: .indexOutOfRange)
             }
-
+            
             if selectedDeleteLoadAxle(at: selectedIndex) {
                 let result = adjustAfterSelectedDelete(
                     loadAxleItem: &loadAxleItem,
@@ -267,7 +267,7 @@ class DataViewModel: ObservableObject {
             if todayLoadAxleItems.isEmpty {
                 return .failure(error: .todayNoData)
             }
-
+            
             if todayDeleteLoadAxle() {
                 let result = adjustAfterTodayDelete(
                     loadAxleItem: &loadAxleItem,
@@ -286,7 +286,7 @@ class DataViewModel: ObservableObject {
             } else {
                 return .failure(error: .unknown)
             }
-
+            
         default:
             return .failure(error: .unknown)
         }
@@ -330,11 +330,11 @@ class DataViewModel: ObservableObject {
         }
         
     }
-
+    
     // MARK: - 삭제 후 처리
     private func adjustAfterSelectedDelete(
-            loadAxleItem: inout LoadAxleInfo,
-            currentIndex: inout Int
+        loadAxleItem: inout LoadAxleInfo,
+        currentIndex: inout Int
     ) -> Int {
         if currentIndex > 0 { currentIndex -= 1 }
         else { currentIndex = 0 }
@@ -343,8 +343,8 @@ class DataViewModel: ObservableObject {
     }
     
     private func adjustAfterTodayDelete(
-            loadAxleItem: inout LoadAxleInfo,
-            currentIndex: inout Int
+        loadAxleItem: inout LoadAxleInfo,
+        currentIndex: inout Int
     ) -> Int{
         currentIndex = 0
         
@@ -357,7 +357,7 @@ class DataViewModel: ObservableObject {
             print("CSV 생성 실패")
             return nil
         }
-
+        
         return csvURL
     }
     
@@ -402,16 +402,71 @@ class DataViewModel: ObservableObject {
     
     func sendFilteredItems(type: CSVDataType) -> DataResult {
         let items = filteredItems
-
+        
         guard !items.isEmpty else {
             return .failure(error: .emptyData)
         }
-
+        
         let result = shareCSVFile(items: items, type: type)
         csvURL = result
-
+        
         return result == nil
-            ? .failure(error: .unknown)
-            : .success(message: NSLocalizedString("SuccessSend", comment: ""))
+        ? .failure(error: .unknown)
+        : .success(message: NSLocalizedString("SuccessSend", comment: ""))
+    }
+    
+    func decodeLoadAxleData(_ data: Data) -> [Int] {
+        (try? JSONDecoder().decode([Int].self, from: data)) ?? []
+    }
+    
+    func sumLoadAxleData(_ data: Data?) -> Int {
+        guard let data else { return 0 }
+        let axles = decodeLoadAxleData(data)
+        return axles.reduce(0, +)
+    }
+    
+    func makePrintPayloads(
+        items: [LoadAxleInfo],
+        printViewModel: PrintFormSettingViewModel
+    ) -> [PrintPayload] {
+        
+        let formatter = ISO8601DateFormatter()
+        
+        return items.map { item in
+            let total = sumLoadAxleData(item.loadAxleData)
+            
+            return PrintPayload(
+                printHeadLine: printViewModel.printHeadLineText ?? "",
+                date: formatter.string(from: item.timestamp ?? Date()),
+                item: item.product ?? "",
+                client: item.client ?? "",
+                serialNumber: item.serialNumber ?? "",
+                vehicleNumber: item.vehicle ?? "",
+                equipmentNumber: item.equipmentNumber ?? "",
+                loadAxle: decodeLoadAxleData(item.loadAxleData ?? Data()),
+                weight: item.weightNum ?? "",
+                total: String(total),
+                inspector: printViewModel.inspectorNameText ?? ""
+            )
+        }
+    }
+    
+    func sendToServer(
+        payloads: [PrintPayload],
+        completion: @escaping (Bool) -> Void
+    ) {
+        APIService.shared.uploadPayloads(payloads) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success:
+                    print("✅ Server upload success")
+                    completion(true)
+                    
+                case .failure(let error):
+                    print("❌ Server upload failed:", error)
+                    completion(false)
+                }
+            }
+        }
     }
 }

@@ -11,13 +11,15 @@ struct CheckBox: View {
     @Binding var isChecked: Bool
     
     @ObservedObject var viewModel: SettingViewModel
+    private var weightingMethod: Int {
+        viewModel.weightingMethod
+    }
     
     var label: String
     var select: String
     var body: some View {
         Button {
             isChecked.toggle()
-            
             switch select {
             case "product":
                 viewModel.saveProductCkeck(isChecked)
@@ -31,7 +33,10 @@ struct CheckBox: View {
                 Image(systemName: isChecked ? "checkmark.square.fill" : "square")
                     .resizable()
                     .frame(width: 22, height: 22)
-                    .foregroundColor(isChecked ? .blue : .gray)
+                    .foregroundColor(
+                        weightingMethod == 0 ? .gray :
+                            (isChecked ? .blue : .gray)
+                    )
                 
                 Text(label)
                     .foregroundColor(.primary)

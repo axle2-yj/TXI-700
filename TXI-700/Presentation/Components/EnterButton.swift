@@ -10,11 +10,16 @@ import Foundation
 
 struct EnterButton: View {
     @ObservedObject var viewModel: SettingViewModel
+    @Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var bleManager: BluetoothManager
     @Binding var loadAxleStatus: [LoadAxleStatus]
     
     @State private var hasChanged: Bool = false
     @State private var lastTotal: Int = 0  // Enter 누른 시점의 합 저장
+    private var tint: Color {
+        colorScheme == .dark ? .white : .black
+    }
+    
     var onEnter: () -> Void
     var onEnterMassege: () -> Void
     let EnterByte: [UInt8] = [
@@ -24,40 +29,57 @@ struct EnterButton: View {
     var body: some View {
         VStack {
             Button("ENTER") {
-                if (bleManager.leftLoadAxel1 ?? 0) < 0 || (bleManager.rightLoadAxel1 ?? 0) < 0 {
+                if (bleManager.axles[1]?.leftWeight ?? 0) < 0 || (bleManager.axles[1]?.rightWeight ?? 0) < 0 {
                     onEnterMassege()
                     return
                 }
-                print("Enter Send Result: \(bleManager.sendData(EnterByte))")
+                bleManager.sendCommand(.bte, log: "Enter")
                 onEnter()
             }.frame(maxWidth: .infinity, maxHeight: 50)
-            .padding()
-            .background(Color.gray.opacity(0.3))
-            .cornerRadius(6)
-            .foregroundColor(.black)
-            .disabled(viewModel.modeName == "Auto Inmotion" || !hasChanged)
-            .opacity(viewModel.modeName == "Auto Inmotion" ? 0.4 :(hasChanged ? 1.0 : 0.4))
-            .onChange(of: bleManager.leftLoadAxel1) { _, _ in detectChange() }
-            .onChange(of: bleManager.rightLoadAxel1) { _, _ in detectChange() }
-        }.onReceive(bleManager.$isEnter) { newValue in
-            if newValue {
-                performEnterAction()
-                onEnter()
+                .padding()
+                .background(Color.gray.opacity(0.3))
+                .cornerRadius(6)
+                .foregroundColor(tint)
+                .disabled(viewModel.modeName == "Auto Inmotion" || !hasChanged)
+                .opacity(viewModel.modeName == "Auto Inmotion" ? 0.4 :(hasChanged ? 1.0 : 0.4))
+                .onChange(of: bleManager.axles[1]?.leftWeight) { _, _ in detectChange() }
+                .onChange(of: bleManager.axles[1]?.rightWeight) { _, _ in detectChange() }
+        }
+//        .onReceive(bleManager.$isEnter) { newValue in
+//            if newValue {
+//                performEnterAction()
+//                onEnter()
+//            }
+//        }
+        .onChange(of: bleManager.indicatorState) { state, _ in
+            if state == IndicatorState.enter {
+                if !viewModel.isSum {
+                    print("enter")
+                    performEnterAction()
+                    onEnter()
+                } else {
+                    print("cancel")
+                    viewModel.isSum = false
+                }
             }
+            else if state == IndicatorState.sum {
+                print("enter sum")
+                viewModel.isSum = true
+            }
+            else { return }
         }
     }
     
     private func performEnterAction() {
         appendAxleData()
         hasChanged = false
-        // Enter 누른 시점 Left, right, Axle 임시 저장
-        lastTotal = (bleManager.leftLoadAxel1 ?? 0) + (bleManager.rightLoadAxel1 ?? 0)
+        lastTotal = bleManager.axles[1]?.totalWeight ?? 0
     }
-
+    
     private func appendAxleData() {
         let currentAxles = [
-            bleManager.leftLoadAxel1 ?? 0,
-            bleManager.rightLoadAxel1 ?? 0
+            bleManager.axles[1]?.leftWeight ?? 0,
+            bleManager.axles[1]?.rightWeight ?? 0
         ]
         
         if var last = loadAxleStatus.last {
@@ -79,21 +101,18 @@ struct EnterButton: View {
     }
     
     private func detectChange() {
-        let currentTotal =
-            (bleManager.leftLoadAxel1 ?? 0) +
-            (bleManager.rightLoadAxel1 ?? 0)
-
+        let currentTotal = bleManager.axles[1]?.totalWeight ?? 0
         let wasZero = lastTotal == 0
         let isZero = currentTotal == 0
-
+        
         if wasZero && !isZero {
             hasChanged = true
         }
-
+        
         if isZero {
             hasChanged = false
         }
-
+        
         lastTotal = currentTotal
     }
 }

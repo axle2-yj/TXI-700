@@ -19,7 +19,12 @@ struct SaveButton: View {
     var weightNum: String
     var onSave: () -> Void
     
+    @Environment(\.colorScheme) var colorScheme
+    
     @State private var isSaved: Bool = false
+    private var tint: Color {
+        colorScheme == .dark ? .white : .black
+    }
     
     var body: some View {
         Button("SAVE") {
@@ -27,15 +32,15 @@ struct SaveButton: View {
             saveData()
             isSaved = true
         }.frame(maxWidth: .infinity, maxHeight: 50)
-        .padding()
-        .background(Color.gray.opacity(0.3))
-        .cornerRadius(6)
-        .foregroundColor(.black)
-        .disabled(isSaved)
-        .opacity(isSaved ? 0.4 : 1.0)
+            .padding()
+            .background(Color.gray.opacity(0.3))
+            .cornerRadius(6)
+            .foregroundColor(tint)
+            .disabled(isSaved)
+            .opacity(isSaved ? 0.4 : 1.0)
     }
     
-     private func saveData() {
+    private func saveData() {
         onSave()
         for status in loadAxleStatus {
             LoadAxleDataManager.shared.addLoadAxle(
@@ -48,7 +53,7 @@ struct SaveButton: View {
                 loadAxleStatus: status.loadAxlesData
             )
         }
-         print(loadAxleStatus)
+        print(loadAxleStatus)
         print("✅ All data saved")
     }
 }

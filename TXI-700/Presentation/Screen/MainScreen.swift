@@ -12,9 +12,6 @@ struct MainScreen: View {
     @State private var goToList = false
     @State private var goToData = false
     @State private var selectedListType: ListType? = nil
-    @State private var selectedProduct: ProductInfo? = nil
-    @State private var selectedClient: ClientInfo? = nil
-    @State private var selectedVehicle: VehicleInfo? = nil
     @State private var loadAxleStatus: [LoadAxleStatus] = []
     @State private var twoStepLoadAxleStatus: [LoadAxleStatus] = []
     @State private var totalSumValue: Int = 0
@@ -42,89 +39,97 @@ struct MainScreen: View {
     @StateObject var printViewModel = PrintFormSettingViewModel()
     @StateObject var dataViewModel = DataViewModel()
     @StateObject private var clockManager = ClockManager()
+    @StateObject private var keyboard = KeyboardObserver()
     
     @Environment(\.presentationMode) var presentationMode
+    @Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var bleManager: BluetoothManager
     @EnvironmentObject var languageManager: LanguageManager
     
-    init() {
-        _productViewModel = StateObject(wrappedValue: ProductViewModel())
-        _clientViewModel = StateObject(wrappedValue: ClientViewModel())
-        _vehicleViewModel = StateObject(wrappedValue: VehicleViewModel())
+    private var tint: Color {
+        colorScheme == .dark ? .white : .black
+    }
+    
+    private var bottom: Color {
+        colorScheme == .dark ? .black : .white
     }
     
     var body: some View {
         ZStack {
+            let axleWeightsDict: [Int: (left: Int, right: Int, total: Int, leftBatteryLevel: Int, rightBatteryLevel: Int)] = Dictionary(
+                uniqueKeysWithValues: (1...4).map { i in
+                    let axle = bleManager.axles[i] ?? AxleState.empty(axle: i)
+                    return (i, (axle.leftWeight ?? 0, axle.rightWeight ?? 0, axle.totalWeight, axle.leftBatteryLevel ?? 0, axle.rightBatteryLevel ?? 0))
+                }
+            )
+            let left1 = axleWeightsDict[1]?.left ?? 0
+            let right1 = axleWeightsDict[1]?.right ?? 0
+            let left2 = axleWeightsDict[2]?.left ?? 0
+            let right2 = axleWeightsDict[2]?.right ?? 0
+            let left3 = axleWeightsDict[3]?.left ?? 0
+            let right3 = axleWeightsDict[3]?.right ?? 0
+            let left4 = axleWeightsDict[4]?.left ?? 0
+            let right4 = axleWeightsDict[4]?.right ?? 0
+            
+            let total1 = axleWeightsDict[1]?.total ?? 0
+            
+            let left1Bat = axleWeightsDict[1]?.leftBatteryLevel ?? 0
+            let right1Bat = axleWeightsDict[1]?.rightBatteryLevel ?? 0
+            let indicatorBat = bleManager.indicatorBatteryLevel ?? 0
+            
             VStack(spacing: 3) {
                 ClockView(currentTime: $clockManager.currentTime)
-                VStack(spacing: 3) {
-                    if settingViewModel.weightingMethod == 3 {
-                        VStack {
-                            HStack {
-                                BatteryLevelBalanceView(
-                                    number: 1,
-                                    level: bleManager.loadAxle1BatteryLevel ?? 0,
-                                    divice: "LEFT1",
-                                    axleWight: bleManager.leftLoadAxel1 ?? 0)
-                                
-                                BatteryLevelBalanceView(
-                                    number: 2,
-                                    level: bleManager.loadAxle2BatteryLevel ?? 0,
-                                    divice: "RIGHT1",
-                                    axleWight: bleManager.rightLoadAxel1 ?? 0)
-                            }
-                            HStack {
-                                BatteryLevelBalanceView(
-                                    number: 3,
-                                    level: bleManager.loadAxle3BatteryLevel ?? 0,
-                                    divice: "LEFT2",
-                                    axleWight: bleManager.leftLoadAxel2 ?? 0)
-                                
-                                BatteryLevelBalanceView(
-                                    number: 4,
-                                    level: bleManager.loadAxle4BatteryLevel ?? 0,
-                                    divice: "RIGHT2",
-                                    axleWight: bleManager.rightLoadAxel2 ?? 0)
-                            }
-                            BatteryLevelBalanceView(
-                                number: 5,
+                ScrollView {
+                    VStack(spacing: 3) {
+                        if settingViewModel.weightingMethod == 3 {
+                            BalanceModeCell(
+                                axles: balanceAxles,
+                                indicatorBattery: indicatorBat,
+                            )
+                        } else {
+                            
+                            BatteryLevelLoadAxleWeightView(
+                                level: left1Bat,
+                                divice: "LEFT:",
+                                axleWight: String(left1))
+                            BatteryLevelLoadAxleWeightView(
+                                level: right1Bat,
+                                divice: "RIGHT:",
+                                axleWight: String(right1))
+                            BatteryLevelLoadAxleWeightView(
                                 level: bleManager.indicatorBatteryLevel ?? 0,
-                                divice: "TOTAL",
-                                axleWight: (bleManager.leftLoadAxel1 ?? 0) + (bleManager.rightLoadAxel1 ?? 0) + (bleManager.leftLoadAxel2 ?? 0) + (bleManager.rightLoadAxel2 ?? 0))
+                                divice: "AXLE:",
+                                axleWight: String(total1))
                         }
-                    } else {
-                        BatteryLevelLoadAxleWeightView(level: bleManager.loadAxle1BatteryLevel ?? 0, divice: "LEFT:", axleWight: String(bleManager.leftLoadAxel1 ?? 0))
-                        BatteryLevelLoadAxleWeightView(level: bleManager.loadAxle2BatteryLevel ?? 0, divice: "RIGHT:", axleWight: String(bleManager.rightLoadAxel1 ?? 0))
-                        BatteryLevelLoadAxleWeightView(level: bleManager.indicatorBatteryLevel ?? 0, divice: "AXLE:", axleWight: String(String((bleManager.leftLoadAxel1 ?? 0) + (bleManager.rightLoadAxel1 ?? 0))))
                     }
-                }
+                }.scrollDisabled(keyboard.keyboardHeight == 0)
+                
                 let noWidth: CGFloat = 35
                 VStack(alignment: .leading, spacing: 5) {
                     if settingViewModel.weightingMethod != 3 {
                         HStack {
                             Text("No")
                                 .frame(width: noWidth, alignment: .leading)
-
-                            Text("LEFT")
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .layoutPriority(1)
-
-                            Text("RIGHT")
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .layoutPriority(1)
-
-                            Text("AXLE")
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .layoutPriority(1)
+                            TableColumn(alignment: .center) {
+                                Text("LEFT")
+                            }
+                            
+                            TableColumn(alignment: .center) {
+                                Text("RIGHT")
+                            }
+                            
+                            TableColumn(alignment: .center) {
+                                Text("AXLE")
+                            }
                         }
                         .font(.system(size: 25))
-                        .padding(.vertical, 6)
                         .background(Color.gray.opacity(0.1))
+                        .padding(.vertical, 2)
                         
                         ScrollView {
                             if !loadAxleStatus.isEmpty {
                                 ForEach(loadAxleStatus) { loadAxle in
-                                    let rowCount = (loadAxle.loadAxlesData.count + 1) / 2  // 2개씩 묶어서 몇 줄 필요한지
+                                    let rowCount = (loadAxle.loadAxlesData.count + 1) / 2
                                     ForEach(0..<rowCount, id: \.self) { rowIndex in
                                         let firstIndex = rowIndex * 2
                                         let secondIndex = firstIndex + 1
@@ -134,34 +139,155 @@ struct MainScreen: View {
                                         HStack {
                                             Text("\(loadAxle.id + rowIndex)")
                                                 .frame(width: noWidth, alignment: .leading)
-
-                                            MainWeightText(value: firstValue)
-
-                                            MainWeightText(value: secondValue)
-
-                                            MainWeightText(value: firstValue + secondValue)
+                                            TableColumn(alignment: .trailing) {
+                                                MainWeightText(value: firstValue)
+                                            }
+                                            TableColumn(alignment: .trailing) {
+                                                MainWeightText(value: secondValue)
+                                            }
+                                            
+                                            TableColumn(alignment: .trailing) {
+                                                MainWeightText(value: firstValue + secondValue)
+                                            }
                                         }
                                         .lineLimit(1)
                                         .padding(.vertical, 5)
                                         Divider()
-
+                                        
                                     }
                                 }
                             }
                         }
                     } else {
-                        WeightBalanceView(
-                                left1: CGFloat(bleManager.leftLoadAxel1 ?? 0),
-                                right1: CGFloat(bleManager.rightLoadAxel1 ?? 0),
-                                left2: CGFloat(bleManager.leftLoadAxel2 ?? 0),
-                                right2: CGFloat(bleManager.rightLoadAxel2 ?? 0)
-                        )
-                        .frame(height: 300)
-                        .padding()
+                        GeometryReader { geo in
+                            ScrollView {
+                                if settingViewModel.balanceAxisNuberCount == 0 {
+                                    WeightBalanceOverAxleView(
+                                        axles: [
+                                            Axle(left: CGFloat(left1), right: CGFloat(right1)),
+                                            Axle(left: CGFloat(left2), right: CGFloat(right2)),
+                                        ],
+                                        isEdgeTotals: settingViewModel.balanceWeight,
+                                        viewModel: settingViewModel
+                                    )
+                                    .frame(maxHeight: geo.size.height - 25)
+                                } else if settingViewModel.balanceAxisNuberCount == 1 {
+                                    WeightBalanceOverAxleView(
+                                        axles: [
+                                            Axle(left: CGFloat(left1), right: CGFloat(right1)),
+                                            Axle(left: CGFloat(left2), right: CGFloat(right2)),
+                                            Axle(left: CGFloat(left3), right: CGFloat(right3))
+                                        ],
+                                        isEdgeTotals: settingViewModel.balanceWeight,
+                                        viewModel: settingViewModel
+                                    )
+                                    .frame(maxHeight: geo.size.height - 25)
+                                } else {
+                                    WeightBalanceOverAxleView(
+                                        axles: [
+                                            Axle(left: CGFloat(left1), right: CGFloat(right1)),
+                                            Axle(left: CGFloat(left2), right: CGFloat(right2)),
+                                            Axle(left: CGFloat(left3), right: CGFloat(right3)),
+                                            Axle(left: CGFloat(left4), right: CGFloat(right4))
+                                        ],
+                                        isEdgeTotals: settingViewModel.balanceWeight,
+                                        viewModel: settingViewModel
+                                    )
+                                    .frame(maxHeight: geo.size.height - 25)
+                                }
+                            }
+                        }.scrollDisabled(keyboard.keyboardHeight == 0)
+                        let weightingMethodInt = settingViewModel.weightingMethod
+                        let balanceCellNum = settingViewModel.balanceAxisNuberCount
+                        let vehicle = String(vehicleNum).isEmpty ? "N/A" : String(vehicleNum)
+                        let client = String(clientViewModel.selectedClient?.name ?? "N/A")
+                        let product = String(productViewModel.selectedProduct?.name ?? "N/A")
+                        let leftAxles  = [left1, left2, left3, left4]
+                        let rightAxles = [right1, right2, right3, right4]
                         
+                        let lines: [String] = {
+                            PrintLineBuilder.buildBalanceLines(
+                                axleState: bleManager.axles,
+                                timeStamp: Date(),
+                                client : client,
+                                vehicle : vehicle,
+                                serialNumber: String(mainViewModel.sn),
+                                printViewModel: printViewModel
+                            )
+                        }()
+                        
+                        HStack {
+                            Button("Car.no") {
+                                selectedListType = .vehicle
+                                goToList = true
+                            }.padding()
+                                .background(Color.gray.opacity(0.3))
+                                .cornerRadius(6)
+                                .foregroundColor(tint)
+                            CustomPlaceholderTextField(
+                                placeholder: "VehicleNum".localized(languageManager.selectedLanguage),
+                                text: $vehicleNum
+                            ).onReceive(vehicleViewModel.$selectedVehicle) { newValue in
+                                guard newValue != nil else { return }
+                                vehicleNum = newValue?.vehicle ?? ""
+                                weighting1stData = Int(newValue?.weight ?? 0)
+                            }
+                            
+                            PrintButton(
+                                isMain: true,
+                                seletedType: $selectNum,
+                                viewModel: dataViewModel,
+                                printViewModel: printViewModel,
+                                settingViewModel: settingViewModel,
+                                printResponse: $printResponse,
+                                lines: lines,
+                                onPrint: {
+                                    isPrinting = true
+                                    if balanceCellNum == 0 {
+                                        
+                                        for i in 0..<2 {
+                                            mainViewModel.handleLoadAxleState(
+                                                loadAxleStatus: &loadAxleStatus,
+                                                left: leftAxles[i],
+                                                right: rightAxles[i]
+                                            )
+                                        }
+                                    } else {
+                                        for i in 0..<3 {
+                                            mainViewModel.handleLoadAxleState(
+                                                loadAxleStatus: &loadAxleStatus,
+                                                left: leftAxles[i],
+                                                right: rightAxles[i]
+                                            )
+                                        }
+                                    }
+                                },
+                                offPrint: {
+                                    let vehicle = String(vehicleViewModel.selectedVehicle?.vehicle ?? "N/A")
+                                    if weightingMethodInt == 3 && !loadAxleStatus.isEmpty {
+                                        LoadAxleSaveService.printSaveData(
+                                            serialNumber: String(mainViewModel.sn),
+                                            equipmentNumber: String(bleManager.equipmentNumber),
+                                            client: "\(client)",
+                                            product: "\(product)",
+                                            vehicle: "\(vehicle)",
+                                            weightNum: String(weightingMethodInt),
+                                            loadAxleStatus: loadAxleStatus
+                                        ) {
+                                            isPrinting = false
+                                            printInitial()
+                                        }
+                                    }
+                                }).frame(height: 30)
+                        }.safeAreaPadding(
+                            .bottom,
+                            settingViewModel.weightingMethod == 3
+                            ? keyboard.keyboardHeight - 300
+                            : 0
+                        )
+                        .animation(.easeOut(duration: 0.25), value: keyboard.keyboardHeight - 300)
                     }
-                }.padding()
-                Spacer()
+                }.padding(.horizontal)
             }
             .safeAreaInset(edge: .top) {
                 CustomMainTopBar(title: mainViewModel.text,onBack: {
@@ -171,7 +297,7 @@ struct MainScreen: View {
                 }, viewModel: settingViewModel)
                 .onReceive(bleManager.$modeChangeInt) { newValue in
                     settingViewModel.saveModeChange(newValue)
-                    settingViewModel.loadModeChange()
+                    settingViewModel.loadModeChange(colorScheme == .dark)
                 }.onAppear {
                     DispatchQueue.main.async {
                         mainViewModel.loadProduct()
@@ -181,10 +307,15 @@ struct MainScreen: View {
                     mainViewModel.loadSn()
                     settingViewModel.loadLanguage()
                     settingViewModel.loadWeightingMethod()
-                    settingViewModel.loadModeChange()
+                    settingViewModel.loadModeChange(colorScheme == .dark)
                     settingViewModel.loadProductCkeck()
                     settingViewModel.loadClientCkeck()
                     settingViewModel.loadPrintOutputCountSetting()
+                    settingViewModel.loadBalanceAxisNumberSetting()
+                    settingViewModel.loadBalanceWeghtSetting()
+                    settingViewModel.loadDangerousNumberSetting()
+                    settingViewModel.loadCautionNumberSetting()
+                    settingViewModel.loadSafetyNumberSetting()
                 }
                 
             }
@@ -196,29 +327,35 @@ struct MainScreen: View {
                                 Text("S/N : \(mainViewModel.sn)")
                                 Spacer()
                                 Text("TOTAL : \(totalSumValue) kg")
-                            }.padding(.horizontal, 20)
-                                .font(Font.system(size: 25, weight: .bold, design: .default))
+                            }.padding(.horizontal, 5)
+                                .font(Font.system(size: 20, weight: .bold, design: .default))
                             
                             HStack {
-                                let weighting1stvalue = selectedVehicle?.weight == nil ? weighting1stData : 0
                                 if settingViewModel.weightingMethod == 2 {
                                     Text("1stWeight")
                                         .lineLimit(1)
                                         .truncationMode(.tail)
+                                        .font(Font.system(size: 20, weight: .bold, design: .default))
                                     Text(" : ")
-                                    Text(String(weighting1stvalue))
+                                        .font(Font.system(size: 15, weight: .bold, design: .default))
+                                    Text("\(weighting1stData)")
                                         .lineLimit(1)
+                                        .font(Font.system(size: 20, weight: .bold, design: .default))
                                     Text("kg")
+                                        .font(Font.system(size: 15, weight: .bold, design: .default))
                                     Spacer()
                                     Text("NetWeight").lineLimit(1)
                                         .truncationMode(.tail)
+                                        .font(Font.system(size: 20, weight: .bold, design: .default))
                                     Text(String(netWeightData)).lineLimit(1)
+                                        .font(Font.system(size: 20, weight: .bold, design: .default))
                                     Text("kg")
+                                        .font(Font.system(size: 15, weight: .bold, design: .default))
                                 }
-                            }.padding(.horizontal, 20)
-                                .font(Font.system(size: 25, weight: .bold, design: .default))
+                            }.padding(.horizontal, 5)
+                                
                         }
-                        
+                        let isButtonEnabled = (settingViewModel.weightingMethod != 0 || !vehicleNum.isEmpty) && !isTwoStep
                         HStack {
                             Button("Car.no") {
                                 selectedListType = .vehicle
@@ -226,71 +363,78 @@ struct MainScreen: View {
                             }.padding()
                                 .background(Color.gray.opacity(0.3))
                                 .cornerRadius(6)
-                                .foregroundColor(.black)
+                                .foregroundColor(tint)
                             
-                            TextField("Car Number", text: $vehicleNum)
-                                .textFieldStyle(.roundedBorder)
-                                .onChange(of: selectedVehicle) { newValue, _ in
-                                    vehicleNum = newValue?.vehicle ?? ""
-                                }
+                            CustomPlaceholderTextField(
+                                placeholder: "VehicleNum".localized(languageManager.selectedLanguage),
+                                text: $vehicleNum
+                            ).onReceive(vehicleViewModel.$selectedVehicle) { newValue in
+                                guard newValue != nil else { return }
+                                vehicleNum = newValue?.vehicle ?? ""
+                                weighting1stData = Int(newValue?.weight ?? 0)
+                            }
                             
                             
-                            Button(settingViewModel.weightingMethod != 2 ? "Send" : "1stWeight") {
-                                if settingViewModel.weightingMethod == 2 {
-                                    let total = loadAxleStatus.reduce(0) { $0 + $1.total }
-                                    loadAxleStatus[0].loadAxlesData = [total]
-                                    twoStepLoadAxleStatus = loadAxleStatus
-                                    weighting1stData = loadAxleStatus.reduce(0) { $0 + $1.total }
-                                    isTwoStep = true
-                                    isMainSum = false
-                                    okButtonAction()
-                                } else if settingViewModel.weightingMethod == 0{
-                                    let type: BLEItemType = .vechicle
-                                    
-                                    let bytes = makePacket(
-                                        type: type,
-                                        num: 0,
-                                        name: vehicleNum
-                                    )
-                                    print("Vehicle save send : \(bleManager.sendData(bytes))")
-                                }
-                            }.padding()
-                                .background(Color.gray.opacity(0.3))
-                                .cornerRadius(6)
-                                .foregroundColor(.black)
-                                .disabled(
-                                    (!isMainSum &&
-                                     isTwoStep) ||
-                                    vehicleNum.isEmpty
-                                )
-                                .opacity(
-                                    (isMainSum && isTwoStep) || !vehicleNum.isEmpty
-                                    ? 1.0
-                                    : 0.4
-                                )
+                            if settingViewModel.weightingMethod != 1 {
+                                Button(settingViewModel.weightingMethod != 2 ? "Send" : "1stWeight") {
+                                    if settingViewModel.weightingMethod == 2 {
+                                        guard !loadAxleStatus.isEmpty else { return }
+                                        let total = loadAxleStatus.reduce(0) { $0 + $1.total }
+                                        loadAxleStatus[0].loadAxlesData = [total]
+                                        twoStepLoadAxleStatus = loadAxleStatus
+                                        weighting1stData = loadAxleStatus.reduce(0) { $0 + $1.total }
+                                        isTwoStep = true
+                                        isMainSum = false
+                                        okButtonAction()
+                                    } else if settingViewModel.weightingMethod == 0{
+                                        bleManager.sendCommand(.btc(vehicleNum), log: "Vehicle Save Send")
+                                    }
+                                }.padding()
+                                    .background(Color.gray.opacity(0.3))
+                                    .cornerRadius(6)
+                                    .foregroundColor(tint)
+                                    .disabled(!isButtonEnabled)
+                                    .opacity(isButtonEnabled ? 1.0 : 0.4)
+                            } else {
+                                Button("Save") {
+                                    vehicleViewModel.save(vehicleNum: vehicleNum)
+                                }.padding()
+                                    .background(Color.gray.opacity(0.3))
+                                    .cornerRadius(6)
+                                    .foregroundColor(tint)
+                                    .disabled(!isButtonEnabled)
+                                    .opacity(isButtonEnabled ? 1.0 : 0.4)
+                                    .onReceive(vehicleViewModel.$saveSuccessMessage) { message in
+                                        guard message != nil else { return }
+                                        activeAlert = .saveSuccess(message ?? "")
+                                    }.onReceive(vehicleViewModel.$saveFailedMessage) { message in
+                                        guard message != nil else { return }
+                                        activeAlert = .saveError((message!.localized(languageManager.selectedLanguage)))
+                                    }
+                            }
                         }
                         
                         HStack {
                             if settingViewModel.checkedProduct {
-                                Button("\(selectedProduct?.name ?? mainViewModel.saveProduct ?? "ITEM <<")") {
+                                Button("\(productViewModel.selectedProduct?.name ?? mainViewModel.saveProduct ?? "ITEM <<")") {
                                     selectedListType = .product
                                     goToList = true
                                 }.frame(maxWidth: .infinity) // 화면 절반 차지
                                     .padding()
                                     .background(Color.gray.opacity(0.3))
                                     .cornerRadius(6)
-                                    .foregroundColor(.black)
+                                    .foregroundColor(tint)
                             }
                             
                             if settingViewModel.checkedClient {
-                                Button("\(selectedClient?.name ?? mainViewModel.saveClient ?? "CLIENT <<")") {
+                                Button("\(clientViewModel.selectedClient?.name ?? mainViewModel.saveClient ?? "CLIENT <<")") {
                                     selectedListType = .client
                                     goToList = true
                                 }.frame(maxWidth: .infinity)
                                     .padding()
                                     .background(Color.gray.opacity(0.3))
                                     .cornerRadius(6)
-                                    .foregroundColor(.black)
+                                    .foregroundColor(tint)
                             }
                         }
                         
@@ -298,12 +442,12 @@ struct MainScreen: View {
                             ZeroButton()
                             Button("DATA") {
                                 goToData = true
-                                bleManager.sendInitialSaveDataCommand()
+                                bleManager.sendCommand(.bdc, log: "SaveData Call")
                             }.frame(maxWidth: .infinity)
                                 .padding()
                                 .background(Color.gray.opacity(0.3))
                                 .cornerRadius(6)
-                                .foregroundColor(.black)
+                                .foregroundColor(tint)
                             if isMainSum {
                                 Button("CANCEL") {
                                     okButtonAction()
@@ -311,7 +455,7 @@ struct MainScreen: View {
                                     .padding()
                                     .background(Color.gray.opacity(0.3))
                                     .cornerRadius(6)
-                                    .foregroundColor(.black)
+                                    .foregroundColor(tint)
                             }
                         }
                         
@@ -322,10 +466,9 @@ struct MainScreen: View {
                                     viewModel: settingViewModel,
                                     loadAxleStatus: $loadAxleStatus,
                                     onEnter: {
-                                        let weighting1stvalue = selectedVehicle?.weight == nil ? weighting1stData : 0
                                         if settingViewModel.weightingMethod == 2 {
                                             totalSumValue = loadAxleStatus.reduce(0) { $0 + $1.total }
-                                            netWeightData = totalSumValue - weighting1stvalue
+                                            netWeightData = totalSumValue - weighting1stData
                                         }
                                     },
                                     onEnterMassege: {
@@ -348,6 +491,10 @@ struct MainScreen: View {
                                 }
                             } else {
                                 let weightingMethodInt = settingViewModel.weightingMethod
+                                let vehicle = String(vehicleViewModel.selectedVehicle?.vehicle ?? "N/A")
+                                let product = String(productViewModel.selectedProduct?.name ?? "N/A")
+                                let client = String(clientViewModel.selectedClient?.name ?? "N/A")
+                                
                                 let lines: [String] = if weightingMethodInt == 0 {
                                     []
                                 } else if weightingMethodInt == 2{
@@ -358,9 +505,9 @@ struct MainScreen: View {
                                         dataViewModel: dataViewModel,
                                         printViewModel: printViewModel,
                                         timeStamp: Date(),
-                                        item: selectedProduct?.name ?? mainViewModel.saveProduct ?? "N/A",
-                                        client : selectedClient?.name ?? mainViewModel.saveClient ?? "N/A",
-                                        vehicle : selectedVehicle?.vehicle ?? "N/A",
+                                        item: product,
+                                        client : client,
+                                        vehicle : vehicle,
                                         serialNumber: String(mainViewModel.sn),
                                         selectedType: weightingMethodInt
                                     )
@@ -370,9 +517,9 @@ struct MainScreen: View {
                                         dataViewModel: dataViewModel,
                                         printViewModel: printViewModel,
                                         timeStamp: Date(),
-                                        item: selectedProduct?.name ?? mainViewModel.saveProduct ?? "N/A",
-                                        client : selectedClient?.name ?? mainViewModel.saveClient ?? "N/A",
-                                        vehicle : selectedVehicle?.vehicle ?? "N/A",
+                                        item: product,
+                                        client : client,
+                                        vehicle : vehicle,
                                         serialNumber: String(mainViewModel.sn),
                                         selectedType: weightingMethodInt
                                     )
@@ -389,17 +536,11 @@ struct MainScreen: View {
                                     onPrint: {
                                         isPrinting = true
                                         if weightingMethodInt != 0 {
-                                            let type: BLEItemType = .vechicle
-                                            
-                                            let bytes = makePacket(
-                                                type: type,
-                                                num: 0,
-                                                name: vehicleNum
-                                            )
-                                            print("Vehicle save send : \(bleManager.sendData(bytes))")
+                                            bleManager.sendCommand(.btc(vehicleNum), log: "Vehicle Save Send")
                                         }
                                     },
                                     offPrint: {
+                                        let vehicle = String(vehicleViewModel.selectedVehicle?.vehicle ?? "N/A")
                                         if weightingMethodInt == 2 {
                                             twoStepLoadAxleStatus[0].loadAxlesData.append(loadAxleStatus[0].total)
                                             twoStepLoadAxleStatus[0].total = twoStepLoadAxleStatus[0].total + loadAxleStatus[0].total
@@ -408,9 +549,9 @@ struct MainScreen: View {
                                                 LoadAxleSaveService.printSaveData(
                                                     serialNumber: String(mainViewModel.sn),
                                                     equipmentNumber: String(bleManager.equipmentNumber),
-                                                    client: selectedClient?.name ?? mainViewModel.saveClient ?? "N/A",
-                                                    product: selectedProduct?.name ?? mainViewModel.saveProduct ?? "N/A",
-                                                    vehicle: selectedVehicle?.vehicle ?? "N/A",
+                                                    client: "\(client)",
+                                                    product: "\(product)",
+                                                    vehicle: "\(vehicle)",
                                                     weightNum: String(weightingMethodInt),
                                                     loadAxleStatus: twoStepLoadAxleStatus
                                                 ) {
@@ -433,9 +574,9 @@ struct MainScreen: View {
                                                 LoadAxleSaveService.printSaveData(
                                                     serialNumber: String(mainViewModel.sn),
                                                     equipmentNumber: String(bleManager.equipmentNumber),
-                                                    client: selectedClient?.name ?? mainViewModel.saveClient ?? "N/A",
-                                                    product: selectedProduct?.name ?? mainViewModel.saveProduct ?? "N/A",
-                                                    vehicle: selectedVehicle?.vehicle ?? "N/A",
+                                                    client: "\(client)",
+                                                    product: "\(product)",
+                                                    vehicle: "\(vehicle)",
                                                     weightNum: String(weightingMethodInt),
                                                     loadAxleStatus: loadAxleStatus
                                                 ) {
@@ -468,9 +609,9 @@ struct MainScreen: View {
                                             twoStepLoadAxleStatus[0].total = twoStepLoadAxleStatus[0].total + loadAxleStatus[0].total
                                         },
                                         loadAxleStatus: $twoStepLoadAxleStatus,
-                                        client: "\(selectedClient?.name ?? "N/A")",
-                                        product: "\(selectedProduct?.name ?? "N/A")",
-                                        vehicle: "\(selectedVehicle?.vehicle ?? "N/A")",
+                                        client: "\(client)",
+                                        product: "\(product)",
+                                        vehicle: "\(vehicle)",
                                         serialNumber : "\(mainViewModel.sn)",               // 시리얼 넘버 비교 저장 필요
                                         equipmentNumber : bleManager.equipmentNumber,       // 추후 진짜 장치 고유번호 정식 번호 저장 필요
                                         weightNum : String(settingViewModel.weightingMethod),
@@ -484,9 +625,9 @@ struct MainScreen: View {
                                             print("beforSave")
                                         },
                                         loadAxleStatus: $loadAxleStatus,
-                                        client: "\(selectedClient?.name ?? "N/A")",
-                                        product: "\(selectedProduct?.name ?? "N/A")",
-                                        vehicle: "\(selectedVehicle?.vehicle ?? "N/A")",
+                                        client: "\(client)",
+                                        product: "\(product)",
+                                        vehicle: "\(vehicle)",
                                         serialNumber : "\(mainViewModel.sn)",               // 시리얼 넘버 비교 저장 필요
                                         equipmentNumber : bleManager.equipmentNumber,       // 추후 진짜 장치 고유번호 정식 번호 저장 필요
                                         weightNum : String(settingViewModel.weightingMethod),
@@ -497,6 +638,10 @@ struct MainScreen: View {
                         }
                     }
                 }
+                .background(bottom)
+            }
+            .onTapGesture {
+                hideKeyboard()
             }
             .navigationBarHidden(true)
             .navigationDestination(isPresented: $goToSetting){
@@ -509,9 +654,9 @@ struct MainScreen: View {
                                clientViewModel: clientViewModel,
                                vehicleViewModel: vehicleViewModel,
                                printViewModel: printViewModel,
-                               onSelectProduct: { selectedProduct = $0; goToList = false },
-                               onSelectClient: { selectedClient = $0; goToList = false },
-                               onSelectVehicle: { selectedVehicle = $0; goToList = false }
+                               onSelectProduct: { goToList = false },
+                               onSelectClient: { goToList = false },
+                               onSelectVehicle: { goToList = false }
                     )
                 }
             }.navigationDestination(isPresented: $goToData) {
@@ -523,36 +668,25 @@ struct MainScreen: View {
                     dismissButton: .default(
                         Text("OK"),
                         action: {
-                            isAlertShowing = false
-                            activeAlert = nil
-                            netWeightData = 0
-                            weighting1stData = 0
-                            vehicleNum.removeAll()
-                            printInitial()
+                            switch alertType {
+                            case .saveSuccess:
+                                break
+                            case .saveError:
+                                break
+                            default:
+                                isAlertShowing = false
+                                activeAlert = nil
+                                netWeightData = 0
+                                weighting1stData = 0
+                                vehicleNum.removeAll()
+                                printInitial()
+                            }
                         }
                     )
                 )
             }.onDisappear {
                 activeAlert = nil
                 isAlertShowing = false
-//                selectedProduct = nil
-//                selectedClient = nil
-//                selectedVehicle = nil
-//                loadAxleStatus = []
-//                twoStepLoadAxleStatus = []
-//                totalSumValue = 0
-//                isMainSum = false
-//                isTwoStep = false
-//                isPrint = false
-//                isSave = false
-//                printResponse = ""
-//                selectedListType = nil
-//                isPrinting = false
-//                weighting1stData = 0
-//                netWeightData = 0
-//                vehicleNumber = ""
-//                selectNum = 0
-//                enterError = ""
             }.onReceive(bleManager.$printResponse) { newValue in
                 guard !newValue.isEmpty else { return }
                 if !isAlertShowing {
@@ -560,25 +694,26 @@ struct MainScreen: View {
                     activeAlert = .printResponse(newValue)
                     isPrinting = false
                 }
-            }.onReceive(bleManager.$isSum) { newValue in
-                guard newValue else { return }
-                isMainSum = newValue
-            }.onReceive(bleManager.$isCancel) { newValue in
-                guard newValue else {
-                    print("isSum false")
-                    return
-                }
-                okButtonAction()
-                loadAxleStatus = []
-                isSave = false
-                isMainSum = false
-                isPrint = false
-                totalSumValue = 0
-                weighting1stData = 0
-                netWeightData = 0
-                isTwoStep = false
-                print("isSum true")
-            }.onReceive(bleManager.$SnNumber) { newSn in
+            }
+//            .onReceive(bleManager.$isSum) { newValue in
+//                guard newValue else { return }
+//                isMainSum = newValue
+//            }
+//            .onReceive(bleManager.$isCancel) { newValue in
+//                guard newValue else { return }
+//                okButtonAction()
+//                loadAxleStatus = []
+//                isSave = false
+//                isMainSum = false
+//                isPrint = false
+//                totalSumValue = 0
+//                if !isTwoStep {
+//                    weighting1stData = 0
+//                }
+//                netWeightData = 0
+//                isTwoStep = false
+//            }
+            .onReceive(bleManager.$SnNumber) { newSn in
                 guard newSn > 0 else { return }
                 mainViewModel.saveSn(newSn)
                 mainViewModel.loadSn()
@@ -588,9 +723,55 @@ struct MainScreen: View {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     mainViewModel.handleInmotion(
                         loadAxleStatus: &loadAxleStatus,
-                        left: bleManager.leftLoadAxel1 ?? 0,
-                        right: bleManager.rightLoadAxel1 ?? 0
+                        left: left1,
+                        right: right1
                     )
+                }
+            }
+            .onChange(of: bleManager.indicatorState) { state, _ in
+                switch state {
+                case IndicatorState.sum:
+                    if isMainSum {
+                        isMainSum = false
+                        print("print")
+                    } else {
+                        isMainSum = true
+                        print("sum")
+                    }
+                case IndicatorState.enter:
+                    if isMainSum {
+                        print("cancel")
+                        okButtonAction()
+                        loadAxleStatus = []
+                        isSave = false
+                        isMainSum = false
+                        isPrint = false
+                        totalSumValue = 0
+                        if !isTwoStep {
+                            weighting1stData = 0
+                        }
+                        netWeightData = 0
+                        isTwoStep = false
+                        settingViewModel.isSum = false
+                    }
+                default:
+                    break
+                }
+                bleManager.indicatorState = .idle
+            }
+            .onChange(of: goToSetting) { _, newValue in
+                if newValue {
+                    hideKeyboard()
+                }
+            }
+            .onChange(of: goToList) { _, newValue in
+                if newValue {
+                    hideKeyboard()
+                }
+            }
+            .onChange(of: goToData) { _, newValue in
+                if newValue {
+                    hideKeyboard()
                 }
             }
             
@@ -617,6 +798,12 @@ struct MainScreen: View {
         }
     }
     
+    var content: some View {
+        VStack(spacing: 3) {
+            ClockView(currentTime: $clockManager.currentTime)
+        }
+    }
+    
     func okButtonAction() {
         loadAxleStatus = []
         isSave = false
@@ -624,7 +811,7 @@ struct MainScreen: View {
         isPrint = false
         totalSumValue = 0
         saveValue = 0
-        bleManager.sendCancelCommand()
+        bleManager.sendCommand(.bte, log: "Cancel")
     }
     
     func printInitial() {
@@ -635,7 +822,81 @@ struct MainScreen: View {
         totalSumValue = 0
         saveValue = 0
     }
+    
+    private var balanceAxles: [BalanceCellData] {
+        let axleWeightsDict: [Int: (left: Int, right: Int, total: Int, leftBatteryLevel: Int, rightBatteryLevel: Int)] = Dictionary(
+            uniqueKeysWithValues: (1...4).map { i in
+                let axle = bleManager.axles[i] ?? AxleState.empty(axle: i)
+                return (i, (axle.leftWeight ?? 0, axle.rightWeight ?? 0, axle.totalWeight, axle.leftBatteryLevel ?? 0, axle.rightBatteryLevel ?? 0))
+            }
+        )
+        let left1 = axleWeightsDict[1]?.left ?? 0
+        let right1 = axleWeightsDict[1]?.right ?? 0
+        let left2 = axleWeightsDict[2]?.left ?? 0
+        let right2 = axleWeightsDict[2]?.right ?? 0
+        let left3 = axleWeightsDict[3]?.left ?? 0
+        let right3 = axleWeightsDict[3]?.right ?? 0
+        let left4 = axleWeightsDict[4]?.left ?? 0
+        let right4 = axleWeightsDict[4]?.right ?? 0
+        
+        let left1Bat = axleWeightsDict[1]?.leftBatteryLevel ?? 0
+        let right1Bat = axleWeightsDict[1]?.rightBatteryLevel ?? 0
+        let left2Bat = axleWeightsDict[2]?.leftBatteryLevel ?? 0
+        let right2Bat = axleWeightsDict[2]?.rightBatteryLevel ?? 0
+        let left3Bat = axleWeightsDict[3]?.leftBatteryLevel ?? 0
+        let right3Bat = axleWeightsDict[3]?.rightBatteryLevel ?? 0
+        let left4Bat = axleWeightsDict[4]?.leftBatteryLevel ?? 0
+        let right4Bat = axleWeightsDict[4]?.rightBatteryLevel ?? 0
+        
+        var result: [BalanceCellData] = [
+            BalanceCellData(
+                leftWeight: left1,
+                rightWeight: right1,
+                leftBattery: left1Bat,
+                rightBattery: right1Bat
+            ),
+            BalanceCellData(
+                leftWeight: left2,
+                rightWeight: right2,
+                leftBattery: left2Bat,
+                rightBattery: right2Bat
+            )
+        ]
+        
+        if settingViewModel.balanceAxisNuberCount == 1 {
+            result.append(
+                BalanceCellData(
+                    leftWeight: left3,
+                    rightWeight: right3,
+                    leftBattery: left3Bat,
+                    rightBattery: right3Bat
+                )
+            )
+        }
+        
+        if settingViewModel.balanceAxisNuberCount == 2 {
+            result.append(
+                BalanceCellData(
+                    leftWeight: left3,
+                    rightWeight: right3,
+                    leftBattery: left3Bat,
+                    rightBattery: right3Bat
+                )
+            )
+            result.append(
+                BalanceCellData(
+                    leftWeight: left4,
+                    rightWeight: right4,
+                    leftBattery: left4Bat,
+                    rightBattery: right4Bat
+                )
+            )
+        }
+        return result
+    }
+    
 }
+
 
 #Preview {
     MainScreen()
