@@ -24,9 +24,9 @@ struct ListScreen: View {
     @EnvironmentObject var bleManager: BluetoothManager
     @EnvironmentObject var languageManager: LanguageManager
     
-    var onSelectProduct: ((ProductInfo) ->Void)?
-    var onSelectClient: ((ClientInfo) -> Void)?
-    var onSelectVehicle: ((VehicleInfo) -> Void)?
+    var onSelectProduct: () ->Void
+    var onSelectClient: () -> Void
+    var onSelectVehicle: () -> Void
     
     var body: some View {
         VStack{
@@ -37,8 +37,8 @@ struct ListScreen: View {
                         TextField("product", text: $productViewModel.name)
                             .textFieldStyle(.roundedBorder)
                         let productNum: Int = {
-                            if let num = productViewModel.selectedProduct?.num {
-                                return Int(num)
+                            if let num = productViewModel.selectedProduct?.shortcutNum {
+                                return Int(num) + 1
                             } else {
                                 return productViewModel.productItems.count
                             }
@@ -48,22 +48,12 @@ struct ListScreen: View {
                             title: productViewModel.selectedProduct == nil ? "Save".localized(languageManager.selectedLanguage) : "Update".localized(languageManager.selectedLanguage),
                             onButton:{
                                 let name = productViewModel.name
-                                let type: BLEItemType = .product
                                 
                                 guard !name.isEmpty else {
                                     activeAlert = .error("ProductError".localized(languageManager.selectedLanguage))
                                     return
                                 }
-                                
-                                let bytes = makePacket(
-                                    type: type,
-                                    num: productNum + 1,
-                                    name: name
-                                )
-                                
-                                print("Product name : \(name)")
-                                print("Product save send : \(bleManager.sendData(bytes))")
-                                
+                                bleManager.sendItemSaveCommand(num: productNum, name: name)
                                 productViewModel.saveOrUpdateProcduct()
                             }
                         )
@@ -77,8 +67,8 @@ struct ListScreen: View {
                         TextField("client", text: $clientViewModel.name)
                             .textFieldStyle(.roundedBorder)
                         let clientNum: Int = {
-                            if let num = clientViewModel.selectedClient?.num {
-                                return Int(num)
+                            if let num = clientViewModel.selectedClient?.shortcutNum {
+                                return Int(num) + 1
                             } else {
                                 return clientViewModel.clientItems.count
                             }
@@ -87,19 +77,12 @@ struct ListScreen: View {
                             title: clientViewModel.selectedClient == nil ? "Save".localized(languageManager.selectedLanguage) : "Update".localized(languageManager.selectedLanguage),
                             onButton:{
                                 let name = clientViewModel.name
-                                let type: BLEItemType = .client
                                 
                                 guard !name.isEmpty else {
                                     activeAlert = .error("ClientError".localized(languageManager.selectedLanguage))
                                     return
                                 }
-                                
-                                let bytes = makePacket(
-                                    type: type,
-                                    num: clientNum + 1,
-                                    name: name
-                                )
-                                print("Client save send : \(bleManager.sendData(bytes))")
+                                bleManager.sendClientSaveCommand(num: clientNum, name: name)
                                 clientViewModel.saveOrUpdateClient()
                             }
                         )
@@ -131,36 +114,37 @@ struct ListScreen: View {
                     else {
                         List {
                             ForEach(productViewModel.productItems) { item in
-                                HStack {
-                                    Text("\(item.num+1)")
-                                    Spacer()
-                                    Text("\(item.name ?? "")")
-                                    Spacer()
-                                    if isAddMode {
-                                        Button(action: { productViewModel.deleteProduct(item: item) }) {
-                                            Image(systemName: "trash")
-                                                .font(.title)
-                                                .foregroundColor(.red)
+                                ZStack {
+                                    if productViewModel.selectedProduct?.id == item.id {
+                                        Color.blue.opacity(0.15)
+                                            .cornerRadius(6)
+                                    }
+                                    Button {
+                                        if !isAddMode {
+                                            onSelectProduct()
+                                            productViewModel.selectProduct(item)
+                                        } else {
+                                            productViewModel.selectProduct(item)
                                         }
-                                        .buttonStyle(BorderlessButtonStyle())
+                                    } label: {
+                                        HStack {
+                                            Text("\(item.num+1)")
+                                            Spacer()
+                                            Text("\(item.name ?? "")")
+                                            Spacer()
+                                            if isAddMode {
+                                                Button(action: { productViewModel.deleteProduct(item: item) }) {
+                                                    Image(systemName: "trash")
+                                                        .font(.title)
+                                                        .foregroundColor(.red)
+                                                }
+                                                .buttonStyle(BorderlessButtonStyle())
+                                            }
+                                        }
+                                        .padding(8)
+                                        .contentShape(Rectangle())
                                     }
-                                }
-                                .padding(8)
-                                .contentShape(Rectangle()) // HStack 전체 영역을 클릭 가능하게 함
-                                .background(
-                                            productViewModel.selectedProduct == item
-                                            ? Color.blue.opacity(0.15)
-                                            : Color.clear
-                                        )
-                                .onTapGesture {
-                                    if !isAddMode {
-                                        bleManager.sendInitialItemCommand(
-                                            num: Int(item.num+1)
-                                        )
-                                        onSelectProduct?(item)
-                                    } else {
-                                        productViewModel.selectProduct(item)
-                                    }
+                                    .buttonStyle(.plain)
                                 }
                             }.onMove { from, to in
                                 if isAddMode {
@@ -181,36 +165,37 @@ struct ListScreen: View {
                     else {
                         List {
                             ForEach(clientViewModel.clientItems) { item in
-                                HStack {
-                                    Text("\(item.num+1)")
-                                    Spacer()
-                                    Text("\(item.name ?? "")")
-                                    Spacer()
-                                    if isAddMode {
-                                        Button(action: { clientViewModel.deleteClient(item: item) }) {
-                                            Image(systemName: "trash")
-                                                .font(.title)
-                                                .foregroundColor(.red)
+                                ZStack {
+                                    if clientViewModel.selectedClient?.id == item.id {
+                                        Color.blue.opacity(0.15)
+                                            .cornerRadius(6)
+                                    }
+                                    Button {
+                                        if !isAddMode {
+                                            onSelectClient()
+                                            clientViewModel.selectClient(item)
+                                        } else {
+                                            clientViewModel.selectClient(item)
                                         }
-                                        .buttonStyle(BorderlessButtonStyle())
+                                    } label: {
+                                        HStack {
+                                            Text("\(item.num+1)")
+                                            Spacer()
+                                            Text("\(item.name ?? "")")
+                                            Spacer()
+                                            if isAddMode {
+                                                Button(action: { clientViewModel.deleteClient(item: item) }) {
+                                                    Image(systemName: "trash")
+                                                        .font(.title)
+                                                        .foregroundColor(.red)
+                                                }
+                                                .buttonStyle(BorderlessButtonStyle())
+                                            }
+                                        }
+                                        .padding(8)
+                                        .contentShape(Rectangle())
                                     }
-                                }
-                                .padding(8)
-                                .contentShape(Rectangle())
-                                .background(
-                                            clientViewModel.selectedClient == item
-                                            ? Color.blue.opacity(0.15)
-                                            : Color.clear
-                                        )
-                                .onTapGesture {
-                                    if !isAddMode {
-                                        bleManager.sendInitialClientCommand(
-                                            num: Int(item.num+1)
-                                        )
-                                        onSelectClient?(item)
-                                    } else {
-                                        clientViewModel.selectClient(item)
-                                    }
+                                    .buttonStyle(.plain)
                                 }
                             }.onMove { from, to in
                                 if isAddMode {
@@ -230,34 +215,40 @@ struct ListScreen: View {
                     else {
                         List {
                             ForEach(vehicleViewModel.vehicleItems.sorted { $0.num < $1.num }) { item in
-                                HStack {
-                                    Text("\(item.num+1)")
-                                    Spacer()
-                                    Text("\(item.vehicle ?? "")")
-                                    Spacer()
-                                    Text("\(item.weight) kg")
-                                    if isAddMode {
-                                        Button(action: { vehicleViewModel.deleteVehicleItem(item: item) }) {
-                                            Image(systemName: "trash")
-                                                .font(.title)
-                                                .foregroundColor(.red)
+                                ZStack {
+                                    if vehicleViewModel.selectedVehicle?.id == item.id {
+                                        Color.blue.opacity(0.15)
+                                            .cornerRadius(6)
+                                    }
+                                    Button {
+                                        if !isAddMode {
+                                            onSelectVehicle()
+                                            vehicleViewModel.selectVehicle(item)
+                                        } else {
+                                            vehicleViewModel.selectVehicle(item)
                                         }
-                                        .buttonStyle(BorderlessButtonStyle())
+                                    } label: {
+                                        HStack {
+                                            Text("\(item.num + 1)")
+                                            Spacer()
+                                            Text(item.vehicle ?? "")
+                                            Spacer()
+                                            Text("\(item.weight) kg")
+                                            
+                                            if isAddMode {
+                                                Button {
+                                                    vehicleViewModel.deleteVehicleItem(item: item)
+                                                } label: {
+                                                    Image(systemName: "trash")
+                                                        .foregroundColor(.red)
+                                                }
+                                                .buttonStyle(.borderless)
+                                            }
+                                        }
+                                        .padding(8)
+                                        .contentShape(Rectangle())
                                     }
-                                }
-                                .padding(8)
-                                .contentShape(Rectangle()) // HStack 전체 영역을 클릭 가능하게 함
-                                .background(
-                                            vehicleViewModel.selectedVehicle == item
-                                            ? Color.blue.opacity(0.15)
-                                            : Color.clear
-                                        )
-                                .onTapGesture {
-                                    if !isAddMode {
-                                        onSelectVehicle?(item)
-                                    } else {
-                                        vehicleViewModel.selectVehicle(item)
-                                    }
+                                    .buttonStyle(.plain)
                                 }
                             }.onMove { from, to in
                                 if isAddMode {
@@ -267,15 +258,6 @@ struct ListScreen: View {
                         }
                     }
                 }
-            }
-            .safeAreaInset(edge: .top) {
-                CustomListTopBar(title: titleText,onBack: {
-                    presentationMode.wrappedValue.dismiss()
-                }, onChange: {
-                    newMode in
-                            isAddMode = !newMode
-                            print("현재 모드:", newMode ? "X" : "Add")
-                })
             }
             .navigationBarHidden(true)
             .padding()
@@ -289,9 +271,6 @@ struct ListScreen: View {
                     vehicleViewModel.fetchVehicleItems()
                 }
             }.onDisappear {
-                clientViewModel.clearSelection()
-                productViewModel.clearSelection()
-                vehicleViewModel.clearSelection()
                 activeAlert = nil
             }.alert(item: $activeAlert) { alertType in
                 Alert(
@@ -300,6 +279,22 @@ struct ListScreen: View {
                     dismissButton: .default(Text("Confirmation"))
                 )
             }
+        }.safeAreaInset(edge: .top) {
+            CustomListTopBar(title: titleText,onBack: {
+                presentationMode.wrappedValue.dismiss()
+            }, onChange: { newMode in
+                isAddMode = !newMode
+//                guard !isAddMode else { return }
+                switch listType {
+                case .product:
+                    productViewModel.clearSelection()
+                case .client:
+                    clientViewModel.clearSelection()
+                case .vehicle:
+                    vehicleViewModel.clearSelection()
+                }
+                print("현재 모드:", newMode ? "X" : "Add")
+            })
         }
     }
     

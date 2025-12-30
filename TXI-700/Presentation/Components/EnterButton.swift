@@ -24,11 +24,11 @@ struct EnterButton: View {
     var body: some View {
         VStack {
             Button("ENTER") {
-                if (bleManager.leftLoadAxel1 ?? 0) < 0 || (bleManager.rightLoadAxel1 ?? 0) < 0 {
+                if (bleManager.axles[1]?.leftWeight ?? 0) < 0 || (bleManager.axles[1]?.rightWeight ?? 0) < 0 {
                     onEnterMassege()
                     return
                 }
-                print("Enter Send Result: \(bleManager.sendData(EnterByte))")
+                print("Enter Send Result: \(bleManager.sendCancelCommand())")
                 onEnter()
             }.frame(maxWidth: .infinity, maxHeight: 50)
             .padding()
@@ -37,8 +37,8 @@ struct EnterButton: View {
             .foregroundColor(.black)
             .disabled(viewModel.modeName == "Auto Inmotion" || !hasChanged)
             .opacity(viewModel.modeName == "Auto Inmotion" ? 0.4 :(hasChanged ? 1.0 : 0.4))
-            .onChange(of: bleManager.leftLoadAxel1) { _, _ in detectChange() }
-            .onChange(of: bleManager.rightLoadAxel1) { _, _ in detectChange() }
+            .onChange(of: bleManager.axles[1]?.leftWeight) { _, _ in detectChange() }
+            .onChange(of: bleManager.axles[1]?.rightWeight) { _, _ in detectChange() }
         }.onReceive(bleManager.$isEnter) { newValue in
             if newValue {
                 performEnterAction()
@@ -51,13 +51,13 @@ struct EnterButton: View {
         appendAxleData()
         hasChanged = false
         // Enter 누른 시점 Left, right, Axle 임시 저장
-        lastTotal = (bleManager.leftLoadAxel1 ?? 0) + (bleManager.rightLoadAxel1 ?? 0)
+        lastTotal = bleManager.axles[1]?.totalWeight ?? 0
     }
 
     private func appendAxleData() {
         let currentAxles = [
-            bleManager.leftLoadAxel1 ?? 0,
-            bleManager.rightLoadAxel1 ?? 0
+            bleManager.axles[1]?.leftWeight ?? 0,
+            bleManager.axles[1]?.rightWeight ?? 0
         ]
         
         if var last = loadAxleStatus.last {
@@ -79,10 +79,7 @@ struct EnterButton: View {
     }
     
     private func detectChange() {
-        let currentTotal =
-            (bleManager.leftLoadAxel1 ?? 0) +
-            (bleManager.rightLoadAxel1 ?? 0)
-
+        let currentTotal = bleManager.axles[1]?.totalWeight ?? 0
         let wasZero = lastTotal == 0
         let isZero = currentTotal == 0
 

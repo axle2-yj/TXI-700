@@ -19,6 +19,7 @@ class BluetoothManager: NSObject, ObservableObject {
     @Published var isSelfScanning = false
     @Published var isConnected = false
     @Published var isConnecting = false
+    @Published var isDisconnected = true
     @Published var connectedPeripheral: CBPeripheral?
     @Published var receivedText: String = ""
     @Published var bluetoothPermissionStatus: PermissionStatus = .notDetermined
@@ -26,14 +27,8 @@ class BluetoothManager: NSObject, ObservableObject {
     
     @Published var bluetoothMac: String? = nil
     
-    @Published var leftLoadAxel1: Int? = nil
-    @Published var rightLoadAxel1: Int? = nil
-    @Published var leftLoadAxel2: Int? = nil
-    @Published var rightLoadAxel2: Int? = nil
-    @Published var loadAxle1BatteryLevel: Int? = nil
-    @Published var loadAxle2BatteryLevel: Int? = nil
-    @Published var loadAxle3BatteryLevel: Int? = nil
-    @Published var loadAxle4BatteryLevel: Int? = nil
+    @Published var axles: [Int: AxleState] = [:] // 1~8
+    @Published var weightMode: WeightMode = .staticMode
     @Published var indicatorBatteryLevel: Int? = nil
     @Published var inmotion: Int = 0
     
@@ -53,12 +48,31 @@ class BluetoothManager: NSObject, ObservableObject {
     @Published var SnNumber = 0
     @Published var equipmentVer: String = ""
     @Published var equipmentNumber: String = ""
-    @Published var rf: String = ""
-    
+    @Published var rfMassage: String = ""
+    @Published var isAuthenticated = false
+    @Published var lastResponse: BLEResponse?
+    @Published var showAuthAlert = false
+
     // MARK: - Private Managers
     private var centralManager: CBCentralManager!
     private var locationManager: CLLocationManager!
     
+    private var notifyChar: CBCharacteristic?
+    private var writeChar: CBCharacteristic?
+    private var authChallengeChar: CBCharacteristic?
+    var authResponseChar: CBCharacteristic?
+    var authTimeoutWorkItem: DispatchWorkItem?
+
+    // MARK: - Combine 전용 Publisher
+    var axlesPublisher: AnyPublisher<[AxleState], Never> {
+            $axles
+                .map { Array($0.values) }
+                .eraseToAnyPublisher()
+        }
+
+        var weightModePublisher: AnyPublisher<WeightMode, Never> {
+            $weightMode.eraseToAnyPublisher()
+        }
 
     // MARK: - BLE Characteristic
     internal var targetCharacteristic: CBCharacteristic?
@@ -67,6 +81,11 @@ class BluetoothManager: NSObject, ObservableObject {
     let targetServiceUUID = CBUUID(string: "0000FFF0-0000-1000-8000-00805F9B34FB")
     let targetCharctersticUUID = CBUUID(string: "0000FFF1-0000-1000-8000-00805F9B34FB")
     let targetCharcterstic2UUID = CBUUID(string: "0000FFF2-0000-1000-8000-00805F9B34FB")
+    
+    // MARK: - Auth UUID
+    let authServiceUUID   = CBUUID(string: "0000AAA0-0000-1000-8000-00805F9B34FB")
+    let authChallengeUUID = CBUUID(string: "0000AAA1-0000-1000-8000-00805F9B34FB") // Notify
+    let authResponseUUID  = CBUUID(string: "0000AAA2-0000-1000-8000-00805F9B34FB") // Write
     
     // MARK: - Init
     override init() {
@@ -80,6 +99,10 @@ class BluetoothManager: NSObject, ObservableObject {
         locationManager.delegate = self
         
         checkLocationPermission()
+        
+        for i in 1...8 {
+            axles[i] = .empty(axle: i)
+        }
     }
     
     
@@ -180,6 +203,10 @@ class BluetoothManager: NSObject, ObservableObject {
         peripheral.writeValue(data, for: characteristic, type: .withResponse)
         
         return true
+    }
+    
+    func send(_ command: BLECommand) -> Bool {
+        return sendData(command.bytes)
     }
     
     

@@ -17,7 +17,6 @@ struct CheckBox: View {
     var body: some View {
         Button {
             isChecked.toggle()
-            
             switch select {
             case "product":
                 viewModel.saveProductCkeck(isChecked)

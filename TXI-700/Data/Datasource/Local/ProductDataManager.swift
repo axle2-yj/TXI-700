@@ -11,11 +11,12 @@ class ProductDataManager {
     static let shared = ProductDataManager()
     private let context = PersistenceController.shared.context
     
-    func addProduct(name: String, num: Int16) {
+    func addProduct(name: String, num: Int16, shortcutNum: Int16) {
             let item = ProductInfo(context: context)
             item.id = UUID()
             item.name = name
             item.num = num
+            item.shortcutNum = shortcutNum
             save()
         }
     
@@ -45,10 +46,12 @@ class ProductDataManager {
     func updateProduct(
         item: ProductInfo,
         name: String,
-        num: Int16
+        num: Int16,
+        shortcutNum: Int16
     ) {
         item.name = name
         item.num = num
+        item.shortcutNum = shortcutNum
         save()
     }
     

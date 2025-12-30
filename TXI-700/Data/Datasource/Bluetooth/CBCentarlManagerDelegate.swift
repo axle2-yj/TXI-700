@@ -77,9 +77,14 @@ extension BluetoothManager: CBCentralManagerDelegate {
             self.connectedPeripheral = peripheral
             self.isConnected = true
             self.isConnecting = false
+            self.isDisconnected = false
             print("Connected to \(peripheral.name ?? "Unknown")")
         }
-
+        // 🔐 1. 아이폰 고유 키 준비 (없으면 생성)
+        let deviceUUID = BLEKeyManager.shared.getDeviceUUID()
+        sendIdCheckCommand(deviceUUID)
+        print("deviceUUID " + deviceUUID)
+            
         peripheral.delegate = self
         peripheral.discoverServices([targetServiceUUID])
     }
@@ -112,6 +117,7 @@ extension BluetoothManager: CBCentralManagerDelegate {
             self.connectedPeripheral = nil
             self.isConnected = false
             self.isConnecting = false
+            self.isDisconnected = true
             print("Disconnected")
         }
 
@@ -132,89 +138,98 @@ extension BluetoothManager: CBCentralManagerDelegate {
     }
     
     func sendInitialSNCallCommand() {
-        let bytes: [UInt8] = [0x42, 0x53, 0x4E]      // 'B' 'S' 'N'
-        print("S/n : \(sendData(bytes))")
+        print("S/n : \(send(.bsn))")
     }
     
     func sendInitialModeCallCommand() {
-        let bytes: [UInt8] = [0x42, 0x54, 0x4D]      // 'B' 'T' 'M'
-        print("ModeCall : \(sendData(bytes))")
+        print("ModeCall : \(send(.btm))")
     }
     
     func sendInitialModeChangeCommand() {
-        let bytes: [UInt8] = [0x42, 0x54, 0x46]      // 'B', 'T', 'F'
-        print("ModeChange : \(sendData(bytes))")
+        print("ModeChange : \(send(.btf))")
     }
     
     func sendInitialBatteryCheckCommand() {
-        let bytes: [UInt8] = [0x42, 0x54, 0x42]      // 'B', 'T', 'B'
-        print("BatteryCheck : \(sendData(bytes))")
+        print("BatteryCheck : \(send(.btb))")
+    }
+    
+    func sendZeroCommand() {
+        print("ZeroButton : \(send(.btz))")
     }
     
     func sendInitialItemCommand(num: Int) {
-        var bytes: [UInt8] = [0x42, 0x54, 0x51]      // 'B', 'T', 'Q'
-        let numBytes = numTo2ByteAscii(num)
-        bytes.append(contentsOf: numBytes)
-        print("ItemCheck : \(sendData(bytes))")
+        print("ItemCheck : \(send(.btq(num)))")
     }
-    
-    func sendItemSaveCommand() {
-        let bytes: [UInt8] = [0x42, 0x54, 0x49]      // 'B', 'T', 'I'
-        print("ItemSave : \(sendData(bytes))")
-    }
-    
+        
     func sendInitialClientCommand(num: Int) {
-        var bytes: [UInt8] = [0x42, 0x54, 0x47]      // 'B', 'T', 'G'
-        let numBytes = numTo2ByteAscii(num)
-        bytes.append(contentsOf: numBytes)
-        print("ClientCheck : \(sendData(bytes))")
+        print("ClientCheck : \(send(.btg(num)))")
     }
-    
-    func sendClientSaveCommand() {
-        let bytes: [UInt8] = [0x42, 0x54, 0x41]      // 'B', 'T', 'A'
-        print("ClientSave : \(sendData(bytes))")
-    }
-    
+        
     func sendInitialSettingCommand() {
-        let bytes: [UInt8] = [0x42, 0x53, 0x54]      // 'B', 'S', 'T'
-        print("Setting : \(sendData(bytes))")
+        print("Setting : \(send(.bst))")
     }
     
     func sendInitialSaveDataCommand() {
-        let bytes: [UInt8] = [0x42, 0x44, 0x43]      // 'B', 'D', 'C'
-        print("SaveData : \(sendData(bytes))")
+        print("SaveData : \(send(.bdc))")
     }
     
     func sendLangugeCommand(lang: Int) {
-        let bytes: [UInt8] = {                      // 'B', 'T', 'U'
-            switch lang {
-            case 0:
-                return [0x42, 0x54, 0x55, 0x00]
-            case 1:
-                return [0x42, 0x54, 0x55, 0x02]
-            case 2:
-                return [0x42, 0x54, 0x55, 0x01]
-            default:
-                return [0x42, 0x54, 0x55, 0x00]
-            }
-        }()
-        print("Languge : \(sendData(bytes))")
+        print("Languge : \(send(.btu(lang)))")
     }
     
     func sendCancelCommand() {
-        let bytes: [UInt8] = [0x42, 0x54, 0x45]      // 'B', 'T', 'E'
-        print("Cancel : \(sendData(bytes))")
+        print("Cancel : \(send(.bte))")
     }
     
     func sendSumCommand() {
-        let bytes: [UInt8] = [0x42, 0x54, 0x53]      // 'B', 'T', 'S'
-        print("Sum Send Result: \(sendData(bytes))")
+        print("Sum Send Result: \(send(.bts))")
     }
     
     func sendEquipmentNumberCall() {
-        let bytes: [UInt8] = [0x42, 0x43, 0x46]     // 'B', 'C', 'F'
-        print("EquipmentNumber Call Send Result: \(sendData(bytes))")
+        print("EquipmentNumber Call Send Result: \(send(.bcf))")
     }
     
+    func sendPrintHeadLineCommand(title: String) {
+        print("PrintHeadLine Send Result: \(send(.bth(title)))")
+    }
     
+    func sendPrintHeadLineDeleteCommand() {
+        print("PrintHeadLineDelete Send Result: \(send(.btd))")
+    }
+    
+    func sendPrintAndSumCommand() {
+        print("PrintIndicator Send Result: \(send(.bts))")
+    }
+    
+    func sendPrintOneLineStartCommand(text: String) {
+        print("PrintOneLine Start Send Result: \(send(.wps(text)))")
+    }
+    
+    func sendPrintOneLineLastCommand(text: String) {
+        print("PrintOneLine Last Send Result: \(send(.wpt(text)))")
+    }
+    
+    func sendPrintOneLineCommand(text: String) {
+        print("PrintOneLine Send Result: \(send(.wpe(text)))")
+    }
+    
+    func sendVehicleSaveCommand(name: String) {
+        print("Vehicle Save Send: \(send(.btc(name)))")
+    }
+    
+    func sendItemSaveCommand(num: Int, name: String) {
+        print("Item Save Send: \(send(.bti(num: num, name: name)))")
+    }
+    
+    func sendClientSaveCommand(num: Int, name: String) {
+        print("Item Save Send: \(send(.bta(num: num, name: name)))")
+    }
+    
+    func sendPowerOffCommand() {
+        print("Power Off Send: \(send(.btp))")
+    }
+    
+    func sendIdCheckCommand(_ text: String) {
+        print("Id Check Send: \(send(.xxx(text)))")
+    }
 }

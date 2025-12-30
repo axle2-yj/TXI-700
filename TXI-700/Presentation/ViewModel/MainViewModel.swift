@@ -12,6 +12,8 @@ import Combine
 enum ActiveMainAlert: Identifiable {
     case printResponse(String)
     case success(String)
+    case saveSuccess(String)
+    case saveError(String)
     case error(String)
 
     var id: String {
@@ -20,6 +22,10 @@ enum ActiveMainAlert: Identifiable {
             return "\(msg)"
         case .success:
             return "success"
+        case .saveSuccess(let msg):
+            return "\(msg)"
+        case .saveError(let msg):
+            return "\(msg)"
         case .error:
             return "error"
         }
@@ -30,6 +36,8 @@ enum ActiveMainAlert: Identifiable {
         switch self {
         case .printResponse(let msg),
              .success(let msg),
+             .saveSuccess(let msg),
+             .saveError(let msg),
              .error(let msg):
             return msg
         }
@@ -114,5 +122,42 @@ class MainViewModel: ObservableObject {
             )
         }
     }
+    
+    func handleLoadAxleState(
+        loadAxleStatus: inout [LoadAxleStatus],
+        left: Int,
+        right: Int
+    ) {
+        handleBalance(
+            loadAxleStatus: &loadAxleStatus,
+            axles: [left, right]
+        )
+    }
+    
+    func handleBalance(
+        loadAxleStatus: inout [LoadAxleStatus],
+        axles: [Int]
+    ) {
+        guard !axles.isEmpty else { return }
+
+        let sum = axles.reduce(0, +)
+
+        if var last = loadAxleStatus.last {
+            // 데이터 개수 제한이 필요하다면 여기서 처리
+            last.loadAxlesData.append(contentsOf: axles)
+            last.total += sum
+
+            loadAxleStatus[loadAxleStatus.count - 1] = last
+        } else {
+            loadAxleStatus.append(
+                LoadAxleStatus(
+                    id: 1,
+                    loadAxlesData: axles,
+                    total: sum
+                )
+            )
+        }
+    }
+
 }
 

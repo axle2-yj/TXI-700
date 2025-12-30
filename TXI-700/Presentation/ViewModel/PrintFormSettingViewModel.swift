@@ -190,5 +190,34 @@ class PrintFormSettingViewModel: ObservableObject {
     func loadInspectorName() {
         inspectorNameText = StorageManager.shared.loadInspecterName()
     }
+    
+    func calculateCrossBalance(
+        lefts: [Int],
+        rights: [Int]
+    ) -> (lfRr: Int, rfLr: Int) {
+
+        // 0은 존재하지 않는 축으로 간주
+        let validLefts  = lefts.filter { $0 > 0 }
+        let validRights = rights.filter { $0 > 0 }
+
+        // 최소 2축 필요
+        guard validLefts.count >= 2,
+              validRights.count >= 2 else {
+            return (0, 0)
+        }
+
+        // 앞축
+        let frontLeft  = validLefts.first!
+        let frontRight = validRights.first!
+
+        // 뒤축 (3축 이상이 없을 수도 있으므로 "마지막 유효 축")
+        let rearLeft   = validLefts.last!
+        let rearRight  = validRights.last!
+
+        let lfRr = frontLeft + rearRight   // LF + RR
+        let rfLr = frontRight + rearLeft   // RF + LR
+
+        return (lfRr, rfLr)
+    }
 }
 

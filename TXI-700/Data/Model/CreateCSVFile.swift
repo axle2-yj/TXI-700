@@ -91,13 +91,10 @@ func createCSVFile(items: [LoadAxleInfo], type: CSVDataType) -> URL? {
 
     do {
         try csvText.write(to: fileURL, atomically: true, encoding: .utf8)
+        let bom = "\u{FEFF}" // UTF-8 BOM
+        let csvWithBOM = bom + csvText
         
-        // 파일 존재 여부 재확인
-                guard FileManager.default.fileExists(atPath: fileURL.path) else {
-                    print("파일이 생성되지 않았습니다.")
-                    return nil
-                }
-        
+        try csvWithBOM.write(to: fileURL, atomically: true, encoding: .utf8)
         return fileURL
     } catch {
         print("CSV 파일 저장 실패: \(error.localizedDescription)")

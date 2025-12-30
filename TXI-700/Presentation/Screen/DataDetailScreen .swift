@@ -86,12 +86,23 @@ struct DataDetailScreen: View {
                             }
                         })
                     
-                    if bleManager.isConnected {
-                        let weightNumBool = Int(loadAxleItem.weightNum ?? "0") != 2
-                        let printLinBuilder = if weightNumBool {
-                            PrintLineBuilder.build(loadAxleItem: loadAxleItem, dataViewModel: viewModel, printViewModel: printViewModel)
+                    if !bleManager.isDisconnected {
+                        let twoStepWight = Int(loadAxleItem.weightNum ?? "0") == 2
+                        let balanceWight = Int(loadAxleItem.weightNum ?? "0") == 3
+                        let printLinBuilder = if twoStepWight {
+                            PrintLineBuilder.buildTwoStepPrint(
+                                loadAxleItem: loadAxleItem,
+                                dataViewModel: viewModel,
+                                printViewModel: printViewModel)
+                        } else if balanceWight{
+                            PrintLineBuilder.buildBalanceDataPrintLine(
+                                loadAxleItem: loadAxleItem,
+                                printViewModel: printViewModel)
                         } else {
-                            PrintLineBuilder.buildTwoStepRead(loadAxleItem: loadAxleItem, dataViewModel: viewModel, printViewModel: printViewModel)
+                            PrintLineBuilder.buildPrint(
+                                loadAxleItem: loadAxleItem,
+                                dataViewModel: viewModel,
+                                printViewModel: printViewModel)
                         }
                         PrintButton(
                             isMain: false,
@@ -327,14 +338,18 @@ extension DataDetailScreen {
 extension DataDetailScreen {
     var printPreviewView: some View {
         let weightNum = Int(loadAxleItem.weightNum ?? "0")
-        let lines = if weightNum != 2 {
-            PrintLineBuilder.build(
+        let lines = if weightNum == 2 {
+            PrintLineBuilder.buildTwoStepRead(
             loadAxleItem: loadAxleItem,
             dataViewModel: viewModel,
             printViewModel: printViewModel
             )
+        } else if weightNum == 3 {
+            PrintLineBuilder.buildBalanceRead(
+                loadAxleItem: loadAxleItem,
+                printViewModel: printViewModel)
         } else {
-            PrintLineBuilder.buildTwoStepRead(
+            PrintLineBuilder.buildRead(
             loadAxleItem: loadAxleItem,
             dataViewModel: viewModel,
             printViewModel: printViewModel

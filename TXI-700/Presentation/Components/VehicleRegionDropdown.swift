@@ -63,7 +63,14 @@ struct VehicleRegionDropdown: View {
                         }
                         viewModel.saveOrUpdateVehicleItem()
                     }
-                )
+                ).onReceive(viewModel.$saveSuccessMessage) { message in
+                    guard message != nil else { return }
+                    activeAlert = .success(message ?? "")
+                }.onReceive(viewModel.$saveFailedMessage) { message in
+                    guard message != nil else { return }
+                    activeAlert = .error(message ?? "")
+                }
+                
                 if viewModel.selectedVehicle != nil {
                     Button("Cancel") {
                         viewModel.clearSelection()

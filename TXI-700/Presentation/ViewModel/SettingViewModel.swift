@@ -22,7 +22,11 @@ class SettingViewModel: ObservableObject {
     @Published var checkedProduct: Bool = false
     @Published var checkedClient: Bool = false
     @Published var printOutputCount: Int = 0
-
+    @Published var balanceAxisNuberCount: Int = 0
+    @Published var balanceWeight: Int = 1
+    @Published var dangerous: Int = 25
+    @Published var caution: Int = 15
+    @Published var safety: Int = 10
     func reset() {
         
     }
@@ -38,6 +42,14 @@ class SettingViewModel: ObservableObject {
     
     func printOutputToggleChanged(to newValue: Int) {
         printOutputCount = newValue
+    }
+    
+    func balanceAxisNumberToggleChanged(to newValue: Int) {
+        balanceAxisNuberCount = newValue
+    }
+    
+    func balanceWeightToggleChanged(to newValue: Int) {
+        balanceWeight = newValue
     }
     
     // 언어 저장
@@ -131,5 +143,45 @@ class SettingViewModel: ObservableObject {
     
     func loadPrintOutputCountSetting() {
         printOutputCount = StorageManager.shared.loadPrintOutputCount()
+    }
+    
+    func saveBalanceAxisNumberSetting(_ count: Int) {
+        StorageManager.shared.saveBalanceAxisNuberCount(count)
+    }
+    
+    func loadBalanceAxisNumberSetting() {
+        balanceAxisNuberCount = StorageManager.shared.loadBalanceAxisNuberCount()
+    }
+    
+    func saveBalanceWeghtSetting(_ bool: Int) {
+        StorageManager.shared.saveBalanceWeightBool(bool)
+    }
+    
+    func loadBalanceWeghtSetting() {
+        balanceWeight = StorageManager.shared.loadBalanceWeightBool()
+    }
+    
+    func saveDangerousNumberSetting(_ Number: Int) {
+        StorageManager.shared.saveDangerousNumber(Number)
+    }
+    
+    func loadDangerousNumberSetting() {
+        dangerous = StorageManager.shared.loadDangerousNumber()
+    }
+    
+    func saveCautionNumberSetting(_ Number: Int) {
+        StorageManager.shared.saveCautionNumber(Number)
+    }
+    
+    func loadCautionNumberSetting() {
+        caution = StorageManager.shared.loadCautionNumber()
+    }
+    
+    func saveSafetyNumberSetting(_ Number: Int) {
+        StorageManager.shared.saveSafetyNumber(Number)
+    }
+    
+    func loadSafetyNumberSetting() {
+        safety = StorageManager.shared.loadSafetyNumber()
     }
 }

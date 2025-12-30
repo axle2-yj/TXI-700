@@ -11,9 +11,9 @@ import Foundation
 struct PrintButton: View {
     @State var isMain = false
     @Binding var seletedType : Int
-    @State private var printDataByte: [UInt8] = [
-        0x42, 0x54, 0x53
-    ]
+//    @State private var printDataByte: [UInt8] = [
+//        0x42, 0x54, 0x53
+//    ]
     @State private var printAlert: Bool = false
     @EnvironmentObject var bleManager: BluetoothManager
     
@@ -76,7 +76,7 @@ struct PrintButton: View {
     func printMain() {
         if settingViewModel.weightingMethod == 0 {
             onPrint()
-            print("Print Send Result: \(bleManager.sendData(printDataByte))")
+            bleManager.sendPrintAndSumCommand()
         } else {
             startPrintWithCopies()
         }
@@ -133,22 +133,14 @@ struct PrintButton: View {
         for (index, line) in lines.enumerated() {
             DispatchQueue.main.asyncAfter(deadline: .now() + delay * Double(index)) {
 
-                var packet: [UInt8]
-
                 switch index {
-                case 0:
-                    packet = [0x57, 0x50, 0x53] // WPS
-                case lastIndex:
-                    packet = [0x57, 0x50, 0x54] // WPT
-                default:
-                    packet = [0x57, 0x50, 0x45] // WPE
+                case 0: bleManager.sendPrintOneLineStartCommand(text: line)
+                case lastIndex: bleManager.sendPrintOneLineLastCommand(text: line)
+                default: bleManager.sendPrintOneLineCommand(text: line)
                 }
 
-                packet.append(contentsOf: line.utf8)
-                packet.append(contentsOf: [0x0D, 0x0A])
-                
 //                print("Send[\(index)] after \(delay * Double(index))s → \(packet)")
-                print("Content[\(index)] Result: \(bleManager.sendData(packet))")
+//                print("Content[\(index)] Result: \(bleManager.sendData(packet))")
             }
         }
 
@@ -159,9 +151,7 @@ struct PrintButton: View {
         }
     }
     
-    // MARK: - 연속 출력 데이터 묶음 나눔
-
-    
+    // MARK: - 연속 출력 데이터 묶음 나눔    
     func printLoadAxleInfos(
         infos: [LoadAxleInfo],
         completion: @escaping () -> Void
@@ -208,22 +198,12 @@ struct PrintButton: View {
 
         for (index, line) in lines.enumerated() {
             DispatchQueue.main.asyncAfter(deadline: .now() + delay * Double(index)) {
-
-                var packet: [UInt8]
-
                 switch index {
-                case 0:
-                    packet = [0x57, 0x50, 0x53] // WPS
-                case lastIndex:
-                    packet = [0x57, 0x50, 0x54] // WPT
-                default:
-                    packet = [0x57, 0x50, 0x45] // WPE
+                case 0: bleManager.sendPrintOneLineStartCommand(text: line)
+                case lastIndex: bleManager.sendPrintOneLineLastCommand(text: line)
+                default: bleManager.sendPrintOneLineCommand(text: line)
                 }
-
-                packet.append(contentsOf: line.utf8)
-                packet.append(contentsOf: [0x0D, 0x0A])
-
-                print("Content[\(index)] Result: \(self.bleManager.sendData(packet))")
+//                print("Content[\(index)] Result: \(self.bleManager.sendData(packet))")
             }
         }
 
