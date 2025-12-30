@@ -89,3 +89,7 @@
 "One" = "1 page";
 "Two" = "2 page";
 "Three" = "3 page";
+"BalanceAxisNumberSetting" = "Vehicle Axle Number Setting";
+"number4" = "2 axle";
+"number6" = "3 axle";
+"number8" = "4 axle";

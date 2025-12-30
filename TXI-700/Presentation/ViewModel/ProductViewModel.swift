@@ -31,7 +31,8 @@ class ProductViewModel: ObservableObject {
     @Published var productItems: [ProductInfo] = []
     @Published var text: String = NSLocalizedString("ProductScreenTitle", comment: "")
     @Published var name: String = ""
-    @Published var num: Int16 = 0
+//    @Published var num: Int16 = 0
+//    @Published var shortcutNum: Int16 = 0
     @Published var selectedProduct: ProductInfo? = nil
 
     private let productManager = ProductDataManager.shared
@@ -50,20 +51,22 @@ class ProductViewModel: ObservableObject {
                 productManager.updateProduct(
                     item: product,
                     name: name.replacingOccurrences(of: " ", with: ""),
-                    num: product.num
+                    num: product.num,
+                    shortcutNum: product.shortcutNum
                 )
             } else {
                 // ADD
                 let nextNum = Int16(productItems.count)
-                productManager.addProduct(name: name.replacingOccurrences(of: " ", with: ""), num: nextNum)
+                let netxShortcutNum = Int16(productItems.count)
+                productManager.addProduct(name: name.replacingOccurrences(of: " ", with: ""), num: nextNum, shortcutNum: netxShortcutNum)
             }
 
             fetchProductItems()
             clearSelection()
     }
     
-    func updateProduct(item: ProductInfo, name: String, num: Int16) {
-        productManager.updateProduct(item: item, name: name, num: num)
+    func updateProduct(item: ProductInfo, name: String, num: Int16, shortcutNum: Int16) {
+        productManager.updateProduct(item: item, name: name, num: num, shortcutNum: shortcutNum)
         fetchProductItems()
     }
     

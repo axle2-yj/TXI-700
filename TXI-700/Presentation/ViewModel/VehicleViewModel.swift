@@ -14,7 +14,7 @@ class VehicleViewModel: ObservableObject {
     @Published var text: String = NSLocalizedString("VehicleScreenTitle", comment: "")
     @Published var vehicle: String = ""
     @Published var weight: String = ""
-    @Published var num: Int16 = 0
+//    @Published var num: Int16 = 0
     @Published var items: [String] = []
     @Published var selectedRegion: String = ""
     @Published var searchText: String = ""

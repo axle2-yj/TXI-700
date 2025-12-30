@@ -87,3 +87,7 @@
 "One" = "1장";
 "Two" = "2장";
 "Three" = "3장";
+"BalanceAxisNumberSetting" = "차량 축 수 설정";
+"number4" = "2축";
+"number6" = "3축";
+"number8" = "4축";

@@ -102,6 +102,14 @@ extension BluetoothManager: CBPeripheralDelegate {
                         self.leftLoadAxel2 = realValue
                     case 4:
                         self.rightLoadAxel2 = realValue
+                    case 5:
+                        self.leftLoadAxel3 = realValue
+                    case 6:
+                        self.rightLoadAxel3 = realValue
+                    case 7:
+                        self.leftLoadAxel4 = realValue
+                    case 8:
+                        self.rightLoadAxel4 = realValue
                     default :
                         break
                     }
@@ -122,6 +130,14 @@ extension BluetoothManager: CBPeripheralDelegate {
                             self.loadAxle3BatteryLevel = battery
                         case 4:
                             self.loadAxle4BatteryLevel = battery
+                        case 5:
+                            self.loadAxle5BatteryLevel = battery
+                        case 6:
+                            self.loadAxle6BatteryLevel = battery
+                        case 7:
+                            self.loadAxle7BatteryLevel = battery
+                        case 8:
+                            self.loadAxle8BatteryLevel = battery
                         default :
                             break
                         }

@@ -9,7 +9,6 @@ import SwiftUI
 
 struct SettingScreen: View {
     @State private var goToPrintFormSetting = false
-    @State var toggles = Array(repeating: false, count: 17)
     @State private var optionProduct = true
     @State private var optionClient = true
     @State private var selectedProduct: ProductInfo? = nil
@@ -23,11 +22,9 @@ struct SettingScreen: View {
     @EnvironmentObject var bleManager: BluetoothManager
 
     var body: some View {
-        VStack(spacing : 0) {
-            CustomTopBar(title: viewModel.title, onBack: {
-                presentationMode.wrappedValue.dismiss()
-            })
+        VStack {
             VStack {
+                // 언어 설정
                 HStack {
                     VStack(spacing: 8) {
                         SettingLineText("Lenguge")
@@ -40,10 +37,10 @@ struct SettingScreen: View {
                         .background(Color.gray.opacity(0.2))
                         .cornerRadius(8)
                         
-                    }.padding()
-                }.frame(maxWidth: .infinity)
-                    .padding()
-                
+                    }
+                }.padding(.horizontal)
+                .frame(maxWidth: .infinity)
+                // 모드 선택 및 프린트 양식 설정 이동 버튼
                 HStack {
                     VStack(spacing: 8) {
                         SettingLineText("ModeChange")
@@ -72,8 +69,8 @@ struct SettingScreen: View {
                             .disabled(viewModel.isModeButtonDisabled)
                             .onReceive(bleManager.$modeChangeResponse) { success in
                                 if success {
-                                    viewModel.enableButton()   // 다시 눌릴 수 있게 활성화
-                                    bleManager.modeChangeResponse = false      // 응답 플래그 초기화
+                                    viewModel.enableButton()
+                                    bleManager.modeChangeResponse = false
                                 }
                             }
                     }.frame(maxWidth: .infinity)
@@ -94,7 +91,7 @@ struct SettingScreen: View {
                     }.frame(maxWidth: .infinity)
                         .padding()
                 }
-                
+                // Print 양식 해드라인
                 VStack(spacing: 8) {
                     SettingLineText("PrintHeadline")
                     HStack {
@@ -106,8 +103,8 @@ struct SettingScreen: View {
                         .textFieldStyle(.roundedBorder)
                         HeadlineTitleEnter(printHeadlinText: printViewModel.printHeadLineText ?? "",viewModel: printViewModel)
                     }
-                }
-                
+                }.padding(.horizontal)
+                // 버튼 활성화 여부
                 VStack(spacing: 8) {
                     SettingLineText("ActivateButton")
                     HStack {
@@ -117,11 +114,18 @@ struct SettingScreen: View {
                                      label: "\(selectedProduct?.name ?? viewModel.saveProduct ?? "ITEM")",
                                      select: "product")
                                                 .disabled(true).opacity(0.6)
+                                                .onAppear {
+                                                    viewModel.saveProductCkeck(optionProduct)
+                                                }
                             CheckBox(isChecked: $optionClient,
                                      viewModel: viewModel,
                                      label: "\(selectedClient?.name ?? viewModel.saveClient ?? "CLIENT")",
                                      select: "client")
                                                 .disabled(true).opacity(0.6)
+                                                .onAppear {
+                                                    viewModel.saveClientCkeck(optionClient)
+                                                }
+                           
                         } else {
                             CheckBox(isChecked: $optionProduct,
                                      viewModel: viewModel,
@@ -133,22 +137,22 @@ struct SettingScreen: View {
                                      select: "client")
                         }
                     }.frame(maxWidth: .infinity, alignment: .leading)
-                }
-                
+                }.padding(.horizontal)
+                // 가중치 부여 방법 및 우선순위
                 VStack(spacing: 8)  {
                     SettingLineText("WeightingMathod")
                     HStack {
                         weightingMathodSegmentButton(title: "Indicator", tag: 0)
                         weightingMathodSegmentButton(title: "One-Time", tag: 1)
                         weightingMathodSegmentButton(title: "Two-step", tag: 2)
-//                        weightingMathodSegmentButton(title: "Blance", tag: 3)
+                        weightingMathodSegmentButton(title: "Balance", tag: 3)
                     }
                     .frame(height: 36)
                     .background(Color.gray.opacity(0.2))
                     .cornerRadius(8)
-                }
-                
-                VStack(spacing: 8)  {
+                }.padding(.horizontal)
+                // Print 출력 숫자 설정
+                VStack(spacing: 8) {
                     SettingLineText("PrintOutputSetting")
                     HStack {
                         printOutputSettingSegmentButton(title: "One", tag: 0)
@@ -157,8 +161,20 @@ struct SettingScreen: View {
                     }.frame(height: 36)
                         .background(Color.gray.opacity(0.2))
                         .cornerRadius(8)
-                }
-                
+                }.padding(.horizontal)
+                // 축 수 설정
+//                if viewModel.weightingMethod == 3 {
+//                    VStack(spacing: 8) {
+//                        SettingLineText("BalanceAxisNumberSetting")
+//                        HStack {
+//                            balanceAxisNumberSettingSagmentButton(title: "number4", tag: 0)
+//                            balanceAxisNumberSettingSagmentButton(title: "number6", tag: 1)
+//                            balanceAxisNumberSettingSagmentButton(title: "number8", tag: 2)
+//                        }.frame(height: 36)
+//                            .background(Color.gray.opacity(0.2))
+//                            .cornerRadius(8)
+//                    }.padding(.horizontal)
+//                }
                 Spacer()
             }.navigationBarBackButtonHidden(true).padding()
         }.onAppear {
@@ -174,7 +190,12 @@ struct SettingScreen: View {
                 optionProduct = viewModel.checkedProduct
                 optionClient = viewModel.checkedClient
             }
-        }.safeAreaInset(edge: .bottom, alignment: .center) {
+        }.safeAreaInset(edge: .top) {
+            CustomTopBar(title: viewModel.title, onBack: {
+                presentationMode.wrappedValue.dismiss()
+            })
+        }
+        .safeAreaInset(edge: .bottom, alignment: .center) {
             HStack {
                 Text("Indecator Ver. : \(bleManager.equipmentVer)").opacity(0.4)
             }
@@ -182,7 +203,7 @@ struct SettingScreen: View {
     }
 }
 
-// MARK: - SEGMENT BUTTON
+// MARK: - LENGUAGE SEGMENT BUTTON
 
 extension SettingScreen {
     func segmentButton(title: String, tag: Int) -> some View {
@@ -206,7 +227,7 @@ extension SettingScreen {
     }
 }
 
-// MARK: - SEGMENT BUTTON
+// MARK: - WIGHTING MATHOD SEGMENT BUTTON
 
 extension SettingScreen {
     func weightingMathodSegmentButton(title: String, tag: Int) -> some View {
@@ -227,7 +248,7 @@ extension SettingScreen {
     }
 }
 
-// MARK: - SEGMENT BUTTON
+// MARK: - PRINT OUTPUT SEGMENT BUTTON
 
 extension SettingScreen {
     func printOutputSettingSegmentButton(title: String, tag: Int) -> some View {
@@ -238,6 +259,23 @@ extension SettingScreen {
             Text(title.localized(languageManager.selectedLanguage))
                 .frame(maxWidth: .infinity)
                 .background(viewModel.printOutputCount == tag ? Color.gray.opacity(0.4) : Color.clear)
+                .foregroundColor(.black)
+                .cornerRadius(6)
+        }
+    }
+}
+
+// MARK: - BALANCE AXIS NUMBER SEGMENT BUTTON
+
+extension SettingScreen {
+    func balanceAxisNumberSettingSagmentButton(title: String, tag: Int) -> some View {
+        Button(action: {
+            viewModel.balanceAxisNumberToggleChanged(to: tag)
+            viewModel.saveBalanceAxisNumberSetting(tag)
+        }) {
+            Text(title.localized(languageManager.selectedLanguage))
+                .frame(maxWidth: .infinity)
+                .background(viewModel.balanceAxisNuberCount == tag ? Color.gray.opacity(0.4) : Color.clear)
                 .foregroundColor(.black)
                 .cornerRadius(6)
         }

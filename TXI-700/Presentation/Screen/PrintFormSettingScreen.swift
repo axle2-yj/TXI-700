@@ -106,9 +106,9 @@ struct PrintFormSettingScreen: View {
                         if viewModel.isOn(11) {
                             VStack(alignment: .leading) {
                                 weightRow("1Axle :", "2450kg/", "2500kg")
-                                lineText("4950kg")
+                                lineTextTailing("4950kg")
                                 weightRow("2Axle :", "3450kg/", "3400kg")
-                                lineText("6850kg")
+                                lineTextTailing("6850kg")
                             }
                         }
                         
@@ -162,16 +162,16 @@ struct PrintFormSettingScreen: View {
                         if viewModel.isOn(17) {
                             UnderlineFieldRow("Driver : ", "", 8)
                         }
-                    }.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                    }.padding(2)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                         .background(Color.white)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color.blue.opacity(0.3), lineWidth: 1)
-                        )
-                }.background(Color.white)
+                        
+                }.background(Color.white).overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.blue.opacity(0.3), lineWidth: 1)
+                )
                 
                 ScrollView {
-                    
                     VStack(alignment: .leading) {
                         ForEach(viewModel.labels.indices, id: \.self) { i in
                             HStack {

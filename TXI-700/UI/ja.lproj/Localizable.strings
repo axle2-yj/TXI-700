@@ -88,3 +88,7 @@
 "One" = "1ページ";
 "Two" = "2ページ";
 "Three" = "3ページ";
+"BalanceAxisNumberSetting" = "車両軸数設定";
+"number4" = "2軸";
+"number6" = "3軸";
+"number8" = "4軸";

@@ -11,11 +11,12 @@ class ClientDataManager {
     static let shared = ClientDataManager()
     private let context = PersistenceController.shared.context
     
-    func addClient(name: String, num: Int16) {
+    func addClient(name: String, num: Int16, shortcutNum: Int16) {
             let item = ClientInfo(context: context)
             item.id = UUID()
             item.name = name
             item.num = num
+            item.shortcutNum = shortcutNum
             save()
         }
     
@@ -45,10 +46,12 @@ class ClientDataManager {
     func updateClient(
         item: ClientInfo,
         name: String,
-        num: Int16
+        num: Int16,
+        shortcutNum: Int16
     ) {
         item.name = name
         item.num = num
+        item.shortcutNum = shortcutNum
         save()
     }
     

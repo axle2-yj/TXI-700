@@ -25,6 +25,7 @@ class StorageManager {
     private let clientChecked = "clientChecked"
     private let serialNumber = "serialNumber"
     private let printOutputCount = "printOutputCount"
+    private let balanceAxisNuberCount = "balanceAxisNuberCount"
     
     // MAC 저장
     func saveMacAddress(_ mac: String) {
@@ -155,5 +156,13 @@ class StorageManager {
     
     func loadPrintOutputCount() -> Int {
         return UserDefaults.standard.integer(forKey: printOutputCount)
+    }
+    
+    func saveBalanceAxisNuberCount(_ count: Int) {
+        UserDefaults.standard.set(count, forKey: balanceAxisNuberCount)
+    }
+    
+    func loadBalanceAxisNuberCount() -> Int {
+        return UserDefaults.standard.integer(forKey: balanceAxisNuberCount)
     }
 }

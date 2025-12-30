@@ -45,26 +45,33 @@ func lineText(_ value: String) -> some View {
 }
 
 @ViewBuilder
+func lineTextTailing(_ value: String) -> some View {
+    Text(LocalizedStringKey(value))
+        .frame(maxWidth: .infinity, alignment: .trailing)
+        .padding(2)
+        .lineLimit(1)
+}
+
+@ViewBuilder
 func UnderlineFieldRow(_ title: String, _ value: String, _ minLength: Int) -> some View {
     HStack {
         Text(title)
         
-        ZStack(alignment: .leading) {
-            // 밑줄 (길게 표시)
-            Text(String(repeating: "_", count: max(minLength, value.count)))
-                .foregroundColor(.gray.opacity(0.6))
-            
-            // 실제 값
-            Text(value)
-                .foregroundColor(.black)
-                .frame(alignment: .trailing)
-                .padding(.trailing, 5)
-        }
-        
         Spacer()
+
+        ZStack(alignment: .leading) {
+            if value.isEmpty {
+                // 밑줄 (길게 표시)
+                Text(String(repeating: "_", count: max(minLength, value.count)))
+                    .foregroundColor(.gray.opacity(0.6))
+            } else {
+                // 실제 값
+                Text(value)
+                    .foregroundColor(.black)
+            }
+        }.padding(.trailing, 5)
     }
     .frame(maxWidth: .infinity, alignment: .leading).lineLimit(1)
-        
 }
 
 @ViewBuilder

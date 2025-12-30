@@ -22,6 +22,7 @@ class SettingViewModel: ObservableObject {
     @Published var checkedProduct: Bool = false
     @Published var checkedClient: Bool = false
     @Published var printOutputCount: Int = 0
+    @Published var balanceAxisNuberCount: Int = 0
 
     func reset() {
         
@@ -38,6 +39,10 @@ class SettingViewModel: ObservableObject {
     
     func printOutputToggleChanged(to newValue: Int) {
         printOutputCount = newValue
+    }
+    
+    func balanceAxisNumberToggleChanged(to newValue: Int) {
+        balanceAxisNuberCount = newValue
     }
     
     // 언어 저장
@@ -131,5 +136,13 @@ class SettingViewModel: ObservableObject {
     
     func loadPrintOutputCountSetting() {
         printOutputCount = StorageManager.shared.loadPrintOutputCount()
+    }
+    
+    func saveBalanceAxisNumberSetting(_ count: Int) {
+        StorageManager.shared.saveBalanceAxisNuberCount(count)
+    }
+    
+    func loadBalanceAxisNumberSetting() {
+        balanceAxisNuberCount = StorageManager.shared.loadBalanceAxisNuberCount()
     }
 }

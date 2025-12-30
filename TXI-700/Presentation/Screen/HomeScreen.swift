@@ -138,6 +138,12 @@ struct HomeScreen: View {
             .onDisappear {
                 homeViewModel.stopAutoConnect()
             }
+            .onReceive(bleManager.$isConnected) { isConnected in
+                if !isConnected {
+                    bluetoothConnected = false
+                }
+            }
+            
     }
 }
 

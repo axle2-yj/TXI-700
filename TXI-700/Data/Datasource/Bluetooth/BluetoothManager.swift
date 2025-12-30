@@ -30,10 +30,18 @@ class BluetoothManager: NSObject, ObservableObject {
     @Published var rightLoadAxel1: Int? = nil
     @Published var leftLoadAxel2: Int? = nil
     @Published var rightLoadAxel2: Int? = nil
+    @Published var leftLoadAxel3: Int? = nil
+    @Published var rightLoadAxel3: Int? = nil
+    @Published var leftLoadAxel4: Int? = nil
+    @Published var rightLoadAxel4: Int? = nil
     @Published var loadAxle1BatteryLevel: Int? = nil
     @Published var loadAxle2BatteryLevel: Int? = nil
     @Published var loadAxle3BatteryLevel: Int? = nil
     @Published var loadAxle4BatteryLevel: Int? = nil
+    @Published var loadAxle5BatteryLevel: Int? = nil
+    @Published var loadAxle6BatteryLevel: Int? = nil
+    @Published var loadAxle7BatteryLevel: Int? = nil
+    @Published var loadAxle8BatteryLevel: Int? = nil
     @Published var indicatorBatteryLevel: Int? = nil
     @Published var inmotion: Int = 0
     

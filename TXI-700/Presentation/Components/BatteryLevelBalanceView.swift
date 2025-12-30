@@ -71,7 +71,7 @@ struct BatteryLevelBalanceView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 30, height: 30, alignment: .leading)
-                    if number < percentages.count {
+                    if number <= percentages.count {
                         Text(String(format: "%.1f", percentages[number-1])).font(.system(size: 25))
                         Text("%").font(.system(size: 25))
                     } else {

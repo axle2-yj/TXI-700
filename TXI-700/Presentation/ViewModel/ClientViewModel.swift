@@ -13,7 +13,6 @@ class ClientViewModel: ObservableObject {
     @Published var clientItems: [ClientInfo] = []
     @Published var text: String = NSLocalizedString("ClientScreenTitle", comment: "")
     @Published var name: String = ""
-    @Published var num: Int16 = 0
     @Published var selectedClient: ClientInfo? = nil
 
     private let clientManager = ClientDataManager.shared
@@ -32,20 +31,22 @@ class ClientViewModel: ObservableObject {
                 clientManager.updateClient(
                     item: client,
                     name: name.replacingOccurrences(of: " ", with: ""),
-                    num: client.num
+                    num: client.num,
+                    shortcutNum: client.shortcutNum
                 )
             } else {
                 // ADD
                 let nextNum = Int16(clientItems.count)
-                clientManager.addClient(name: name.replacingOccurrences(of: " ", with: ""), num: nextNum)
+                let netxShortcutNum = Int16(clientItems.count)
+                clientManager.addClient(name: name.replacingOccurrences(of: " ", with: ""), num: nextNum, shortcutNum: netxShortcutNum)
             }
 
             fetchClientItems()
             clearSelection()
     }
     
-    func updateClient(item: ClientInfo, name: String, num: Int16) {
-        clientManager.updateClient(item: item, name: name, num: num)
+    func updateClient(item: ClientInfo, name: String, num: Int16, shortcutNum: Int16) {
+        clientManager.updateClient(item: item, name: name, num: num, shortcutNum: shortcutNum)
         fetchClientItems()
     }
     

@@ -89,9 +89,9 @@ struct DataDetailScreen: View {
                     if bleManager.isConnected {
                         let weightNumBool = Int(loadAxleItem.weightNum ?? "0") != 2
                         let printLinBuilder = if weightNumBool {
-                            PrintLineBuilder.build(loadAxleItem: loadAxleItem, dataViewModel: viewModel, printViewModel: printViewModel)
+                            PrintLineBuilder.buildPrint(loadAxleItem: loadAxleItem, dataViewModel: viewModel, printViewModel: printViewModel)
                         } else {
-                            PrintLineBuilder.buildTwoStepRead(loadAxleItem: loadAxleItem, dataViewModel: viewModel, printViewModel: printViewModel)
+                            PrintLineBuilder.buildTwoStepPrint(loadAxleItem: loadAxleItem, dataViewModel: viewModel, printViewModel: printViewModel)
                         }
                         PrintButton(
                             isMain: false,
@@ -328,7 +328,7 @@ extension DataDetailScreen {
     var printPreviewView: some View {
         let weightNum = Int(loadAxleItem.weightNum ?? "0")
         let lines = if weightNum != 2 {
-            PrintLineBuilder.build(
+            PrintLineBuilder.buildRead(
             loadAxleItem: loadAxleItem,
             dataViewModel: viewModel,
             printViewModel: printViewModel

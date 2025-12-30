@@ -6,5 +6,10 @@
 	<array>
 		<string>tmt_font.ttf</string>
 	</array>
+	<key>UILaunchScreen</key>
+	<dict>
+		<key>UIImageName</key>
+		<string>TXI_700</string>
+	</dict>
 </dict>
 </plist>
