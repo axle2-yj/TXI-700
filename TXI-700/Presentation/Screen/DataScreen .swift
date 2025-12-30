@@ -15,12 +15,16 @@ struct DataScreen: View {
     @State private var selectedItem: LoadAxleInfo? = nil
     @State private var selectedItemIndex : Int?
     @State private var showFilterBar = true
-
+    
     @Environment(\.presentationMode) var presentationMode
     @ObservedObject var printViewModel: PrintFormSettingViewModel
     @ObservedObject var settingViewModel: SettingViewModel
     @EnvironmentObject var bleManager: BluetoothManager
+    @Environment(\.colorScheme) var colorScheme
     
+    private var returnImage: String {
+        colorScheme == .dark ? "return_dark" : "return"
+    }
     // 필터 적용 후 그룹화된 데이터
     private var groupedItems: [String: [LoadAxleInfo]] {
         Dictionary(grouping: viewModel.filteredItems) { item in
@@ -32,7 +36,7 @@ struct DataScreen: View {
     }
     
     var body: some View {
-        ZStack{
+        ZStack {
             VStack {
                 if viewModel.filteredItems.isEmpty {
                     Spacer()
@@ -59,13 +63,13 @@ struct DataScreen: View {
                         if let item = selectedItem,
                            let index = selectedItemIndex{
                             DataDetailScreen(currentIndex: index,
-                                            loadAxleItem: item,
-                                            viewModel: viewModel,
-                                            printViewModel: printViewModel,
-                                            settingViewMdoel: settingViewModel)
+                                             loadAxleItem: item,
+                                             viewModel: viewModel,
+                                             printViewModel: printViewModel,
+                                             settingViewMdoel: settingViewModel)
                         }
                     }
-                                    
+                    
                 }
             }
             .padding()
@@ -83,7 +87,7 @@ struct DataScreen: View {
                 // MARK: - Bottom Bar
                 Button(action: { showFilterBar.toggle() }) {
                     HStack {
-                        Image("return")
+                        Image(returnImage)
                             .resizable()
                             .frame(width: 30, height: 30)
                             .rotationEffect(.degrees(showFilterBar ? 270 : 90))

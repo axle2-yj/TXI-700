@@ -7,14 +7,14 @@
 
 struct LoadAxleSaveService: Equatable {
     static func printSaveData(
-            serialNumber: String,
-            equipmentNumber: String,
-            client: String,
-            product: String,
-            vehicle: String,
-            weightNum: String,
-            loadAxleStatus: [LoadAxleStatus],
-            completion: (() -> Void)? = nil
+        serialNumber: String,
+        equipmentNumber: String,
+        client: String,
+        product: String,
+        vehicle: String,
+        weightNum: String,
+        loadAxleStatus: [LoadAxleStatus],
+        completion: (() -> Void)? = nil
     ) {
         for status in loadAxleStatus {
             LoadAxleDataManager.shared.addLoadAxle(

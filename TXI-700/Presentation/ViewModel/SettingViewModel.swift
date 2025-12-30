@@ -22,7 +22,12 @@ class SettingViewModel: ObservableObject {
     @Published var checkedProduct: Bool = false
     @Published var checkedClient: Bool = false
     @Published var printOutputCount: Int = 0
-
+    @Published var balanceAxisNuberCount: Int = 0
+    @Published var balanceWeight: Int = 1
+    @Published var dangerous: Int = 25
+    @Published var caution: Int = 15
+    @Published var safety: Int = 10
+    @Published var isSum: Bool = false
     func reset() {
         
     }
@@ -38,6 +43,14 @@ class SettingViewModel: ObservableObject {
     
     func printOutputToggleChanged(to newValue: Int) {
         printOutputCount = newValue
+    }
+    
+    func balanceAxisNumberToggleChanged(to newValue: Int) {
+        balanceAxisNuberCount = newValue
+    }
+    
+    func balanceWeightToggleChanged(to newValue: Int) {
+        balanceWeight = newValue
     }
     
     // 언어 저장
@@ -59,7 +72,7 @@ class SettingViewModel: ObservableObject {
     func loadClient() {
         saveClient = StorageManager.shared.loadClientTitle()
     }
-        
+    
     // 언어 호출
     func loadLanguage() {
         language = StorageManager.shared.loadLanguage() ?? 0
@@ -69,29 +82,29 @@ class SettingViewModel: ObservableObject {
     func saveModeChange(_ mode: Int) {
         StorageManager.shared.saveModeChange(mode)
     }
-        
+    
     // Weighting Method 호출
     func loadWeightingMethod() {
         weightingMethod = StorageManager.shared.loadWeighingMethod() ?? 0
     }
     
     // Mode 호출
-    func loadModeChange() {
+    func loadModeChange(_ dark: Bool) {
         modeInt = StorageManager.shared.loadModeChange()
         let mode = self.modeInt ?? 0
         switch mode {
-            case 0:
-                self.modeName = "Static"
-                self.imageName = "car_static"
-            case 1:
-                self.modeName = "Inmotion"
-                self.imageName = "car_inmotion"
-            case 2:
-                self.modeName = "Auto Inmotion"
-                self.imageName = "car_auto_inmotion"
-            default:
-                self.modeName = "Static"
-                self.imageName = "car_static"
+        case 0:
+            self.modeName = "Static"
+            self.imageName = dark ? "car_static_dark" : "car_static"
+        case 1:
+            self.modeName = "Inmotion"
+            self.imageName = dark ? "car_inmotion_dark" : "car_inmotion"
+        case 2:
+            self.modeName = "Auto Inmotion"
+            self.imageName = dark ? "car_auto_inmotion_dark" : "car_auto_inmotion"
+        default:
+            self.modeName = "Static"
+            self.imageName = dark ? "car_static_dark" : "car_static"
         }
     }
     
@@ -119,7 +132,7 @@ class SettingViewModel: ObservableObject {
     func disableButton() {
         isModeButtonDisabled = true
     }
-
+    
     // Mode 변경 완료 후 버튼 사용 가능
     func enableButton() {
         isModeButtonDisabled = false
@@ -131,5 +144,45 @@ class SettingViewModel: ObservableObject {
     
     func loadPrintOutputCountSetting() {
         printOutputCount = StorageManager.shared.loadPrintOutputCount()
+    }
+    
+    func saveBalanceAxisNumberSetting(_ count: Int) {
+        StorageManager.shared.saveBalanceAxisNuberCount(count)
+    }
+    
+    func loadBalanceAxisNumberSetting() {
+        balanceAxisNuberCount = StorageManager.shared.loadBalanceAxisNuberCount()
+    }
+    
+    func saveBalanceWeghtSetting(_ bool: Int) {
+        StorageManager.shared.saveBalanceWeightBool(bool)
+    }
+    
+    func loadBalanceWeghtSetting() {
+        balanceWeight = StorageManager.shared.loadBalanceWeightBool()
+    }
+    
+    func saveDangerousNumberSetting(_ Number: Int) {
+        StorageManager.shared.saveDangerousNumber(Number)
+    }
+    
+    func loadDangerousNumberSetting() {
+        dangerous = StorageManager.shared.loadDangerousNumber()
+    }
+    
+    func saveCautionNumberSetting(_ Number: Int) {
+        StorageManager.shared.saveCautionNumber(Number)
+    }
+    
+    func loadCautionNumberSetting() {
+        caution = StorageManager.shared.loadCautionNumber()
+    }
+    
+    func saveSafetyNumberSetting(_ Number: Int) {
+        StorageManager.shared.saveSafetyNumber(Number)
+    }
+    
+    func loadSafetyNumberSetting() {
+        safety = StorageManager.shared.loadSafetyNumber()
     }
 }

@@ -10,26 +10,32 @@ import Foundation
 
 struct PrintButton: View {
     @State var isMain = false
-    @Binding var seletedType : Int
-    @State private var printDataByte: [UInt8] = [
-        0x42, 0x54, 0x53
-    ]
     @State private var printAlert: Bool = false
+    @Binding var seletedType : Int
+
+    @Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var bleManager: BluetoothManager
     
     @ObservedObject var viewModel: DataViewModel
     @ObservedObject var printViewModel: PrintFormSettingViewModel
     @ObservedObject var settingViewModel: SettingViewModel
-
+    
     @Binding var printResponse: String
     
+    private var tint: Color {
+        colorScheme == .dark ? .white : .black
+    }
+    private var oppositionTint: Color {
+        colorScheme == .dark ? .black : .white
+    }
+
     let lines: [String]
     var onPrint: () -> Void
     var offPrint: () -> Void
     
     var body: some View {
         VStack {
-
+            
             Button("PRINT") {
                 guard Int(bleManager.indicatorBatteryLevel ?? 0) > 2 else {
                     printAlert = true
@@ -46,18 +52,18 @@ struct PrintButton: View {
                 .padding()
                 .background(
                     isMain
-                       ? Color.gray.opacity(0.3)
-                       : (viewModel.selectedType == nil
-                           ? Color.gray.opacity(0.4)
-                           : Color.gray.opacity(0.2))
+                    ? Color.gray.opacity(0.3)
+                    : (viewModel.selectedType == nil
+                       ? Color.gray.opacity(0.4)
+                       : Color.gray.opacity(0.2))
                 )
                 .cornerRadius(6)
                 .foregroundColor(
                     isMain
-                        ? .black
-                        : (viewModel.selectedType == nil
-                            ? .white
-                            : .black)
+                    ? tint
+                    : (viewModel.selectedType == nil
+                       ? oppositionTint
+                       : tint)
                 )
         }.onReceive(bleManager.$printResponse){ newVelue in
             DispatchQueue.main.async {
@@ -76,7 +82,7 @@ struct PrintButton: View {
     func printMain() {
         if settingViewModel.weightingMethod == 0 {
             onPrint()
-            print("Print Send Result: \(bleManager.sendData(printDataByte))")
+            bleManager.sendCommand(.bts, log: "PrintIndicator Send Result")
         } else {
             startPrintWithCopies()
         }
@@ -84,8 +90,8 @@ struct PrintButton: View {
     
     func startPrintWithCopies() {
         onPrint()
-            let copies = max(1, settingViewModel.printOutputCount + 1)
-            printCopies(current: 1, total: copies)
+        let copies = max(1, settingViewModel.printOutputCount + 1)
+        printCopies(current: 1, total: copies)
     }
     
     func printCopies(current: Int, total: Int) {
@@ -93,7 +99,7 @@ struct PrintButton: View {
             offPrint()
             return
         }
-
+        
         viewModel.printTotal = total
         viewModel.printingNumber = current
         
@@ -102,22 +108,22 @@ struct PrintButton: View {
             printLineData(lines: lines) {
                 self.printCopies(current: current + 1, total: total)
             }
-
+            
         case 1:
             printLoadAxleInfos(infos: viewModel.todayLoadAxleItems) {
                 self.printCopies(current: current + 1, total: total)
             }
-
+            
         case 2:
             printLoadAxleInfos(infos: viewModel.loadAxleItems) {
                 self.printCopies(current: current + 1, total: total)
             }
-
+            
         default:
             offPrint()
         }
     }
-
+    
     func printLineData(
         lines: [String],
         completion: @escaping () -> Void
@@ -126,32 +132,24 @@ struct PrintButton: View {
             completion()
             return
         }
-
+        
         let delay: Double = 0.5
         let lastIndex = lines.count - 1
-
+        
         for (index, line) in lines.enumerated() {
             DispatchQueue.main.asyncAfter(deadline: .now() + delay * Double(index)) {
-
-                var packet: [UInt8]
-
-                switch index {
-                case 0:
-                    packet = [0x57, 0x50, 0x53] // WPS
-                case lastIndex:
-                    packet = [0x57, 0x50, 0x54] // WPT
-                default:
-                    packet = [0x57, 0x50, 0x45] // WPE
-                }
-
-                packet.append(contentsOf: line.utf8)
-                packet.append(contentsOf: [0x0D, 0x0A])
                 
-//                print("Send[\(index)] after \(delay * Double(index))s → \(packet)")
-                print("Content[\(index)] Result: \(bleManager.sendData(packet))")
+                switch index {
+                case 0: bleManager.sendCommand(.wps(line), log: "PrintOneLine Start Send Result")
+                case lastIndex: bleManager.sendCommand(.wpt(line), log: "PrintOneLine Last Send Result")
+                default: bleManager.sendCommand(.wpe(line), log: "PrintOneLine Send Result")
+                }
+                
+                //                print("Send[\(index)] after \(delay * Double(index))s → \(packet)")
+                //                print("Content[\(index)] Result: \(bleManager.sendData(packet))")
             }
         }
-
+        
         DispatchQueue.main.asyncAfter(
             deadline: .now() + delay * Double(lines.count + 1)
         ) {
@@ -159,9 +157,7 @@ struct PrintButton: View {
         }
     }
     
-    // MARK: - 연속 출력 데이터 묶음 나눔
-
-    
+    // MARK: - 연속 출력 데이터 묶음 나눔    
     func printLoadAxleInfos(
         infos: [LoadAxleInfo],
         completion: @escaping () -> Void
@@ -170,11 +166,11 @@ struct PrintButton: View {
             completion()
             return
         }
-
+        
         viewModel.printTotal = infos.count
         sendNext(index: 0, infos: infos, completion: completion)
     }
-
+    
     private func sendNext(
         index: Int,
         infos: [LoadAxleInfo],
@@ -193,7 +189,7 @@ struct PrintButton: View {
             dataViewModel: viewModel,
             printViewModel: printViewModel
         )
-
+        
         sendLines(lines) {
             self.sendNext(index: index + 1, infos: infos, completion: completion)
         }
@@ -205,28 +201,19 @@ struct PrintButton: View {
     ) {
         let delay: Double = 0.5
         let lastIndex = lines.count - 1
-
+        
         for (index, line) in lines.enumerated() {
             DispatchQueue.main.asyncAfter(deadline: .now() + delay * Double(index)) {
-
-                var packet: [UInt8]
-
                 switch index {
-                case 0:
-                    packet = [0x57, 0x50, 0x53] // WPS
-                case lastIndex:
-                    packet = [0x57, 0x50, 0x54] // WPT
-                default:
-                    packet = [0x57, 0x50, 0x45] // WPE
+                    
+                case 0: bleManager.sendCommand(.wps(line), log: "PrintOneLine Start Send Result")
+                case lastIndex: bleManager.sendCommand(.wpt(line), log: "PrintOneLine Last Send Result")
+                default: bleManager.sendCommand(.wpe(line), log: "PrintOneLine Send Result")
                 }
-
-                packet.append(contentsOf: line.utf8)
-                packet.append(contentsOf: [0x0D, 0x0A])
-
-                print("Content[\(index)] Result: \(self.bleManager.sendData(packet))")
+                //                print("Content[\(index)] Result: \(self.bleManager.sendData(packet))")
             }
         }
-
+        
         DispatchQueue.main.asyncAfter(
             deadline: .now() + delay * Double(lines.count + 1)
         ) {

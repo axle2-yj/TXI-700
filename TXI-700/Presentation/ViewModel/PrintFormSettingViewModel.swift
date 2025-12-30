@@ -17,7 +17,7 @@ class PrintFormSettingViewModel: ObservableObject {
     @Published var toggles: [Bool] = []
     @Published var inspectorNameText: String? = nil
     @Published var allItems: [LoadAxleInfo] = []
-
+    @Published var isDelete = false
     /// labels는 템플릿 문자열
     private let baseLabels: [String] = [
         "Bar","Head Line","Bar",                        // 0, 1, 2
@@ -45,15 +45,15 @@ class PrintFormSettingViewModel: ObservableObject {
         formatter.dateFormat = "HH:mm"
         return formatter
     }()
-
+    
     /// UI에서 실제 사용할 labels (동적으로 변환됨)
     var labels: [String] {
         baseLabels.map {
             $0.replacingOccurrences(of: "{PRODUCT}", with: productTitle ?? "Item")
-            .replacingOccurrences(of: "{CLIENT}", with: clientTitle ?? "Client")
+                .replacingOccurrences(of: "{CLIENT}", with: clientTitle ?? "Client")
         }
     }
-
+    
     @Published var defaultToggles: [Bool] = [
         true, true, true,
         true, false, false,
@@ -62,7 +62,7 @@ class PrintFormSettingViewModel: ObservableObject {
         false, false, false,
         true, true, false
     ]
-
+    
     init() {
         loadProductTitle()
         loadClientTitle()
@@ -76,11 +76,11 @@ class PrintFormSettingViewModel: ObservableObject {
             toggles = defaultToggles
         }
     }
-
+    
     // MARK: - Toggle 저장 및 로드
     func toggleChanged(index: Int, value: Bool) {
         toggles[index] = value
-       
+        
         // --- 3, 4, 5번 연동 로직 추가 ---
         let idxDateTime = 3
         let idxDate = 4
@@ -115,32 +115,32 @@ class PrintFormSettingViewModel: ObservableObject {
         // 11, 12, 13 상호 배타 + 반드시 1개 true 유지
         // -------------------------------
         if [idxStep, idxEach, idxTwoStep].contains(index) {
-                if value == true {
-                    // 선택된 index 외의 두 개는 false
-                    let trio = [idxStep, idxEach, idxTwoStep]
-                    for i in trio where i != index {
-                        toggles[i] = false
-                    }
-                } else {
-                    let trio = [idxStep, idxEach, idxTwoStep]
-                    let trueCount = trio.filter { toggles[$0] }.count
-                    
-                    if trueCount == 0 {
-                        toggles[index] = true
-                    }
+            if value == true {
+                // 선택된 index 외의 두 개는 false
+                let trio = [idxStep, idxEach, idxTwoStep]
+                for i in trio where i != index {
+                    toggles[i] = false
+                }
+            } else {
+                let trio = [idxStep, idxEach, idxTwoStep]
+                let trueCount = trio.filter { toggles[$0] }.count
+                
+                if trueCount == 0 {
+                    toggles[index] = true
                 }
             }
+        }
         
         saveToggles()
         
         objectWillChange.send()
     }
-
-
+    
+    
     func saveToggles() {
         StorageManager.shared.saveToggles(toggles)
     }
-
+    
     func loadToggles() {
         if let saved = StorageManager.shared.loadToggles(),
            saved.count == defaultToggles.count {
@@ -154,22 +154,22 @@ class PrintFormSettingViewModel: ObservableObject {
     func isOn(_ index: Int) -> Bool {
         toggles.indices.contains(index) && toggles[index]
     }
-
+    
     // MARK: - Title 저장
     func saveProductTitle(_ text: String) {
         StorageManager.shared.saveProductTitle(text)
         productTitle = text
     }
-
+    
     func saveClientTitle(_ text: String) {
         StorageManager.shared.saveClientTitle(text)
         clientTitle = text
     }
-
+    
     func loadProductTitle() {
         productTitle = StorageManager.shared.loadProductTitle()
     }
-
+    
     func loadClientTitle() {
         clientTitle = StorageManager.shared.loadClientTitle()
     }
@@ -189,6 +189,35 @@ class PrintFormSettingViewModel: ObservableObject {
     
     func loadInspectorName() {
         inspectorNameText = StorageManager.shared.loadInspecterName()
+    }
+    
+    func calculateCrossBalance(
+        lefts: [Int],
+        rights: [Int]
+    ) -> (lfRr: Int, rfLr: Int) {
+        
+        // 0은 존재하지 않는 축으로 간주
+        let validLefts  = lefts.filter { $0 > 0 }
+        let validRights = rights.filter { $0 > 0 }
+        
+        // 최소 2축 필요
+        guard validLefts.count >= 2,
+              validRights.count >= 2 else {
+            return (0, 0)
+        }
+        
+        // 앞축
+        let frontLeft  = validLefts.first!
+        let frontRight = validRights.first!
+        
+        // 뒤축 (3축 이상이 없을 수도 있으므로 "마지막 유효 축")
+        let rearLeft   = validLefts.last!
+        let rearRight  = validRights.last!
+        
+        let lfRr = frontLeft + rearRight   // LF + RR
+        let rfLr = frontRight + rearLeft   // RF + LR
+        
+        return (lfRr, rfLr)
     }
 }
 

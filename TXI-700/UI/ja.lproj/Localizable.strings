@@ -24,6 +24,11 @@
 "WeightInput" = "重量の入力";
 "None" = "なし";
 "SelectRegion" = "地域選択";
+"VehicleNumSearch" = "車両番号検索";
+"ClientSearch" = "顧客検索";
+"ProductSearch" = "品目検索";
+"Input" = "入力";
+"InspectorInput" = "検査官の名前を入力";
 
 "Close" = "閉じる";
 "Cancel" = "キャンセル";
@@ -49,7 +54,8 @@
 "PrintHeadline" = "印刷見出し";
 
 //"Line" = "------------------------------";
-"Line" = "= = = = = = = = = = = = = = =";
+"Line" = "- - - - - - - - - - - - - - - -";
+//"Line" = "= = = = = = = = = = = = = = =";
 "Vehicle" = "品川 300 あ 12-34";
 
 "EmptyDelteData" = "削除するデータがありません。";
@@ -88,3 +94,27 @@
 "One" = "1ページ";
 "Two" = "2ページ";
 "Three" = "3ページ";
+"BalanceAxisNumberSetting" = "車両軸数設定";
+"BlanceWeightSetting" = "垂直/水平方向の合計と重み付け設定";
+"Invisible" = "非表示";
+"Visible" = "見える";
+"number4" = "2軸";
+"number6" = "3軸";
+"number8" = "4軸";
+
+"existingVehicleNumber" = "既存の車両番号です。";
+"registeredProductName"="登録された商品名です。";
+"registeredClientName"="登録された顧客会社名です。";
+"saved"="保存されました。";
+"pleaseEnterProductName." = "商品名を入力してください.";
+"pleaseEnterClientName" = "お客様のご社名を入力してください.";
+"pleaseEnterVehicleNum" = "車両番号を入力してください.";
+
+"balanceValueSetting"="バランス値設定";
+"dangerousValueSetting"="危険範囲";
+"cautionValueSetting"="注意範囲";
+"safetyValueSetting"="安全範囲";
+
+"endProcess" = "終了しますか？";
+"AppEnd" = "アプリ終了";
+"AllEnd" = "全体終了";

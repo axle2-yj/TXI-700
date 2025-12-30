@@ -11,19 +11,20 @@ class ClientDataManager {
     static let shared = ClientDataManager()
     private let context = PersistenceController.shared.context
     
-    func addClient(name: String, num: Int16) {
-            let item = ClientInfo(context: context)
-            item.id = UUID()
-            item.name = name
-            item.num = num
-            save()
-        }
+    func addClient(name: String, num: Int16, shortcutNum: Int16) {
+        let item = ClientInfo(context: context)
+        item.id = UUID()
+        item.name = name
+        item.num = num
+        item.shortcutNum = shortcutNum
+        save()
+    }
     
     func fetchAll() -> [ClientInfo] {
         let request: NSFetchRequest<ClientInfo> = ClientInfo.fetchRequest()
         request.sortDescriptors = [
-                NSSortDescriptor(key: "num", ascending: true)
-            ]
+            NSSortDescriptor(key: "num", ascending: true)
+        ]
         do {
             return try context.fetch(request)
         } catch {
@@ -45,10 +46,12 @@ class ClientDataManager {
     func updateClient(
         item: ClientInfo,
         name: String,
-        num: Int16
+        num: Int16,
+        shortcutNum: Int16
     ) {
         item.name = name
         item.num = num
+        item.shortcutNum = shortcutNum
         save()
     }
     

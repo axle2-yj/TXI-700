@@ -14,18 +14,19 @@ class VehicleViewModel: ObservableObject {
     @Published var text: String = NSLocalizedString("VehicleScreenTitle", comment: "")
     @Published var vehicle: String = ""
     @Published var weight: String = ""
-    @Published var num: Int16 = 0
     @Published var items: [String] = []
     @Published var selectedRegion: String = ""
     @Published var searchText: String = ""
     @Published var selectedVehicle: VehicleInfo? = nil
     @State private var activeAlert: ActiveListAlert?
+    @Published var saveSuccessMessage: String? = nil
+    @Published var saveFailedMessage: String? = nil
     
     @EnvironmentObject var languageManager: LanguageManager
     var lang = Locale.current.language.languageCode?.identifier ?? "en"
-
+    
     private let vehicleManger = VehicleDataManager.shared
-
+    
     init() {
         loadItems()
     }
@@ -37,7 +38,18 @@ class VehicleViewModel: ObservableObject {
     func saveOrUpdateVehicleItem() {
         
         let vehicleContent = (selectedRegion+vehicle).replacingOccurrences(of: " ", with: "")
-        guard !vehicleContent.isEmpty else {return}
+        guard !vehicleContent.isEmpty else {
+            print("pleaseEnterVehicleNum")
+            saveFailedMessage = "pleaseEnterVehicleNum"
+            return
+        }
+        
+        // 중복 체크
+        if vehicleItems.contains(where: { $0.vehicle == vehicleContent && $0.id != selectedVehicle?.id }) {
+            saveFailedMessage = "existingVehicleNumber"
+            return
+        }
+        
         if let vehicleinfo = selectedVehicle {
             vehicleManger.updateVehicle(
                 // UPDATE
@@ -52,6 +64,25 @@ class VehicleViewModel: ObservableObject {
         }
         fetchVehicleItems()
         clearSelection()
+        saveSuccessMessage = "saved"
+    }
+    
+    func save(vehicleNum: String) {
+        fetchVehicleItems()
+        guard !vehicleNum.isEmpty else {
+            saveFailedMessage = "pleaseEnterVehicleNum"
+            return
+        }
+        
+        // 중복 체크
+        if vehicleItems.contains(where: { $0.vehicle == vehicleNum }) {
+            saveFailedMessage = "existingVehicleNumber"
+            return
+        }
+        
+        let nextNum = Int16(vehicleItems.count)
+        vehicleManger.addVehicle(vehicle: vehicleNum, weight: 0, num: nextNum)
+        saveSuccessMessage = "saved"
     }
     
     func deleteVehicleItem(item: VehicleInfo) {
@@ -85,21 +116,21 @@ class VehicleViewModel: ObservableObject {
     }
     
     func loadRegions() -> [String] {
-            if let url = Bundle.main.url(forResource: language(), withExtension: "json"),
-               let data = try? Data(contentsOf: url),
-               let regions = try? JSONDecoder().decode([String].self, from: data) {                return regions
-            }
-            return []
+        if let url = Bundle.main.url(forResource: language(), withExtension: "json"),
+           let data = try? Data(contentsOf: url),
+           let regions = try? JSONDecoder().decode([String].self, from: data) {                return regions
         }
+        return []
+    }
     
     func language() -> String {
         switch lang {
-            case "ja":
-                "jepenRegions"
-            case "ko":
-                "koreaRegions"
-            default:
-                "regions"
+        case "ja":
+            "jepenRegions"
+        case "ko":
+            "koreaRegions"
+        default:
+            "regions"
         }
     }
     

@@ -12,22 +12,22 @@ import Combine
 enum ActiveHomeAlert: Identifiable {
     case success(String)
     case error(String)
-
+    
     var id: String {
         switch self {
         case .success(let msg):
             return "\(msg)"
         case .error(let msg):
-//            return "error"
+            //            return "error"
             return "\(msg)"
         }
     }
-
+    
     /// Alert에 표시할 메시지
     var message: String {
         switch self {
         case .success(let msg),
-             .error(let msg):
+                .error(let msg):
             return msg
         }
     }
@@ -62,12 +62,12 @@ class HomeViewModel: ObservableObject {
     func setBleManager(_ manager: BluetoothManager) {
         self.bleManager = manager
     }
-
+    
     func startAutoConnect() {
         guard autoConnectEnabled else { return }
         scheduleScanCycle()
     }
-        
+    
     func stopAutoConnect() {
         scanTimer?.invalidate()
         scanTimer = nil
@@ -76,21 +76,21 @@ class HomeViewModel: ObservableObject {
     func setAutoConnectState(_ isEnabled: Bool) {
         autoConnectEnabled = isEnabled
         StorageManager.shared.saveAutoScan(isEnabled)
-//        if !isEnabled {
-//            StorageManager.shared.saveMacAddress("")
-//        }
+        //        if !isEnabled {
+        //            StorageManager.shared.saveMacAddress("")
+        //        }
     }
     
     func loadAutoConnectState() {
         autoConnectEnabled = StorageManager.shared.loadAutoScan()
         print(autoConnectEnabled)
     }
-
+    
     private func scheduleScanCycle() {
         // 5초 스캔
         scanTimer = Timer.scheduledTimer(withTimeInterval: 3, repeats: false) { [weak self] _ in
             guard let self else { return }
-
+            
             Task { @MainActor in
                 self.autoStartScan()
             }
@@ -116,7 +116,7 @@ class HomeViewModel: ObservableObject {
             }
         }
     }
-
+    
     private func checkForSavedDevice() {
         guard let bleManager, let savedMAC else { return }
         if let device = bleManager.devices.first(where: { $0.mac == savedMAC }) {

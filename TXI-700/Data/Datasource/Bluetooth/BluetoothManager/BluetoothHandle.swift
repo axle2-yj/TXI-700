@@ -1,0 +1,115 @@
+//
+//  BluetoothHandle.swift
+//  TXI-700
+//
+//  Created by 서용준 on 1/13/26.
+//
+
+import Foundation
+
+extension BluetoothManager: BLEEventHandling {
+    
+    func BluetoothHandle(_ response: BLEResponse) {
+        
+        DispatchQueue.main.async {
+            switch response {
+                
+                // MARK: - ENTER / CANCEL
+            case .enterOrCancel:
+                self.indicatorState = IndicatorState.enter
+                
+                // MARK: - SUM / PRINT
+            case .sumOrPrint:
+                self.indicatorState = .sum
+                
+                // MARK: - MODE
+            case .staticMode:
+                self.updateMode(.staticMode)
+                
+            case .inmotionMode:
+                self.updateMode(.inmotionMode)
+                
+            case .autoInmotionMode:
+                self.updateMode(.autoInmotionMode)
+                
+                // MARK: - BATTERY
+            case .battery(let level):
+                self.indicatorBatteryLevel = level
+                
+                // MARK: - SERIAL
+            case .serialNumber(let value):
+                self.SnNumber = value + 1
+                
+                // MARK: - INDICATOR SERIAL
+            case .sirealNumberChecke(let value):
+                self.IndicatorSnNumber = value
+                
+                // MARK: - HEADLINE
+            case .headlineSaved:
+                self.indicatorState = .headlineSaved
+                
+            case .headlineDeleted:
+                self.indicatorState = .headlineDeleted
+                
+                // MARK: - CALL DATA
+            case .itemCall(let value):
+                print("itemCall \(value)")
+            case .clientCall(let value):
+                print("clientCall \(value)")
+            case .dataCall(let value):
+                print("dataCall \(value)")
+            case .settingCall(let value):
+                print("settingCall \(value)")
+                
+                // MARK: - PRINT
+            case .printing:
+                self.indicatorState = .printing
+                
+            case .printSuccess:
+                self.indicatorState = .printSuccess
+                
+            case .printErrorCommunication:
+                self.indicatorState = .printError(.communication)
+                
+            case .printErrorPaper:
+                self.indicatorState = .printError(.noPaper)
+                
+                // MARK: - EQUIPMENT
+            case .equipment(let value):
+                self.parseEquipment(value)
+                
+                // MARK: - RF
+            case .rf(let value):
+                self.rfMassage = value
+                    .map { String(format: "%02X", $0) }
+                    .joined(separator: " ")
+                
+            
+            default:
+                break
+            }
+        }
+    }
+    private func updateMode(_ mode: WeightMode) {
+        weightMode = mode
+        modeChangeResponse = true
+        modeChangeInt = mode.rawValue
+        
+        print("🔥 Mode Changed → \(mode)")
+    }
+    
+    private func parseEquipment(_ value: [UInt8]) {
+        guard value.count >= 11 else { return }
+        
+        let part1 = String(bytes: value[0..<3], encoding: .ascii) ?? ""
+        let part2 = String(bytes: value[3..<9], encoding: .ascii) ?? ""
+        let part3 = String(bytes: value[9..<11], encoding: .ascii) ?? ""
+        
+        equipmentVer = part1
+        equipmentNumber = part2
+        
+        print("🔥 Equipment Version → \(part1)")
+        print("🔥 Equipment S/N → \(part2)")
+        print("🔥 Equipment Sub → \(part3)")
+    }
+}

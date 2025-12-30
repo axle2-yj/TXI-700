@@ -11,12 +11,19 @@ import Foundation
 
 struct DataSerchBottomBar: View {
     @State private var showModal = false
-
+    
     @ObservedObject var viewModel: DatePickerViewModel
     @ObservedObject var dataViewModel: DataViewModel
-
+    
+    @EnvironmentObject var languageManager: LanguageManager
+    
     @Environment(\.presentationMode) var presentationMode
-
+    @Environment(\.colorScheme) var colorScheme
+    
+    private var tint: Color {
+        colorScheme == .dark ? .white : .black
+    }
+    
     var body: some View {
         
         VStack {
@@ -29,7 +36,7 @@ struct DataSerchBottomBar: View {
                         .padding(8)
                         .background(Color.gray.opacity(0.1))
                         .cornerRadius(6)
-
+                    
                 }.sheet(isPresented: $showModal) {
                     DatePickerCustom(viewModel: viewModel)
                 }
@@ -37,25 +44,25 @@ struct DataSerchBottomBar: View {
             HStack {
                 Text("Car No")
                     .frame(width: 80, alignment: .leading)
-                TextField("차량번호 검색", text: $dataViewModel.filterVehicle)
-                    .textFieldStyle(.roundedBorder)
-                    .frame(maxWidth: .infinity)
+                CustomPlaceholderTextField(
+                    placeholder: "VehicleNumSearch".localized(languageManager.selectedLanguage),
+                    text: $dataViewModel.filterVehicle)
             }
             
             HStack {
                 Text("Client")
                     .frame(width: 80, alignment: .leading)
-                TextField("고객 검색", text: $dataViewModel.filterClient)
-                    .textFieldStyle(.roundedBorder)
-                    .frame(maxWidth: .infinity)
+                CustomPlaceholderTextField(
+                    placeholder: "ClientSearch".localized(languageManager.selectedLanguage),
+                    text: $dataViewModel.filterClient)
             }
             
             HStack {
                 Text("Item")
                     .frame(width: 80, alignment: .leading)
-                TextField("품목 검색", text: $dataViewModel.filterProduct)
-                    .textFieldStyle(.roundedBorder)
-                    .frame(maxWidth: .infinity)
+                CustomPlaceholderTextField(
+                    placeholder: "ProductSearch".localized(languageManager.selectedLanguage),
+                    text: $dataViewModel.filterProduct)
             }
             HStack {
                 Button("Clear") {
@@ -66,17 +73,17 @@ struct DataSerchBottomBar: View {
                 .padding()
                 .background(Color.gray.opacity(0.3))
                 .cornerRadius(6)
-                .foregroundColor(.black)
+                .foregroundColor(tint)
                 
                 Button("Serch") {
                     dataViewModel.applyFilters(startDate: viewModel.startDate,
                                                endDate: viewModel.endDate)
                 }
-                .frame(maxWidth: .infinity) // 화면 절반 차지
-                    .padding()
-                    .background(Color.gray.opacity(0.3))
-                    .cornerRadius(6)
-                    .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color.gray.opacity(0.3))
+                .cornerRadius(6)
+                .foregroundColor(tint)
             }
         }
     }

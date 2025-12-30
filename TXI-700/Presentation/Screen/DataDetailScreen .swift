@@ -14,23 +14,28 @@ struct DataDetailScreen: View {
     @State private var checeked: Int? = 0
     @State private var showShareSheet = false
     @State private var activeAlert: ActiveAlert?
-
+    
     @State private var deleteError: DataError?
     @State private var successMessage: String?
     @State private var printResponse: String = ""
     @State private var isPrinting: Bool = false
     @State private var selectPrintConditions : Int = 0
     @State private var isAlertShowing : Bool = false
+    
     @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject var bleManager: BluetoothManager
-
+    @Environment(\.colorScheme) var colorScheme
+    
     @ObservedObject var viewModel: DataViewModel
     @ObservedObject var printViewModel: PrintFormSettingViewModel
     @ObservedObject var settingViewMdoel: SettingViewModel
     
     private var items: [LoadAxleInfo] {
-            viewModel.filteredItems
-        }
+        viewModel.filteredItems
+    }
+    private var tint: Color {
+        colorScheme == .dark ? .white : .black
+    }
     
     var body: some View {
         ZStack {
@@ -45,6 +50,7 @@ struct DataDetailScreen: View {
                     printPreviewView
                         .padding(10)
                         .frame(maxWidth: 240)
+                        .foregroundStyle(Color.black)
                         .background(Color.white)
                         .overlay(
                             RoundedRectangle(cornerRadius: 12)
@@ -86,12 +92,23 @@ struct DataDetailScreen: View {
                             }
                         })
                     
-                    if bleManager.isConnected {
-                        let weightNumBool = Int(loadAxleItem.weightNum ?? "0") != 2
-                        let printLinBuilder = if weightNumBool {
-                            PrintLineBuilder.build(loadAxleItem: loadAxleItem, dataViewModel: viewModel, printViewModel: printViewModel)
+                    if !bleManager.isDisconnected {
+                        let twoStepWight = Int(loadAxleItem.weightNum ?? "0") == 2
+                        let balanceWight = Int(loadAxleItem.weightNum ?? "0") == 3
+                        let printLinBuilder = if twoStepWight {
+                            PrintLineBuilder.buildTwoStepPrint(
+                                loadAxleItem: loadAxleItem,
+                                dataViewModel: viewModel,
+                                printViewModel: printViewModel)
+                        } else if balanceWight{
+                            PrintLineBuilder.buildBalanceDataPrintLine(
+                                loadAxleItem: loadAxleItem,
+                                printViewModel: printViewModel)
                         } else {
-                            PrintLineBuilder.buildTwoStepRead(loadAxleItem: loadAxleItem, dataViewModel: viewModel, printViewModel: printViewModel)
+                            PrintLineBuilder.buildPrint(
+                                loadAxleItem: loadAxleItem,
+                                dataViewModel: viewModel,
+                                printViewModel: printViewModel)
                         }
                         PrintButton(
                             isMain: false,
@@ -237,9 +254,11 @@ struct DataDetailScreen: View {
                                     currentIndex: &currentIndex
                                 )
                                 
+                                //                                sendPayload()         // 단건 JSON 파일 전송 Bluetooth
                             case 2, 3:
                                 result = viewModel.sendFilteredItems(type: .filtered)
                                 
+                                //                                multipleSendPayload(viewModel.selectedType ?? 1) // 다건 JSON 파일 전송 Bluetooth
                             default:
                                 return
                             }
@@ -317,7 +336,7 @@ extension DataDetailScreen {
                 .frame(maxWidth: .infinity)
                 .padding(8)
                 .background(viewModel.selectedType == tag ? Color.gray.opacity(0.4) : Color.clear)
-                .foregroundColor(.black)
+                .foregroundColor(tint)
                 .cornerRadius(6)
         }
     }
@@ -327,20 +346,24 @@ extension DataDetailScreen {
 extension DataDetailScreen {
     var printPreviewView: some View {
         let weightNum = Int(loadAxleItem.weightNum ?? "0")
-        let lines = if weightNum != 2 {
-            PrintLineBuilder.build(
-            loadAxleItem: loadAxleItem,
-            dataViewModel: viewModel,
-            printViewModel: printViewModel
-            )
-        } else {
+        let lines = if weightNum == 2 {
             PrintLineBuilder.buildTwoStepRead(
-            loadAxleItem: loadAxleItem,
-            dataViewModel: viewModel,
-            printViewModel: printViewModel
+                loadAxleItem: loadAxleItem,
+                dataViewModel: viewModel,
+                printViewModel: printViewModel
+            )
+        } else if weightNum == 3 {
+            PrintLineBuilder.buildBalanceRead(
+                loadAxleItem: loadAxleItem,
+                printViewModel: printViewModel)
+        } else {
+            PrintLineBuilder.buildRead(
+                loadAxleItem: loadAxleItem,
+                dataViewModel: viewModel,
+                printViewModel: printViewModel
             )
         }
-
+        
         return VStack(alignment: .leading, spacing: 4) {
             ForEach(lines, id: \.self) { line in
                 Text(line)
@@ -349,5 +372,55 @@ extension DataDetailScreen {
             }
         }
         .padding(.vertical, 4)
+    }
+}
+
+extension DataDetailScreen {
+    func sendPayload() {
+        let total = viewModel.sumLoadAxleData(loadAxleItem.loadAxleData)
+        
+        let payload = PrintPayload(
+            printHeadLine: printViewModel.printHeadLineText ?? "",
+            date: ISO8601DateFormatter().string(
+                from: loadAxleItem.timestamp ?? Date()
+            ),
+            item: loadAxleItem.product ?? "",
+            client: loadAxleItem.client ?? "",
+            serialNumber: loadAxleItem.serialNumber ?? "",
+            vehicleNumber: loadAxleItem.vehicle ?? "",
+            equipmentNumber: loadAxleItem.equipmentNumber ?? "",
+            loadAxle: viewModel.decodeLoadAxleData(loadAxleItem.loadAxleData ?? Data()),
+            weight: loadAxleItem.weightNum ?? "",
+            total: String(total),
+            inspector: printViewModel.inspectorNameText ?? ""
+        )
+        // 1️⃣ BLE
+        bleManager.sendToJsonCommand(items: [payload])
+        
+        // 2️⃣ Server
+        viewModel.sendToServer(payloads: [payload]) { success in
+            print(success ? "서버 저장 완료" : "서버 저장 실패")
+        }
+    }
+    
+    func multipleSendPayload(_ state: Int) {
+        // MARK: - JSON 형태로 전달 방식
+        let selectedItems: [LoadAxleInfo] = viewModel.loadAxleItems
+        let payloads = viewModel.makePrintPayloads(
+            items: selectedItems,
+            printViewModel: printViewModel
+        )
+        
+        // 1️⃣ BLE
+        bleManager.sendToJsonCommand(items: payloads)
+        
+        // 2️⃣ Server
+        viewModel.sendToServer(payloads: payloads) { success in
+            if state == 1 {
+                print(success ? "오늘 데이터 서버 전송 완료" : "오늘 데이터 서버 전송 실패")
+            } else {
+                print(success ? "전체 데이터 서버 전송 완료" : "전체 데이터 서버 전송 실패")
+            }
+        }
     }
 }

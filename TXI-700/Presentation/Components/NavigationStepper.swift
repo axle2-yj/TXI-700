@@ -11,30 +11,34 @@ struct NavigationStepper: View {
     @Binding var currentIndex: Int
     let totalCount: Int
     let onIndexChanged: (Int) -> Void
-
+    
+    @Environment(\.colorScheme) var colorScheme
+    
     private let buttonSize: CGFloat = 36
-
+    private var returnImage: String {
+        colorScheme == .dark ? "return_dark" : "return"
+    }
     var body: some View {
         HStack(spacing: 12) {
             Spacer()
             // 현재 위치 표시
             Text("\(currentIndex + 1) / \(totalCount)")
                 .font(.body)
-
+            
             Spacer()
-
+            
             // ← 이전 버튼
             Button(action: {
                 if currentIndex > 0 {
                     let newIndex = currentIndex - 1
                     currentIndex = newIndex
-
+                    
                     DispatchQueue.main.async {
                         onIndexChanged(newIndex)
                     }
                 }
             }) {
-                Image("return")
+                Image(returnImage)
                     .resizable()
                     .frame(width: 15, height: 15)
             }
@@ -43,19 +47,19 @@ struct NavigationStepper: View {
             .foregroundColor(currentIndex == 0 ? .white : .black)
             .cornerRadius(6)
             .disabled(currentIndex == 0)
-
+            
             // → 다음 버튼
             Button(action: {
                 if currentIndex < totalCount - 1 {
                     let newIndex = currentIndex + 1
                     currentIndex = newIndex
-
+                    
                     DispatchQueue.main.async {
                         onIndexChanged(newIndex)
                     }
                 }
             }) {
-                Image("return")
+                Image(returnImage)
                     .resizable()
                     .frame(width: 15, height: 15)
                     .rotationEffect(.degrees(180))
@@ -68,6 +72,6 @@ struct NavigationStepper: View {
             Spacer()
         }
         .padding(.horizontal)
-        .frame(maxWidth: .infinity)    // 전체 고정
+        .frame(maxWidth: .infinity)    
     }
 }

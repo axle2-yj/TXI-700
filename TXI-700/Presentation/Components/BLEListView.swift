@@ -12,7 +12,7 @@ import Foundation
 struct BLEListView: View {
     @ObservedObject var bleManager: BluetoothManager
     @ObservedObject var homeViewModel: HomeViewModel
-
+    
     @Binding var autoConnectEnabled: Bool
     @Binding var savedMAC: String?
     @State private var optionAuto = false
@@ -22,12 +22,12 @@ struct BLEListView: View {
             // MARK: - 권한 안내
             if bleManager.bluetoothPermissionStatus == .denied ||
                 bleManager.locationPermissionStatus == .denied {
-
+                
                 VStack(spacing: 10) {
                     Text("AuthorizationWarning")
                         .font(.headline)
                         .multilineTextAlignment(.center)
-
+                    
                     Button("MoveSetting") {
                         if let url = URL(string: UIApplication.openSettingsURLString) {
                             UIApplication.shared.open(url)
@@ -39,9 +39,9 @@ struct BLEListView: View {
                     .cornerRadius(8)
                 }
                 .padding()
-
+                
             } else {
-
+                
                 VStack {
                     // MARK: - 스캔 버튼 + Auto 토글
                     
@@ -57,15 +57,15 @@ struct BLEListView: View {
                                     bleManager.isSelfScanning = true
                                     print("BLE 스캔 시작")
                                 }
-                        }) {
-                            Text(bleManager.isScanning ? "Stop Scan" : "Start Scan")
-                                .padding()
-                                .background(bleManager.isScanning ? Color.red : Color.blue)
-                                .foregroundColor(.white)
-                                .cornerRadius(8)
-                        }
-                        .padding(.leading)
-
+                            }) {
+                                Text(bleManager.isScanning ? "Stop Scan" : "Start Scan")
+                                    .padding()
+                                    .background(bleManager.isScanning ? Color.red : Color.blue)
+                                    .foregroundColor(.white)
+                                    .cornerRadius(8)
+                            }
+                            .padding(.leading)
+                        
                         CheckBoxAuto(isChecked: $optionAuto,
                                      viewModel: homeViewModel,
                                      label: "Auto")
@@ -76,10 +76,10 @@ struct BLEListView: View {
                             homeViewModel.setAutoConnectState(enabled)
                         }
                     }
-
+                    
                     // MARK: - 리스트 표시 조건
                     if bleManager.isSelfScanning {
-
+                        
                         List(bleManager.devices) { device in
                             Button(action: {
                                 homeViewModel.saveDeviceMac(device.mac)
@@ -99,7 +99,7 @@ struct BLEListView: View {
                             }
                         }
                     }
-
+                    
                     // MARK: - 연결 정보
                     if bleManager.isConnected {
                         VStack {
@@ -112,7 +112,7 @@ struct BLEListView: View {
                         }
                         .padding()
                     }
-
+                    
                     Spacer()
                 }
             }
