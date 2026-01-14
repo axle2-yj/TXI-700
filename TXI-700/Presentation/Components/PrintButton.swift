@@ -25,6 +25,7 @@ struct PrintButton: View {
     private var tint: Color {
         colorScheme == .dark ? .white : .black
     }
+    
     private var oppositionTint: Color {
         colorScheme == .dark ? .black : .white
     }
@@ -133,7 +134,7 @@ struct PrintButton: View {
             return
         }
         
-        let delay: Double = 0.5
+        let delay: Double = 0.6
         let lastIndex = lines.count - 1
         
         for (index, line) in lines.enumerated() {
