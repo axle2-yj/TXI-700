@@ -355,7 +355,7 @@ struct MainScreen: View {
                             }.padding(.horizontal, 5)
                                 
                         }
-                        let isButtonEnabled = (settingViewModel.weightingMethod != 0 || !vehicleNum.isEmpty) && !isTwoStep
+
                         HStack {
                             Button("Car.no") {
                                 selectedListType = .vehicle
@@ -373,44 +373,39 @@ struct MainScreen: View {
                                 vehicleNum = newValue?.vehicle ?? ""
                                 weighting1stData = Int(newValue?.weight ?? 0)
                             }
-                            
-                            
-                            if settingViewModel.weightingMethod != 1 {
-                                Button(settingViewModel.weightingMethod != 2 ? "Send" : "1stWeight") {
-                                    if settingViewModel.weightingMethod == 2 {
-                                        guard !loadAxleStatus.isEmpty else { return }
-                                        let total = loadAxleStatus.reduce(0) { $0 + $1.total }
-                                        loadAxleStatus[0].loadAxlesData = [total]
-                                        twoStepLoadAxleStatus = loadAxleStatus
-                                        weighting1stData = loadAxleStatus.reduce(0) { $0 + $1.total }
-                                        isTwoStep = true
-                                        isMainSum = false
-                                        okButtonAction()
-                                    } else if settingViewModel.weightingMethod == 0{
-                                        bleManager.sendCommand(.btc(vehicleNum), log: "Vehicle Save Send")
-                                    }
-                                }.padding()
-                                    .background(Color.gray.opacity(0.3))
-                                    .cornerRadius(6)
-                                    .foregroundColor(tint)
-                                    .disabled(!isButtonEnabled)
-                                    .opacity(isButtonEnabled ? 1.0 : 0.4)
+                        
+                            if settingViewModel.weightingMethod == 2 {
+                                SendOrTwoStepButton(
+                                    title: "1stWeight".localized(languageManager.selectedLanguage),
+                                    action: handleFirstWeight,
+                                    isDisabled: isTwoStep ? true : !isMainSum,
+                                    tint: tint
+                                )
+                            } else if settingViewModel.weightingMethod == 1 {
+                                SendOrTwoStepButton(
+                                    title: "Save".localized(languageManager.selectedLanguage),
+                                    action: { vehicleViewModel.save(vehicleNum: vehicleNum) },
+                                    isDisabled: vehicleNum.isEmpty,
+                                    tint: tint
+                                )
+                                .onReceive(vehicleViewModel.$saveSuccessMessage) { message in
+                                    guard let message else { return }
+                                    activeAlert = .saveSuccess(message)
+                                }
+                                .onReceive(vehicleViewModel.$saveFailedMessage) { message in
+                                    guard let message else { return }
+                                    activeAlert = .saveError(message.localized(languageManager.selectedLanguage))
+                                }
+
                             } else {
-                                Button("Save") {
-                                    vehicleViewModel.save(vehicleNum: vehicleNum)
-                                }.padding()
-                                    .background(Color.gray.opacity(0.3))
-                                    .cornerRadius(6)
-                                    .foregroundColor(tint)
-                                    .disabled(!isButtonEnabled)
-                                    .opacity(isButtonEnabled ? 1.0 : 0.4)
-                                    .onReceive(vehicleViewModel.$saveSuccessMessage) { message in
-                                        guard message != nil else { return }
-                                        activeAlert = .saveSuccess(message ?? "")
-                                    }.onReceive(vehicleViewModel.$saveFailedMessage) { message in
-                                        guard message != nil else { return }
-                                        activeAlert = .saveError((message!.localized(languageManager.selectedLanguage)))
-                                    }
+                                SendOrTwoStepButton(
+                                    title: "Send".localized(languageManager.selectedLanguage),
+                                    action: {
+                                        bleManager.sendCommand(.btc(vehicleNum), log: "Vehicle Save Send")
+                                    },
+                                    isDisabled: vehicleNum.isEmpty,
+                                    tint: tint
+                                )
                             }
                         }
                         
@@ -479,8 +474,7 @@ struct MainScreen: View {
                                     }
                                 )
                                 if settingViewModel.weightingMethod == 2 {
-                                    TwoStepSumButton(onSum: {
-                                        totalSumValue = loadAxleStatus.reduce(0) { $0 + $1.total }
+                                    TwoStepSumButton(onSum: {                                        totalSumValue = loadAxleStatus.reduce(0) { $0 + $1.total }
                                     }).disabled(!isSumEnabled)
                                         .opacity(isSumEnabled ? 1.0 : 0.4)
                                 } else {
@@ -525,6 +519,7 @@ struct MainScreen: View {
                                     )
                                 }
                                 
+                                let twoStepSum = isMainSum && weightingMethodInt != 0
                                 PrintButton(
                                     isMain: true,
                                     seletedType: $selectNum,
@@ -546,6 +541,7 @@ struct MainScreen: View {
                                             twoStepLoadAxleStatus[0].total = twoStepLoadAxleStatus[0].total + loadAxleStatus[0].total
                                             print(twoStepLoadAxleStatus)
                                             if !isSave {
+                                                print("print save 실행")
                                                 LoadAxleSaveService.printSaveData(
                                                     serialNumber: String(mainViewModel.sn),
                                                     equipmentNumber: String(bleManager.equipmentNumber),
@@ -595,8 +591,8 @@ struct MainScreen: View {
                                         }
                                     }
                                 )
-                                .disabled(isPrint)
-                                .opacity(isPrint ? 0.4 : 1.0)
+                                .disabled(twoStepSum ?  isTwoStep : true)
+                                .opacity(twoStepSum ? (isTwoStep ? 1.0 : 0.4) : 1.0)
                                 
                                 if settingViewModel.weightingMethod == 2 {
                                     SaveButton(
@@ -740,7 +736,6 @@ struct MainScreen: View {
                     }
                 case IndicatorState.enter:
                     if isMainSum {
-                        print("cancel")
                         okButtonAction()
                         loadAxleStatus = []
                         isSave = false
@@ -811,6 +806,11 @@ struct MainScreen: View {
         isPrint = false
         totalSumValue = 0
         saveValue = 0
+        if isTwoStep {
+            weighting1stData = 0
+            netWeightData = 0
+            isTwoStep = false
+        }
         bleManager.sendCommand(.bte, log: "Cancel")
     }
     
@@ -821,6 +821,19 @@ struct MainScreen: View {
         isPrint = false
         totalSumValue = 0
         saveValue = 0
+    }
+    
+    func handleFirstWeight() {
+        guard !loadAxleStatus.isEmpty else { return }
+
+        let total = loadAxleStatus.reduce(0) { $0 + $1.total }
+        loadAxleStatus[0].loadAxlesData = [total]
+
+        twoStepLoadAxleStatus = loadAxleStatus
+        weighting1stData = total
+
+        okButtonAction()
+        isTwoStep = true
     }
     
     private var balanceAxles: [BalanceCellData] {
