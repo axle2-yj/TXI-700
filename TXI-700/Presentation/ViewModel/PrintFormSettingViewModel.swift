@@ -20,11 +20,11 @@ class PrintFormSettingViewModel: ObservableObject {
     @Published var isDelete = false
     /// labels는 템플릿 문자열
     private let baseLabels: [String] = [
-        "Bar","Head Line","Bar",                        // 0, 1, 2
+        "Bar","HeadLine","Bar",                        // 0, 1, 2
         "date_time","DATE","TIME",                      // 3, 4, 5
         "{PRODUCT}", "{CLIENT}", "S/N",                 // 6, 7, 8
         "Vehicle","Bar","Step(Standard)",               // 9, 10, 11
-        "each","Two-Step Weighing","Over Weight",       // 12, 13, 14
+        "each","Two-StepWeighing","OverWeight",       // 12, 13, 14
         "Bar","Inspector","Driver"                      // 15, 16, 17
     ]
     

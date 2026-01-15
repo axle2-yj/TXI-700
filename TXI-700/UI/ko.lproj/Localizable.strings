@@ -117,3 +117,33 @@
 "endProcess" = "종료하시겠습니까?";
 "AppEnd" = "App 종료";
 "AllEnd" = "전체 종료";
+
+// Print From
+"DATE" = "날짜";
+"TIME" = "시간";
+"Item" = "품목";
+"Client" = "거래처";
+"apple" = "사과";
+"companyname" = "거래처";
+"S/N" = "일련번호";
+"Vehicle" = "차량번호";
+"1Axle" = "1축";
+"2Axle" = "2축";
+"Weight01" = "1번 축중기";
+"Weight02" = "2번 축중기";
+"Weight03" = "3번 축중기";
+"Weight04" = "4번 축중기";
+"1stWeight" = "1차중량";
+"2stWeight" = "2차 중량";
+"NetWeight" = "순중량";
+"Total" = "총중량";
+"over" = "과적중량";
+"Inspector" = "검사관";
+"Driver" = "운전사";
+"Bar" = "라인";
+"HeadLine" = "헤드라인";
+"date_time" = "날짜/시간";
+"Step(Standard)" = "단계(표준)";
+"each" = "축중기별";
+"Two-StepWeighing" = "2단계 계량";
+"OverWeight" = "과적중량";

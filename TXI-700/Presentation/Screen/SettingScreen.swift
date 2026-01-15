@@ -149,11 +149,13 @@ struct SettingScreen: View {
                 // 버튼 활성화 여부
                 VStack(spacing: 8) {
                     SettingLineText("ActivateButton")
+                    let productTitle = selectedProduct?.name ?? viewModel.saveProduct ?? "ITEM"
+                    let clientTitle = selectedClient?.name ?? viewModel.saveClient ?? "CLIENT"
                     HStack {
                         if viewModel.weightingMethod == 0 {
                             CheckBox(isChecked: $optionProduct,
                                      viewModel: viewModel,
-                                     label: "\(selectedProduct?.name ?? viewModel.saveProduct ?? "ITEM")",
+                                     label: productTitle.localized(languageManager.selectedLanguage),
                                      select: "product")
                             .disabled(true).opacity(0.6)
                             .onAppear {
@@ -161,7 +163,7 @@ struct SettingScreen: View {
                             }
                             CheckBox(isChecked: $optionClient,
                                      viewModel: viewModel,
-                                     label: "\(selectedClient?.name ?? viewModel.saveClient ?? "CLIENT")",
+                                     label: clientTitle.localized(languageManager.selectedLanguage),
                                      select: "client")
                             .disabled(true).opacity(0.6)
                             .onAppear {

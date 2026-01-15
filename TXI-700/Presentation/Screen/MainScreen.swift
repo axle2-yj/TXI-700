@@ -408,10 +408,11 @@ struct MainScreen: View {
                                 )
                             }
                         }
-                        
+                        let productTitle = productViewModel.selectedProduct?.name ?? mainViewModel.saveProduct ?? "ITEM <<"
+                        let clientTitle = clientViewModel.selectedClient?.name ?? mainViewModel.saveClient ?? "CLIENT <<"
                         HStack {
                             if settingViewModel.checkedProduct {
-                                Button("\(productViewModel.selectedProduct?.name ?? mainViewModel.saveProduct ?? "ITEM <<")") {
+                                Button(productTitle.localized(languageManager.selectedLanguage)) {
                                     selectedListType = .product
                                     goToList = true
                                 }.frame(maxWidth: .infinity) // 화면 절반 차지
@@ -422,7 +423,7 @@ struct MainScreen: View {
                             }
                             
                             if settingViewModel.checkedClient {
-                                Button("\(clientViewModel.selectedClient?.name ?? mainViewModel.saveClient ?? "CLIENT <<")") {
+                                Button(clientTitle.localized(languageManager.selectedLanguage)) {
                                     selectedListType = .client
                                     goToList = true
                                 }.frame(maxWidth: .infinity)
@@ -907,7 +908,6 @@ struct MainScreen: View {
         }
         return result
     }
-    
 }
 
 

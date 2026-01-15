@@ -119,3 +119,37 @@
 "endProcess" = "Are you sure you want to exit?";
 "AppEnd" = "App End";
 "AllEnd" = "All End";
+
+// Print From
+"DATE" = "DATE";
+"TIME" = "TIME";
+"Item" = "Item";
+"Client" = "Client";
+"品目" = "Item";
+"取引先" = "Client";
+"품목" = "Item";
+"거래처" = "Client";
+"apple" = "apple";
+"companyname" = "company name";
+"S/N" = "S/N";
+"Vehicle" = "Vehicle";
+"1Axle" = "1Axle";
+"2Axle" = "2Axle";
+"Weight01" = "Weight01";
+"Weight02" = "Weight02";
+"Weight03" = "Weight03";
+"Weight04" = "Weight04";
+"1stWeight" = "1st Weight";
+"2stWeight" = "2st Weight";
+"NetWeight" = "Net Weight";
+"Total" = "Total";
+"over" = "over";
+"Inspector" = "Inspector";
+"Driver" = "Driver";
+"Bar" = "Bar";
+"HeadLine" = "Head Line";
+"date_time" = "date_time";
+"Step(Standard)" = "Step(Standard)";
+"each" = "each";
+"Two-StepWeighing" = "Two-Step Weighing";
+"OverWeight" = "Over Weight";
