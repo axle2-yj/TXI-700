@@ -135,10 +135,12 @@
 "Vehicle" = "Vehicle";
 "1Axle" = "1Axle";
 "2Axle" = "2Axle";
+"Axle" = "Axle";
 "Weight01" = "Weight01";
 "Weight02" = "Weight02";
 "Weight03" = "Weight03";
 "Weight04" = "Weight04";
+"Weight" = "Weight";
 "1stWeight" = "1st Weight";
 "2stWeight" = "2st Weight";
 "NetWeight" = "Net Weight";
@@ -152,4 +154,9 @@
 "Step(Standard)" = "Step(Standard)";
 "each" = "each";
 "Two-StepWeighing" = "Two-Step Weighing";
-"OverWeight" = "Over Weight";
+"OverWeight" = "Over";
+"leftWeight" = "Left ";
+"rightWeight" = "Right ";
+
+
+"UnapprovedModel" = "The connected Bluetooth device is not compatible with this product, so the connection has been terminated.";

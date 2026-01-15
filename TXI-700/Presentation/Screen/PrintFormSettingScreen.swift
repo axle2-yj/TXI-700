@@ -129,10 +129,18 @@ struct PrintFormSettingScreen: View {
                             }
                             
                             if viewModel.isOn(15) {
+                                simpleRow("leftWeight".localized(languageManager.selectedLanguage) + " : ", "4440kg")
+                            }
+                            
+                            if viewModel.isOn(16) {
+                                simpleRow("rightWeight".localized(languageManager.selectedLanguage) + " : ", "5540kg")
+                            }
+                            
+                            if viewModel.isOn(17) {
                                 lineText("Line")
                             }
                             if isAddMode {
-                                if viewModel.isOn(16) {
+                                if viewModel.isOn(18) {
                                     HStack{
                                         Text("Inspector".localized(languageManager.selectedLanguage) + " : ")
                                         Spacer()
@@ -146,12 +154,12 @@ struct PrintFormSettingScreen: View {
                                     }.frame(maxWidth: .infinity, alignment: .leading).lineLimit(1)
                                 }
                             } else {
-                                if viewModel.isOn(16) {
+                                if viewModel.isOn(18) {
                                     UnderlineFieldRow("Inspector".localized(languageManager.selectedLanguage) + " : ", "", 8)
                                 }
                             }
                             
-                            if viewModel.isOn(17) {
+                            if viewModel.isOn(19) {
                                 UnderlineFieldRow("Driver".localized(languageManager.selectedLanguage) + " : ", "", 8)
                             }
                         }.padding(2)

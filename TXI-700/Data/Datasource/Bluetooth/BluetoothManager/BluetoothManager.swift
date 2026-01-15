@@ -38,24 +38,19 @@ final class BluetoothManager: NSObject, ObservableObject {
     weak var eventHandler: BLEEventHandling?
     
     @Published var indicatorState: IndicatorState = .idle
-    
-//    @Published var isEnter = false
-//    @Published var isSum = false
-//    @Published var isPrint = false
-//    @Published var isCancel = false
-//    @Published var isDelete = false
-//    @Published var isPrintHeadline = false
     @Published var printResponse: String = ""
     @Published var modeChangeInt = 0
     @Published var modeChangeResponse = false
     @Published var SnNumber = 0
     @Published var IndicatorSnNumber = 0
+    @Published var IndicatorModelNum = ""
     @Published var equipmentVer: String = ""
     @Published var equipmentNumber: String = ""
     @Published var rfMassage: String = ""
     @Published var isAuthenticated = false
     @Published var lastResponse: BLEResponse?
     @Published var showAuthAlert = false
+    @Published var isUnapprovedModel = false
     
     // MARK: - Private Managers
     private var centralManager: CBCentralManager!

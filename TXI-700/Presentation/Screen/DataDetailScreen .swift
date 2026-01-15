@@ -24,6 +24,7 @@ struct DataDetailScreen: View {
     
     @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject var bleManager: BluetoothManager
+    @EnvironmentObject var languageManager: LanguageManager
     @Environment(\.colorScheme) var colorScheme
     
     @ObservedObject var viewModel: DataViewModel
@@ -108,7 +109,8 @@ struct DataDetailScreen: View {
                             PrintLineBuilder.buildPrint(
                                 loadAxleItem: loadAxleItem,
                                 dataViewModel: viewModel,
-                                printViewModel: printViewModel)
+                                printViewModel: printViewModel,
+                                lang: languageManager)
                         }
                         PrintButton(
                             isMain: false,
@@ -360,15 +362,17 @@ extension DataDetailScreen {
             PrintLineBuilder.buildRead(
                 loadAxleItem: loadAxleItem,
                 dataViewModel: viewModel,
-                printViewModel: printViewModel
+                printViewModel: printViewModel,
+                lang: languageManager
             )
         }
         
         return VStack(alignment: .leading, spacing: 4) {
             ForEach(lines, id: \.self) { line in
                 Text(line)
-                    .font(.system(size: 16))
+                    .font(.system(size: 14, design: .monospaced))
                     .frame(maxWidth: .infinity, alignment: .leading)
+                    .lineLimit(1)
             }
         }
         .padding(.vertical, 4)

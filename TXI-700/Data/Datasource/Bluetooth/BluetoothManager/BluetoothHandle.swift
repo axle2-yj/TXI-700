@@ -16,7 +16,7 @@ extension BluetoothManager: BLEEventHandling {
                 
                 // MARK: - ENTER / CANCEL
             case .enterOrCancel:
-                self.indicatorState = IndicatorState.enter
+                self.indicatorState = .enter
                 
                 // MARK: - SUM / PRINT
             case .sumOrPrint:
@@ -38,6 +38,7 @@ extension BluetoothManager: BLEEventHandling {
                 
                 // MARK: - SERIAL
             case .serialNumber(let value):
+                self.printResponse = "Print Success"
                 self.SnNumber = value + 1
                 
                 // MARK: - INDICATOR SERIAL
@@ -63,15 +64,19 @@ extension BluetoothManager: BLEEventHandling {
                 
                 // MARK: - PRINT
             case .printing:
+                self.printResponse = "Print Send Success"
                 self.indicatorState = .printing
                 
             case .printSuccess:
+                self.printResponse = "Print Success"
                 self.indicatorState = .printSuccess
                 
             case .printErrorCommunication:
+                self.printResponse = "Print Error Communication"
                 self.indicatorState = .printError(.communication)
                 
             case .printErrorPaper:
+                self.printResponse = "Print Error Paper"
                 self.indicatorState = .printError(.noPaper)
                 
                 // MARK: - EQUIPMENT
@@ -83,8 +88,6 @@ extension BluetoothManager: BLEEventHandling {
                 self.rfMassage = value
                     .map { String(format: "%02X", $0) }
                     .joined(separator: " ")
-                
-            
             default:
                 break
             }
@@ -100,14 +103,15 @@ extension BluetoothManager: BLEEventHandling {
     
     private func parseEquipment(_ value: [UInt8]) {
         guard value.count >= 11 else { return }
+        let part0 = String(bytes: value[0..<5], encoding: .ascii) ?? ""
+        let part1 = String(bytes: value[5..<8], encoding: .ascii) ?? ""
+        let part2 = String(bytes: value[8..<14], encoding: .ascii) ?? ""
+        let part3 = String(bytes: value[14..<16], encoding: .ascii) ?? ""
         
-        let part1 = String(bytes: value[0..<3], encoding: .ascii) ?? ""
-        let part2 = String(bytes: value[3..<9], encoding: .ascii) ?? ""
-        let part3 = String(bytes: value[9..<11], encoding: .ascii) ?? ""
-        
+        IndicatorModelNum = part0
         equipmentVer = part1
         equipmentNumber = part2
-        
+        print("🔥 Equipment Model Num → \(part0)")
         print("🔥 Equipment Version → \(part1)")
         print("🔥 Equipment S/N → \(part2)")
         print("🔥 Equipment Sub → \(part3)")

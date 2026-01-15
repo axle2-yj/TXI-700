@@ -21,11 +21,12 @@ class PrintFormSettingViewModel: ObservableObject {
     /// labels는 템플릿 문자열
     private let baseLabels: [String] = [
         "Bar","HeadLine","Bar",                        // 0, 1, 2
-        "date_time","DATE","TIME",                      // 3, 4, 5
-        "{PRODUCT}", "{CLIENT}", "S/N",                 // 6, 7, 8
-        "Vehicle","Bar","Step(Standard)",               // 9, 10, 11
-        "each","Two-StepWeighing","OverWeight",       // 12, 13, 14
-        "Bar","Inspector","Driver"                      // 15, 16, 17
+        "date_time","DATE","TIME",                     // 3, 4, 5
+        "{PRODUCT}", "{CLIENT}", "S/N",                // 6, 7, 8
+        "Vehicle","Bar","Step(Standard)",              // 9, 10, 11
+        "each","Two-StepWeighing","OverWeight",        // 12, 13, 14
+        "leftWeight","rightWeight",                    // 15, 16,
+        "Bar","Inspector","Driver"                     // 17, 18, 19
     ]
     
     let frmatter: DateFormatter = {
@@ -60,6 +61,7 @@ class PrintFormSettingViewModel: ObservableObject {
         true, true, true,
         true, true, true,
         false, false, false,
+        false, false,
         true, true, false
     ]
     

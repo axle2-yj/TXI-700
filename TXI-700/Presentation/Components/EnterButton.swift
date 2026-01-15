@@ -22,10 +22,7 @@ struct EnterButton: View {
     
     var onEnter: () -> Void
     var onEnterMassege: () -> Void
-    let EnterByte: [UInt8] = [
-        0x42, 0x54, 0x45
-    ]
-    
+       
     var body: some View {
         VStack {
             Button("ENTER") {

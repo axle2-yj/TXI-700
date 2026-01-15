@@ -22,4 +22,15 @@ class LanguageManager: ObservableObject {
     func changeLanguage(to language: String) {
         selectedLanguage = language
     }
+    
+    func localized(_ key: String) -> String {
+            guard
+                let path = Bundle.main.path(forResource: selectedLanguage, ofType: "lproj"),
+                let bundle = Bundle(path: path)
+            else {
+                return NSLocalizedString(key, comment: "")
+            }
+
+            return NSLocalizedString(key, bundle: bundle, comment: "")
+        }
 }

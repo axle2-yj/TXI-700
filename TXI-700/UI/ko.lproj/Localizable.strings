@@ -129,13 +129,16 @@
 "Vehicle" = "차량번호";
 "1Axle" = "1축";
 "2Axle" = "2축";
+"Axle" = "축";
 "Weight01" = "1번 축중기";
 "Weight02" = "2번 축중기";
 "Weight03" = "3번 축중기";
 "Weight04" = "4번 축중기";
-"1stWeight" = "1차중량";
+"Weight" = "축중기";
+"1stWeight" = "1차 중량";
 "2stWeight" = "2차 중량";
 "NetWeight" = "순중량";
+"wight" = "중량";
 "Total" = "총중량";
 "over" = "과적중량";
 "Inspector" = "검사관";
@@ -147,3 +150,7 @@
 "each" = "축중기별";
 "Two-StepWeighing" = "2단계 계량";
 "OverWeight" = "과적중량";
+"leftWeight" = "좌측";
+"rightWeight" = "우측";
+
+"UnapprovedModel" = "현재 연결하신 블루투스 기기는 본 제품과 호환되지 않아 연결이 종료되었습니다.";

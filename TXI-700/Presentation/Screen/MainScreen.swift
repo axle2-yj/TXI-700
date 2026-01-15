@@ -138,7 +138,7 @@ struct MainScreen: View {
                                         let secondValue = loadAxle.loadAxlesData.indices.contains(secondIndex) ? loadAxle.loadAxlesData[secondIndex] : 0
                                         HStack {
                                             Text("\(loadAxle.id + rowIndex)")
-                                                .frame(width: noWidth, alignment: .leading)
+                                                .frame(width: noWidth, alignment: .center)
                                             TableColumn(alignment: .trailing) {
                                                 MainWeightText(value: firstValue)
                                             }
@@ -475,7 +475,8 @@ struct MainScreen: View {
                                     }
                                 )
                                 if settingViewModel.weightingMethod == 2 {
-                                    TwoStepSumButton(onSum: {                                        totalSumValue = loadAxleStatus.reduce(0) { $0 + $1.total }
+                                    TwoStepSumButton(onSum: {
+                                        totalSumValue = loadAxleStatus.reduce(0) { $0 + $1.total }
                                     }).disabled(!isSumEnabled)
                                         .opacity(isSumEnabled ? 1.0 : 0.4)
                                 } else {
@@ -520,7 +521,7 @@ struct MainScreen: View {
                                     )
                                 }
                                 
-                                let twoStepSum = isMainSum && weightingMethodInt != 0
+                                let twoStepSum = isMainSum && weightingMethodInt == 2
                                 PrintButton(
                                     isMain: true,
                                     seletedType: $selectNum,
@@ -592,7 +593,7 @@ struct MainScreen: View {
                                         }
                                     }
                                 )
-                                .disabled(twoStepSum ?  isTwoStep : true)
+                                .disabled(twoStepSum ?  isTwoStep : false)
                                 .opacity(twoStepSum ? (isTwoStep ? 1.0 : 0.4) : 1.0)
                                 
                                 if settingViewModel.weightingMethod == 2 {
@@ -691,31 +692,12 @@ struct MainScreen: View {
                     activeAlert = .printResponse(newValue)
                     isPrinting = false
                 }
-            }
-//            .onReceive(bleManager.$isSum) { newValue in
-//                guard newValue else { return }
-//                isMainSum = newValue
-//            }
-//            .onReceive(bleManager.$isCancel) { newValue in
-//                guard newValue else { return }
-//                okButtonAction()
-//                loadAxleStatus = []
-//                isSave = false
-//                isMainSum = false
-//                isPrint = false
-//                totalSumValue = 0
-//                if !isTwoStep {
-//                    weighting1stData = 0
-//                }
-//                netWeightData = 0
-//                isTwoStep = false
-//            }
-            .onReceive(bleManager.$SnNumber) { newSn in
+            }.onReceive(bleManager.$SnNumber) { newSn in
                 guard newSn > 0 else { return }
                 mainViewModel.saveSn(newSn)
                 mainViewModel.loadSn()
             }.onReceive(bleManager.$inmotion) { newValue in
-                guard newValue != 0, saveValue != newValue , newValue != 49 else { return }
+                guard newValue != 0, saveValue != newValue , newValue != 49 , newValue != 65  else{ return }
                 saveValue = newValue
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     mainViewModel.handleInmotion(
@@ -724,8 +706,7 @@ struct MainScreen: View {
                         right: right1
                     )
                 }
-            }
-            .onChange(of: bleManager.indicatorState) { state, _ in
+            }.onChange(of: bleManager.indicatorState) { state, _ in
                 switch state {
                 case IndicatorState.sum:
                     if isMainSum {
@@ -750,22 +731,20 @@ struct MainScreen: View {
                         isTwoStep = false
                         settingViewModel.isSum = false
                     }
+                    
                 default:
                     break
                 }
                 bleManager.indicatorState = .idle
-            }
-            .onChange(of: goToSetting) { _, newValue in
+            }.onChange(of: goToSetting) { _, newValue in
                 if newValue {
                     hideKeyboard()
                 }
-            }
-            .onChange(of: goToList) { _, newValue in
+            }.onChange(of: goToList) { _, newValue in
                 if newValue {
                     hideKeyboard()
                 }
-            }
-            .onChange(of: goToData) { _, newValue in
+            }.onChange(of: goToData) { _, newValue in
                 if newValue {
                     hideKeyboard()
                 }

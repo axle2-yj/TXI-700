@@ -15,6 +15,7 @@ enum IndicatorState: Equatable {
     case cancel
     
     // 프린터 상태
+    case printSend
     case printing
     case printSuccess
     case printError(PrintError)

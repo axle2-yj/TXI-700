@@ -130,13 +130,15 @@
 "Vehicle" = "車両番号";
 "1Axle" = "1軸";
 "2Axle" = "2軸";
+"Axle" = "軸";
 "Weight01" = "1番軸重計";
 "Weight02" = "2番軸重計";
 "Weight03" = "3番軸重計";
 "Weight04" = "4番軸重計";
+"Weight" = "番軸重計";
 "1stWeight" = "一次重量";
 "2stWeight" = "二次重量";
-"NetWeight" = "순중량";
+"NetWeight" = "正味重量";
 "Total" = "総重量";
 "over" = "過積載重量";
 "Inspector" = "検査官";
@@ -148,3 +150,7 @@
 "each" = "軸重機別";
 "Two-StepWeighing" = "第2段階計量";
 "OverWeight" = "過積載重量";
+"leftWeight" = "左側";
+"rightWeight" = "右側";
+
+"UnapprovedModel" = "現在接続されているBluetooth機器は本製品と互換性がないため、接続が終了しました。";

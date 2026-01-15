@@ -13,6 +13,7 @@ struct HomeScreen: View {
     @State private var goToSetting = false
     @State private var bluetoothConnected = false
     @State private var showAlert = false
+    @State private var showUnapprovedModelAlert = false
     @State private var activeAlert: ActiveHomeAlert?
     
     @StateObject var homeViewModel = HomeViewModel()
@@ -140,6 +141,38 @@ struct HomeScreen: View {
                 .ignoresSafeArea()
                 .cornerRadius(12)
             }
+            if showUnapprovedModelAlert {
+                Color.black.opacity(0.4)
+                    .ignoresSafeArea()
+                    .onTapGesture {
+                        showUnapprovedModelAlert = false
+                    }
+                
+                VStack(spacing: 20) {
+                    Text("UnapprovedModel".localized(languageManager.selectedLanguage))
+                        .font(.headline)
+                    
+                    HStack {
+                        Button("Confirmation".localized(languageManager.selectedLanguage)) {
+                            showUnapprovedModelAlert = false
+                        }.frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.gray.opacity(0.3))
+                            .cornerRadius(6)
+                            .foregroundColor(tint)
+                    }
+                }
+                .frame(maxWidth: 250, maxHeight: 150)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 10)
+                .background(oppositionTint)
+                .cornerRadius(12)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                    )
+            }
+            
             if showAlert {
                 Color.black.opacity(0.4)
                     .ignoresSafeArea()
@@ -193,6 +226,7 @@ struct HomeScreen: View {
                 .frame(maxWidth: 250, maxHeight: 150)
                 .padding(.horizontal, 20)
                 .background(oppositionTint)
+                .cornerRadius(12)
                 .overlay(
                     RoundedRectangle(cornerRadius: 12)
                         .stroke(Color.gray.opacity(0.3), lineWidth: 1)
@@ -212,6 +246,14 @@ struct HomeScreen: View {
         .onReceive(bleManager.$isDisconnected) { disconnected in
             if disconnected {
                 bluetoothConnected = false
+            }
+        }.onReceive(bleManager.$isUnapprovedModel) { unapprovedModel in
+            print("unapprovedModel : \(unapprovedModel)")
+            if unapprovedModel {
+                bluetoothConnected = false
+                bleManager.isUnapprovedModel = false
+                homeViewModel.saveDeviceMac("")
+                showUnapprovedModelAlert = true
             }
         }
         
