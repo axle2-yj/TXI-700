@@ -147,3 +147,5 @@
 "each" = "축중기별";
 "Two-StepWeighing" = "2단계 계량";
 "OverWeight" = "과적중량";
+"leftWeight" = "좌측";
+"rightWeight" = "우측";

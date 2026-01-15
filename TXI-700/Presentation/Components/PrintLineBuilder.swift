@@ -67,8 +67,15 @@ struct PrintLineBuilder {
                 let secondValue = loadAxles.indices.contains(secondIndex) ? loadAxles[secondIndex] : 0
                 
                 if printViewModel.isOn(11) {
-                    lines.append("\(rowIndex + 1)Axle : \(firstValue)kg/ \(secondValue)kg")
-                    lines.append("                     \(firstValue + secondValue)kg")
+                    lines.append(
+//                        "\(rowIndex + 1)Axle : \(firstValue)kg/ \(secondValue)kg"
+                        CommonPrintFormatter.fiveColRow("\(rowIndex + 1)Axle", ":", "\(firstValue)kg", "/", " \(secondValue)kg")
+                    )
+                    
+                    lines.append(
+//                        "                     \(firstValue + secondValue)kg"
+                        CommonPrintFormatter.oneColRowRight("\(firstValue + secondValue)kg")
+                    )
                 }
                 
                 if printViewModel.isOn(12) {
@@ -91,6 +98,17 @@ struct PrintLineBuilder {
             
             let first = loadAxles.prefix(half).reduce(0, +)
             let second = loadAxles.dropFirst(half).reduce(0, +)
+            let left = loadAxles
+                .enumerated()
+                .filter { $0.offset % 2 == 0 }
+                .map { $0.element }
+                .reduce(0, +)
+
+            let right = loadAxles
+                .enumerated()
+                .filter { $0.offset % 2 == 1 }
+                .map { $0.element }
+                .reduce(0, +)
             
             if printViewModel.isOn(13) {
                 lines.append("1st Weight : \(first)kg")
@@ -104,14 +122,22 @@ struct PrintLineBuilder {
             if printViewModel.isOn(14) {
                 lines.append("over : \(first - second)kg")
             }
+            
+            if printViewModel.isOn(15) {
+                lines.append("left : \(left)kg")
+            }
+            
+            if printViewModel.isOn(16) {
+                lines.append("right : \(right)kg")
+            }
         }
         let inspector = (printViewModel.inspectorNameText?.isEmpty == false)
         ? printViewModel.inspectorNameText ?? ""
         : "____________"
         
-        if printViewModel.isOn(15) { lines.append(String(localized: "Line")) }
-        if printViewModel.isOn(16) { lines.append("Inspector :     \(inspector)") }
-        if printViewModel.isOn(17) { lines.append("Driver :           ____________") }
+        if printViewModel.isOn(17) { lines.append(String(localized: "Line")) }
+        if printViewModel.isOn(18) { lines.append("Inspector :     \(inspector)") }
+        if printViewModel.isOn(19) { lines.append("Driver :           ____________") }
         return lines
     }
     
@@ -177,8 +203,15 @@ struct PrintLineBuilder {
                 let secondValue = loadAxles.indices.contains(secondIndex) ? loadAxles[secondIndex] : 0
                 
                 if printViewModel.isOn(11) {
-                    lines.append("\(rowIndex + 1)Axle : \(firstValue)kg/ \(secondValue)kg")
-                    lines.append("              \(firstValue + secondValue)kg")
+                    lines.append(
+//                        "\(rowIndex + 1)Axle : \(firstValue)kg/ \(secondValue)kg"
+                        CommonPrintFormatter.fiveColRow("\(rowIndex + 1)Axle", ":", "\(firstValue)kg", "/", " \(secondValue)kg")
+                    )
+                    
+                    lines.append(
+//                        "                     \(firstValue + secondValue)kg"
+                        CommonPrintFormatter.oneColRowRight("\(firstValue + secondValue)kg")
+                    )
                 }
                 
                 if printViewModel.isOn(12) {
@@ -201,6 +234,17 @@ struct PrintLineBuilder {
             
             let first = loadAxles.prefix(half).reduce(0, +)
             let second = loadAxles.dropFirst(half).reduce(0, +)
+            let left = loadAxles
+                .enumerated()
+                .filter { $0.offset % 2 == 0 }
+                .map { $0.element }
+                .reduce(0, +)
+
+            let right = loadAxles
+                .enumerated()
+                .filter { $0.offset % 2 == 1 }
+                .map { $0.element }
+                .reduce(0, +)
             
             if printViewModel.isOn(13) {
                 lines.append("1st Weight : \(first)kg")
@@ -214,14 +258,22 @@ struct PrintLineBuilder {
             if printViewModel.isOn(14) {
                 lines.append("over : \(first - second)kg")
             }
+            
+            if printViewModel.isOn(15) {
+                lines.append("left : \(left)kg")
+            }
+            
+            if printViewModel.isOn(16) {
+                lines.append("right : \(right)kg")
+            }
         }
         let inspector = (printViewModel.inspectorNameText?.isEmpty == false)
         ? printViewModel.inspectorNameText ?? ""
         : "____________"
         
-        if printViewModel.isOn(15) { lines.append(String(localized: "Line")) }
-        if printViewModel.isOn(16) { lines.append("Inspector :     \(inspector)") }
-        if printViewModel.isOn(17) { lines.append("Driver :        ____________") }
+        if printViewModel.isOn(17) { lines.append(String(localized: "Line")) }
+        if printViewModel.isOn(18) { lines.append("Inspector :     \(inspector)") }
+        if printViewModel.isOn(19) { lines.append("Driver :        ____________") }
         lines.append("  ")
         lines.append("  ")
         lines.append("  ")
@@ -298,8 +350,15 @@ struct PrintLineBuilder {
                     let firstValue = loadAxles.indices.contains(firstIndex) ? loadAxles[firstIndex] : 0
                     let secondValue = loadAxles.indices.contains(secondIndex) ? loadAxles[secondIndex] : 0
                     if printViewModel.isOn(11) {
-                        lines.append("\(rowIndex + 1)Axle : \(firstValue)kg / \(secondValue)kg")
-                        lines.append("              \(firstValue + secondValue)kg")
+                        lines.append(
+    //                        "\(rowIndex + 1)Axle : \(firstValue)kg/ \(secondValue)kg"
+                            CommonPrintFormatter.fiveColRow("\(rowIndex + 1)Axle", ":", "\(firstValue)kg", "/", " \(secondValue)kg")
+                        )
+                        
+                        lines.append(
+    //                        "                     \(firstValue + secondValue)kg"
+                            CommonPrintFormatter.oneColRowRight("\(firstValue + secondValue)kg")
+                        )
                     }
                     
                     if printViewModel.isOn(12) {
@@ -321,6 +380,17 @@ struct PrintLineBuilder {
                 
                 let first = loadAxles.prefix(half).reduce(0, +)
                 let second = loadAxles.dropFirst(half).reduce(0, +)
+                let left = loadAxles
+                    .enumerated()
+                    .filter { $0.offset % 2 == 0 }
+                    .map { $0.element }
+                    .reduce(0, +)
+
+                let right = loadAxles
+                    .enumerated()
+                    .filter { $0.offset % 2 == 1 }
+                    .map { $0.element }
+                    .reduce(0, +)
                 
                 if printViewModel.isOn(13) {
                     lines.append("1st Weight : \(first)kg")
@@ -335,17 +405,25 @@ struct PrintLineBuilder {
                 if printViewModel.isOn(14) {
                     lines.append("over : \(first - second)kg")
                 }
+                
+                if printViewModel.isOn(15) {
+                    lines.append("over : \(left)kg")
+                }
+                
+                if printViewModel.isOn(16) {
+                    lines.append("over : \(right)kg")
+                }
             }
         }
         let inspector = (printViewModel.inspectorNameText?.isEmpty == false)
         ? printViewModel.inspectorNameText ?? ""
         : "____________"
-        if printViewModel.isOn(15) { lines.append(String(localized: "Line")) }
-        if printViewModel.isOn(16) {
+        if printViewModel.isOn(17) { lines.append(String(localized: "Line")) }
+        if printViewModel.isOn(18) {
             lines.append("  ")
             lines.append("Inspector :     \(inspector)")
         }
-        if printViewModel.isOn(17) {
+        if printViewModel.isOn(19) {
             lines.append("  ")
             lines.append("  ")
             lines.append("Driver :        ____________")
@@ -430,12 +508,12 @@ struct PrintLineBuilder {
         let inspector = (printViewModel.inspectorNameText?.isEmpty == false)
         ? printViewModel.inspectorNameText ?? ""
         : "____________"
-        if printViewModel.isOn(15) { lines.append(String(localized: "Line")) }
-        if printViewModel.isOn(16) {
+        if printViewModel.isOn(17) { lines.append(String(localized: "Line")) }
+        if printViewModel.isOn(18) {
             lines.append("  ")
             lines.append("Inspector :     \(inspector)")
         }
-        if printViewModel.isOn(17) {
+        if printViewModel.isOn(19) {
             lines.append("  ")
             lines.append("  ")
             lines.append("Driver :        ____________")
@@ -497,6 +575,18 @@ struct PrintLineBuilder {
             let weighting2nd = loadAxles.last ?? 0
             let netWeight = weighting1st - weighting2nd
             let total = weighting1st + weighting2nd
+            let left = loadAxles
+                .enumerated()
+                .filter { $0.offset % 2 == 0 }
+                .map { $0.element }
+                .reduce(0, +)
+
+            let right = loadAxles
+                .enumerated()
+                .filter { $0.offset % 2 == 1 }
+                .map { $0.element }
+                .reduce(0, +)
+            
             lines.append("1st Weight : \(weighting1st)kg")
             lines.append("2st Weight : \(weighting2nd)kg")
             lines.append("Net Weight : \(netWeight)kg")
@@ -506,17 +596,24 @@ struct PrintLineBuilder {
             if printViewModel.isOn(14) {
                 lines.append("over : \(netWeight)kg")
             }
+            if printViewModel.isOn(15) {
+                lines.append("left : \(left)kg")
+            }
+            
+            if printViewModel.isOn(16) {
+                lines.append("right : \(right)kg")
+            }
         }
         let inspector = (printViewModel.inspectorNameText?.isEmpty == false)
         ? printViewModel.inspectorNameText ?? ""
         : "____________"
         
-        if printViewModel.isOn(15) { lines.append(String(localized: "Line")) }
-        if printViewModel.isOn(16) {
+        if printViewModel.isOn(17) { lines.append(String(localized: "Line")) }
+        if printViewModel.isOn(18) {
             lines.append("  ")
             lines.append("Inspector :     \(inspector)")
         }
-        if printViewModel.isOn(17) {
+        if printViewModel.isOn(19) {
             lines.append("  ")
             lines.append("  ")
             lines.append("Driver :           ____________")
@@ -582,6 +679,18 @@ struct PrintLineBuilder {
             let weighting2nd = loadAxles.last ?? 0
             let netWeight = weighting1st - weighting2nd
             let total = weighting1st + weighting2nd
+            let left = loadAxles
+                .enumerated()
+                .filter { $0.offset % 2 == 0 }
+                .map { $0.element }
+                .reduce(0, +)
+
+            let right = loadAxles
+                .enumerated()
+                .filter { $0.offset % 2 == 1 }
+                .map { $0.element }
+                .reduce(0, +)
+            
             lines.append("1st Weight : \(weighting1st)kg")
             lines.append("2st Weight : \(weighting2nd)kg")
             lines.append("Net Weight : \(netWeight)kg")
@@ -591,17 +700,24 @@ struct PrintLineBuilder {
             if printViewModel.isOn(14) {
                 lines.append("over : \(netWeight)kg")
             }
+            if printViewModel.isOn(15) {
+                lines.append("left : \(left)kg")
+            }
+            
+            if printViewModel.isOn(16) {
+                lines.append("right : \(right)kg")
+            }
         }
         let inspector = (printViewModel.inspectorNameText?.isEmpty == false)
         ? printViewModel.inspectorNameText ?? ""
         : "____________"
         
-        if printViewModel.isOn(15) { lines.append(String(localized: "Line")) }
-        if printViewModel.isOn(16) {
+        if printViewModel.isOn(17) { lines.append(String(localized: "Line")) }
+        if printViewModel.isOn(18) {
             lines.append("  ")
             lines.append("Inspector :     \(inspector)")
         }
-        if printViewModel.isOn(17) {
+        if printViewModel.isOn(19) {
             lines.append("  ")
             lines.append("  ")
             lines.append("Driver :        ____________")
@@ -673,6 +789,18 @@ struct PrintLineBuilder {
                     let weighting2nd = loadAxles.last ?? 0
                     let netWeight = weighting1st - weighting2nd
                     let total = weighting1st + weighting2nd
+                    let left = loadAxles
+                        .enumerated()
+                        .filter { $0.offset % 2 == 0 }
+                        .map { $0.element }
+                        .reduce(0, +)
+
+                    let right = loadAxles
+                        .enumerated()
+                        .filter { $0.offset % 2 == 1 }
+                        .map { $0.element }
+                        .reduce(0, +)
+                    
                     lines.append("1st Weight : \(weighting1st)kg")
                     lines.append("2st Weight : \(weighting2nd)kg")
                     lines.append("Net Weight : \(netWeight)kg")
@@ -681,6 +809,13 @@ struct PrintLineBuilder {
                     
                     if printViewModel.isOn(14) {
                         lines.append("over : \(netWeight)kg")
+                    }
+                    if printViewModel.isOn(15) {
+                        lines.append("left : \(left)kg")
+                    }
+                    
+                    if printViewModel.isOn(16) {
+                        lines.append("right : \(right)kg")
                     }
                 }
             } else {
@@ -698,8 +833,15 @@ struct PrintLineBuilder {
                     ? loadAxles[secondIndex] : 0
                     
                     if printViewModel.isOn(11) {
-                        lines.append("\(rowIndex + 1)Axle : \(firstValue)kg / \(secondValue)kg")
-                        lines.append("                      \(firstValue + secondValue)kg")
+                        lines.append(
+    //                        "\(rowIndex + 1)Axle : \(firstValue)kg/ \(secondValue)kg"
+                            CommonPrintFormatter.fiveColRow("\(rowIndex + 1)Axle", ":", "\(firstValue)kg", "/", " \(secondValue)kg")
+                        )
+                        
+                        lines.append(
+    //                        "                     \(firstValue + secondValue)kg"
+                            CommonPrintFormatter.oneColRowRight("\(firstValue + secondValue)kg")
+                        )
                     }
                     
                     if printViewModel.isOn(12) {
@@ -737,9 +879,9 @@ struct PrintLineBuilder {
             ? printViewModel.inspectorNameText ?? ""
             : "____________"
             
-            if printViewModel.isOn(15) { lines.append(String(localized: "Line")) }
-            if printViewModel.isOn(16) { lines.append("Inspector :     \(inspector)") }
-            if printViewModel.isOn(17) { lines.append("Driver :        ____________") }
+            if printViewModel.isOn(17) { lines.append(String(localized: "Line")) }
+            if printViewModel.isOn(18) { lines.append("Inspector :     \(inspector)") }
+            if printViewModel.isOn(19) { lines.append("Driver :        ____________") }
             lines.append("  ")
             lines.append("  ")
         }
@@ -827,8 +969,15 @@ struct PrintLineBuilder {
                 ? loadAxles[secondIndex] : 0
                 
                 if printViewModel.isOn(11) {
-                    lines.append("\(rowIndex + 1)Axle : \(firstValue)kg / \(secondValue)kg")
-                    lines.append("                      \(firstValue + secondValue)kg")
+                    lines.append(
+//                        "\(rowIndex + 1)Axle : \(firstValue)kg/ \(secondValue)kg"
+                        CommonPrintFormatter.fiveColRow("\(rowIndex + 1)Axle", ":", "\(firstValue)kg", "/", " \(secondValue)kg")
+                    )
+                    
+                    lines.append(
+//                        "                     \(firstValue + secondValue)kg"
+                        CommonPrintFormatter.oneColRowRight("\(firstValue + secondValue)kg")
+                    )
                 }
                 
                 if printViewModel.isOn(12) {
@@ -865,9 +1014,9 @@ struct PrintLineBuilder {
         let inspector = (printViewModel.inspectorNameText?.isEmpty == false)
         ? printViewModel.inspectorNameText ?? ""
         : "____________"
-        if printViewModel.isOn(15) { lines.append(String(localized: "Line")) }
-        if printViewModel.isOn(16) { lines.append("Inspector :     \(inspector)") }
-        if printViewModel.isOn(17) { lines.append("Driver :         ____________") }
+        if printViewModel.isOn(17) { lines.append(String(localized: "Line")) }
+        if printViewModel.isOn(18) { lines.append("Inspector :     \(inspector)") }
+        if printViewModel.isOn(19) { lines.append("Driver :         ____________") }
         lines.append("  ")
         lines.append("  ")
         

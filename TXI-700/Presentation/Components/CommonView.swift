@@ -38,7 +38,10 @@ struct CommonPrintFormatter {
     static let Col2Width = 14
     static let Col3Width = 8
     static let Col4Width = 22
-    
+    static let Col5Width = 6
+    static let Col6Width = 5
+    static let Col7Width = 20
+    static let Col8Width = 7
     // MARK: - Rows
     
     static func fullRow(_ text: String) -> String {
@@ -71,6 +74,32 @@ struct CommonPrintFormatter {
         let r = right.rightAligned(width: Col4Width)
         return "\(l)\(r)"
     }
+    
+    static func twoColRowLeftAligned(_ text: String, _ middle: String) -> String {
+        let l = text.leftAlignedPrint(width: Col1Width)
+        let r = middle.centerAligned(width: Col5Width)
+        return "\(l)\(r)"
+    }
+    
+    static func oneColRowRight(_ text: String) -> String {
+        text.rightAlignedPrint(width: fullWidth + 1)
+    }
+    
+    static func threeColRowLift(_ col1: String, _ col2: String, _ col3: String) -> String {
+        let one = col1.leftAlignedPrint(width: Col1Width)
+        let two = col2.centerAligned(width: Col5Width)
+        let three = col3.leftAlignedPrint(width: Col7Width)
+        return "\((one))\(two)\(three)"
+    }
+    
+    static func fiveColRow(_ col1: String, _ col2: String, _ col3: String, _ col4: String, _ col5: String) -> String {
+        let one = col1.leftAlignedPrint(width: Col6Width)
+        let two = col2.centerAligned(width: Col5Width)
+        let three = col3.rightAligned(width: Col8Width)
+        let four = col4.centerAligned(width: Col5Width)
+        let five = col5.rightAligned(width: Col8Width)
+        return "\((one))\(two)\(three)\(four)\(five)"
+    }
 }
 
 extension String {
@@ -84,12 +113,23 @@ extension String {
         if count >= width { return String(suffix(width)) }
         return String(repeating: " ", count: width - count) + self
     }
-}
 
-extension String {
     func rightAligned(width: Int) -> String {
         if count >= width { return self }
         return String(repeating: " ", count: width - count) + self
+    }
+    
+    func centerAligned(width: Int) -> String {
+        let length = self.count
+        guard length < width else { return self }
+
+        let totalPadding = width - length
+        let leftPadding = totalPadding / 2
+        let rightPadding = totalPadding - leftPadding
+
+        return String(repeating: " ", count: leftPadding)
+             + self
+             + String(repeating: " ", count: rightPadding)
     }
 }
 

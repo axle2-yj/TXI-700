@@ -148,3 +148,5 @@
 "each" = "軸重機別";
 "Two-StepWeighing" = "第2段階計量";
 "OverWeight" = "過積載重量";
+"leftWeight" = "左側";
+"rightWeight" = "右側";

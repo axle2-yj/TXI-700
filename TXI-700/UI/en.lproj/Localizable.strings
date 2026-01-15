@@ -153,3 +153,5 @@
 "each" = "each";
 "Two-StepWeighing" = "Two-Step Weighing";
 "OverWeight" = "Over Weight";
+"leftWeight" = "left";
+"rightWeight" = "right";
