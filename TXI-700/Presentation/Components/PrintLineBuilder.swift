@@ -137,6 +137,14 @@ struct PrintLineBuilder {
             if printViewModel.isOn(16) {
                 lines.append(CommonPrintFormatter.threeColumnLine(lang.localized("right"), ":", "\(right)kg"))
             }
+            
+            if printViewModel.isOn(15) {
+                lines.append("left : \(left)kg")
+            }
+            
+            if printViewModel.isOn(16) {
+                lines.append("right : \(right)kg")
+            }
         }
         let inspector = (printViewModel.inspectorNameText?.isEmpty == false)
         ? printViewModel.inspectorNameText ?? ""

@@ -131,6 +131,32 @@ struct CommonPrintFormatter {
     static func oneColRowRead(_ text: String) -> String {
         text.rightAlignedPrint(width: width22)
     }
+    
+    static func twoColRowLeftAligned(_ text: String, _ middle: String) -> String {
+        let l = text.leftAlignedPrint(width: Col1Width)
+        let r = middle.centerAligned(width: Col5Width)
+        return "\(l)\(r)"
+    }
+    
+    static func oneColRowRight(_ text: String) -> String {
+        text.rightAlignedPrint(width: fullWidth + 1)
+    }
+    
+    static func threeColRowLift(_ col1: String, _ col2: String, _ col3: String) -> String {
+        let one = col1.leftAlignedPrint(width: Col1Width)
+        let two = col2.centerAligned(width: Col5Width)
+        let three = col3.leftAlignedPrint(width: Col7Width)
+        return "\((one))\(two)\(three)"
+    }
+    
+    static func fiveColRow(_ col1: String, _ col2: String, _ col3: String, _ col4: String, _ col5: String) -> String {
+        let one = col1.leftAlignedPrint(width: Col6Width)
+        let two = col2.centerAligned(width: Col5Width)
+        let three = col3.rightAligned(width: Col8Width)
+        let four = col4.centerAligned(width: Col5Width)
+        let five = col5.rightAligned(width: Col8Width)
+        return "\((one))\(two)\(three)\(four)\(five)"
+    }
 }
 
 extension String {
