@@ -44,6 +44,7 @@ struct MainScreen: View {
     @Environment(\.presentationMode) var presentationMode
     @Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var bleManager: BluetoothManager
+
     @EnvironmentObject var languageManager: LanguageManager
     
     private var tint: Color {
@@ -206,13 +207,16 @@ struct MainScreen: View {
                         let rightAxles = [right1, right2, right3, right4]
                         
                         let lines: [String] = {
-                            PrintLineBuilder.buildBalanceLines(
+                            PrintLineBuilder.buildPrintBalanceLinesMain(
                                 axleState: bleManager.axles,
                                 timeStamp: Date(),
+                                product: product,
                                 client : client,
                                 vehicle : vehicle,
                                 serialNumber: String(mainViewModel.sn),
-                                printViewModel: printViewModel
+                                dataViewModel: dataViewModel,
+                                printViewModel: printViewModel,
+                                lang: languageManager
                             )
                         }()
                         
@@ -494,7 +498,7 @@ struct MainScreen: View {
                                 let lines: [String] = if weightingMethodInt == 0 {
                                     []
                                 } else if weightingMethodInt == 2{
-                                    PrintLineBuilder.buildThird(
+                                    PrintLineBuilder.buildPrintTwoStepLineMain(
                                         weighting1st: weighting1stData,
                                         weighting2nd: totalSumValue,
                                         netWeight: netWeightData,
@@ -505,10 +509,11 @@ struct MainScreen: View {
                                         client : client,
                                         vehicle : vehicle,
                                         serialNumber: String(mainViewModel.sn),
-                                        selectedType: weightingMethodInt
+                                        selectedType: weightingMethodInt,
+                                        lang: languageManager
                                     )
                                 } else {
-                                    PrintLineBuilder.buildSecond(
+                                    PrintLineBuilder.buildPrintOneStepLineMain(
                                         loadAxleItem: loadAxleStatus,
                                         dataViewModel: dataViewModel,
                                         printViewModel: printViewModel,
@@ -517,7 +522,8 @@ struct MainScreen: View {
                                         client : client,
                                         vehicle : vehicle,
                                         serialNumber: String(mainViewModel.sn),
-                                        selectedType: weightingMethodInt
+                                        selectedType: weightingMethodInt,
+                                        lang: languageManager
                                     )
                                 }
                                 
@@ -593,8 +599,8 @@ struct MainScreen: View {
                                         }
                                     }
                                 )
-                                .disabled(twoStepSum ?  isTwoStep : false)
-                                .opacity(twoStepSum ? (isTwoStep ? 1.0 : 0.4) : 1.0)
+                                .disabled(isTwoStep ?  twoStepSum : false)
+                                .opacity(isTwoStep ? (twoStepSum ? 1.0 : 0.4) : 1.0)
                                 
                                 if settingViewModel.weightingMethod == 2 {
                                     SaveButton(

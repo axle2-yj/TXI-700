@@ -15,6 +15,7 @@ struct PrintButton: View {
 
     @Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var bleManager: BluetoothManager
+    @EnvironmentObject var language: LanguageManager
     
     @ObservedObject var viewModel: DataViewModel
     @ObservedObject var printViewModel: PrintFormSettingViewModel
@@ -185,10 +186,11 @@ struct PrintButton: View {
         viewModel.printingNumber = index + 1
         
         let info = infos[index]
-        let lines = PrintLineBuilder.buildLines(
+        let lines = PrintLineBuilder.buildPrintLinesPrinter(
             info: info,
             dataViewModel: viewModel,
-            printViewModel: printViewModel
+            printViewModel: printViewModel,
+            lang: language
         )
         
         sendLines(lines) {
