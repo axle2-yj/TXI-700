@@ -44,6 +44,7 @@ struct MainScreen: View {
     @Environment(\.presentationMode) var presentationMode
     @Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var bleManager: BluetoothManager
+
     @EnvironmentObject var languageManager: LanguageManager
     
     private var tint: Color {
@@ -206,13 +207,16 @@ struct MainScreen: View {
                         let rightAxles = [right1, right2, right3, right4]
                         
                         let lines: [String] = {
-                            PrintLineBuilder.buildBalanceLines(
+                            PrintLineBuilder.buildPrintBalanceLinesMain(
                                 axleState: bleManager.axles,
                                 timeStamp: Date(),
+                                product: product,
                                 client : client,
                                 vehicle : vehicle,
                                 serialNumber: String(mainViewModel.sn),
-                                printViewModel: printViewModel
+                                dataViewModel: dataViewModel,
+                                printViewModel: printViewModel,
+                                lang: languageManager
                             )
                         }()
                         
@@ -224,6 +228,7 @@ struct MainScreen: View {
                                 .background(Color.gray.opacity(0.3))
                                 .cornerRadius(6)
                                 .foregroundColor(tint)
+                                .contentShape(Rectangle())
                             CustomPlaceholderTextField(
                                 placeholder: "VehicleNum".localized(languageManager.selectedLanguage),
                                 text: $vehicleNum
@@ -364,6 +369,7 @@ struct MainScreen: View {
                                 .background(Color.gray.opacity(0.3))
                                 .cornerRadius(6)
                                 .foregroundColor(tint)
+                                .contentShape(Rectangle())
                             
                             CustomPlaceholderTextField(
                                 placeholder: "VehicleNum".localized(languageManager.selectedLanguage),
@@ -412,46 +418,63 @@ struct MainScreen: View {
                         let clientTitle = clientViewModel.selectedClient?.name ?? mainViewModel.saveClient ?? "CLIENT <<"
                         HStack {
                             if settingViewModel.checkedProduct {
-                                Button(productTitle.localized(languageManager.selectedLanguage)) {
+                                Button {
                                     selectedListType = .product
                                     goToList = true
-                                }.frame(maxWidth: .infinity) // 화면 절반 차지
-                                    .padding()
-                                    .background(Color.gray.opacity(0.3))
-                                    .cornerRadius(6)
-                                    .foregroundColor(tint)
+                                } label: {
+                                    Text(productTitle.localized(languageManager.selectedLanguage))
+                                        .frame(maxWidth: .infinity)
+                                        .padding()
+                                        .background(Color.gray.opacity(0.3))
+                                        .cornerRadius(6)
+                                        .foregroundColor(tint)
+                                        .contentShape(Rectangle())
+                                }
                             }
                             
                             if settingViewModel.checkedClient {
-                                Button(clientTitle.localized(languageManager.selectedLanguage)) {
+                                Button {
                                     selectedListType = .client
                                     goToList = true
-                                }.frame(maxWidth: .infinity)
-                                    .padding()
-                                    .background(Color.gray.opacity(0.3))
-                                    .cornerRadius(6)
-                                    .foregroundColor(tint)
+                                } label: {
+                                    Text(clientTitle.localized(languageManager.selectedLanguage))
+                                        .frame(maxWidth: .infinity)
+                                        .padding()
+                                        .background(Color.gray.opacity(0.3))
+                                        .cornerRadius(6)
+                                        .foregroundColor(tint)
+                                        .contentShape(Rectangle())
+                                }
                             }
                         }
                         
                         HStack {
                             ZeroButton()
-                            Button("DATA") {
+                            Button {
                                 goToData = true
                                 bleManager.sendCommand(.bdc, log: "SaveData Call")
-                            }.frame(maxWidth: .infinity)
-                                .padding()
-                                .background(Color.gray.opacity(0.3))
-                                .cornerRadius(6)
-                                .foregroundColor(tint)
-                            if isMainSum {
-                                Button("CANCEL") {
-                                    okButtonAction()
-                                }.frame(maxWidth: .infinity)
+                            } label: {
+                                Text("DATA")
+                                    .frame(maxWidth: .infinity)
                                     .padding()
                                     .background(Color.gray.opacity(0.3))
                                     .cornerRadius(6)
                                     .foregroundColor(tint)
+                                    .contentShape(Rectangle())
+                            }
+                            
+                            if isMainSum {
+                                Button {
+                                    okButtonAction()
+                                } label: {
+                                    Text("CANCEL")
+                                        .frame(maxWidth: .infinity)
+                                        .padding()
+                                        .background(Color.gray.opacity(0.3))
+                                        .cornerRadius(6)
+                                        .foregroundColor(tint)
+                                        .contentShape(Rectangle())
+                                }
                             }
                         }
                         
@@ -494,7 +517,7 @@ struct MainScreen: View {
                                 let lines: [String] = if weightingMethodInt == 0 {
                                     []
                                 } else if weightingMethodInt == 2{
-                                    PrintLineBuilder.buildThird(
+                                    PrintLineBuilder.buildPrintTwoStepLineMain(
                                         weighting1st: weighting1stData,
                                         weighting2nd: totalSumValue,
                                         netWeight: netWeightData,
@@ -505,10 +528,11 @@ struct MainScreen: View {
                                         client : client,
                                         vehicle : vehicle,
                                         serialNumber: String(mainViewModel.sn),
-                                        selectedType: weightingMethodInt
+                                        selectedType: weightingMethodInt,
+                                        lang: languageManager
                                     )
                                 } else {
-                                    PrintLineBuilder.buildSecond(
+                                    PrintLineBuilder.buildPrintOneStepLineMain(
                                         loadAxleItem: loadAxleStatus,
                                         dataViewModel: dataViewModel,
                                         printViewModel: printViewModel,
@@ -517,7 +541,8 @@ struct MainScreen: View {
                                         client : client,
                                         vehicle : vehicle,
                                         serialNumber: String(mainViewModel.sn),
-                                        selectedType: weightingMethodInt
+                                        selectedType: weightingMethodInt,
+                                        lang: languageManager
                                     )
                                 }
                                 
@@ -593,8 +618,8 @@ struct MainScreen: View {
                                         }
                                     }
                                 )
-                                .disabled(twoStepSum ?  isTwoStep : false)
-                                .opacity(twoStepSum ? (isTwoStep ? 1.0 : 0.4) : 1.0)
+                                .disabled(isTwoStep ?  twoStepSum : false)
+                                .opacity(isTwoStep ? (twoStepSum ? 1.0 : 0.4) : 1.0)
                                 
                                 if settingViewModel.weightingMethod == 2 {
                                     SaveButton(

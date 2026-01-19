@@ -27,17 +27,21 @@ struct SaveButton: View {
     }
     
     var body: some View {
-        Button("SAVE") {
+        Button {
             beforeSave?()
             saveData()
             isSaved = true
-        }.frame(maxWidth: .infinity, maxHeight: 50)
-            .padding()
-            .background(Color.gray.opacity(0.3))
-            .cornerRadius(6)
-            .foregroundColor(tint)
-            .disabled(isSaved)
-            .opacity(isSaved ? 0.4 : 1.0)
+        } label: {
+            Text("SAVE")
+                .frame(maxWidth: .infinity, maxHeight: 50)
+                .padding()
+                .background(Color.gray.opacity(0.3))
+                .cornerRadius(6)
+                .foregroundColor(tint)
+                .disabled(isSaved)
+                .opacity(isSaved ? 0.4 : 1.0)
+                .contentShape(Rectangle())
+        }
     }
     
     private func saveData() {

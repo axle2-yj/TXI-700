@@ -19,32 +19,36 @@ struct TwoStepSumButton: View {
     
     var body: some View {
         var isSum = false
-        Button("SUM") {
+        Button {
             performEnterAction()
-        }.frame(maxWidth: .infinity, maxHeight: 50)
-            .padding()
-            .background(Color.gray.opacity(0.3))
-            .cornerRadius(6)
-            .foregroundColor(tint)
-//            .onReceive(bleManager.$isSum) { newValue in
-//                print(newValue)
-//                if newValue {
-//                    preformIndicatorAction()
-//                }
-//            }
-            .onChange(of: bleManager.indicatorState) { state, _ in
-                switch state {
-                case IndicatorState.sum:
-                    if !isSum {
-                        isSum = true
-                        preformIndicatorAction()
-                    } else {
-                        isSum = false
+        } label: {
+            Text("SUM")
+                .frame(maxWidth: .infinity, maxHeight: 50)
+                .padding()
+                .background(Color.gray.opacity(0.3))
+                .cornerRadius(6)
+                .foregroundColor(tint)
+                .contentShape(Rectangle())
+    //            .onReceive(bleManager.$isSum) { newValue in
+    //                print(newValue)
+    //                if newValue {
+    //                    preformIndicatorAction()
+    //                }
+    //            }
+                .onChange(of: bleManager.indicatorState) { state, _ in
+                    switch state {
+                    case IndicatorState.sum:
+                        if !isSum {
+                            isSum = true
+                            preformIndicatorAction()
+                        } else {
+                            isSum = false
+                        }
+                    default:
+                        break
                     }
-                default:
-                    break
                 }
-            }
+        }
     }
     private func performEnterAction() {
         onSum()

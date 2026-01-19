@@ -74,7 +74,7 @@ extension BluetoothManager: CBPeripheralDelegate {
         
         // 프로토콜 응답
         let response = BLEParser.parse(bytes)
-        
+                
         // 이벤트 전달
 //        handle(response)
         

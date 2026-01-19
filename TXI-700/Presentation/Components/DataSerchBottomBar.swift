@@ -65,25 +65,32 @@ struct DataSerchBottomBar: View {
                     text: $dataViewModel.filterProduct)
             }
             HStack {
-                Button("Clear") {
+                Button {
                     dataViewModel.clearFilters()
                     viewModel.resetSerch()
+                } label: {
+                    Text("Clear".localized(languageManager.selectedLanguage))
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.gray.opacity(0.3))
+                        .cornerRadius(6)
+                        .foregroundColor(tint)
+                        .contentShape(Rectangle())
                 }
-                .frame(maxWidth: .infinity) // 화면 절반 차지
-                .padding()
-                .background(Color.gray.opacity(0.3))
-                .cornerRadius(6)
-                .foregroundColor(tint)
                 
-                Button("Serch") {
+                
+                Button {
                     dataViewModel.applyFilters(startDate: viewModel.startDate,
                                                endDate: viewModel.endDate)
+                } label: {
+                    Text("Search".localized(languageManager.selectedLanguage))
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.gray.opacity(0.3))
+                        .cornerRadius(6)
+                        .foregroundColor(tint)
+                        .contentShape(Rectangle())
                 }
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color.gray.opacity(0.3))
-                .cornerRadius(6)
-                .foregroundColor(tint)
             }
         }
     }

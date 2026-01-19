@@ -28,6 +28,7 @@ class SettingViewModel: ObservableObject {
     @Published var caution: Int = 15
     @Published var safety: Int = 10
     @Published var isSum: Bool = false
+    @Published var isMainSelectSum: Bool = false
     func reset() {
         
     }

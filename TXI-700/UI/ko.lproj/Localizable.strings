@@ -26,6 +26,8 @@
 "VehicleNumSearch" = "차량번호 검색";
 "ClientSearch" = "고객 검색";
 "ProductSearch" = "품목 검색";
+"Search" = "검색";
+"Clear" = "초기화";
 "Input" = "입력";
 "InspectorInput" = "검사관 이름 입력";
 

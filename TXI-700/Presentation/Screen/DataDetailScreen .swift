@@ -48,15 +48,24 @@ struct DataDetailScreen: View {
                 
                 ScrollView {
                     // MARK: -프린트 미리보기 전체
-                    printPreviewView
-                        .padding(10)
-                        .frame(maxWidth: 240)
-                        .foregroundStyle(Color.black)
-                        .background(Color.white)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color.blue.opacity(0.3), lineWidth: 1)
-                        )
+                    VStack{
+                        let weightNum = Int(loadAxleItem.weightNum ?? "0")
+                        if weightNum == 3 {
+                            PreviewBalacneView(loadAxleItem: loadAxleItem, dataViewModel: viewModel, printViewModel: printViewModel)
+                        } else if weightNum == 2{
+                            PreviewTwoStepView(loadAxleItem: loadAxleItem, dataViewModel: viewModel, printViewModel: printViewModel)
+                        } else {
+                            PreviewBasicView(loadAxleItem: loadAxleItem, dataViewModel: viewModel, printViewModel: printViewModel)
+                        }
+                    }
+                    .padding(10)
+                    .frame(maxWidth: 300)
+                    .foregroundStyle(Color.black)
+                    .background(Color.white)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(Color.blue.opacity(0.3), lineWidth: 1)
+                    )
                 }
                 
                 // MARK: -Navigation Stepper
@@ -97,16 +106,20 @@ struct DataDetailScreen: View {
                         let twoStepWight = Int(loadAxleItem.weightNum ?? "0") == 2
                         let balanceWight = Int(loadAxleItem.weightNum ?? "0") == 3
                         let printLinBuilder = if twoStepWight {
-                            PrintLineBuilder.buildTwoStepPrint(
+                            PrintLineBuilder.buildPrintTwoStepLineData(
                                 loadAxleItem: loadAxleItem,
                                 dataViewModel: viewModel,
-                                printViewModel: printViewModel)
+                                printViewModel: printViewModel,
+                                lang: languageManager)
                         } else if balanceWight{
-                            PrintLineBuilder.buildBalanceDataPrintLine(
+                            PrintLineBuilder.buildPrintBalanceLinesData(
                                 loadAxleItem: loadAxleItem,
-                                printViewModel: printViewModel)
+                                dataViewModel: viewModel,
+                                printViewModel: printViewModel,
+                                lang: languageManager
+                            )
                         } else {
-                            PrintLineBuilder.buildPrint(
+                            PrintLineBuilder.buildPrintOneStepLineData(
                                 loadAxleItem: loadAxleItem,
                                 dataViewModel: viewModel,
                                 printViewModel: printViewModel,
@@ -122,7 +135,7 @@ struct DataDetailScreen: View {
                             lines: printLinBuilder,
                             onPrint: {
                                 isPrinting = true
-                                print(selectPrintConditions)
+                                print("selectPrintConditions : \(selectPrintConditions)")
                             },
                             offPrint: {
                                 isPrinting = false
@@ -341,41 +354,6 @@ extension DataDetailScreen {
                 .foregroundColor(tint)
                 .cornerRadius(6)
         }
-    }
-}
-
-// MARK: - Print Preview View
-extension DataDetailScreen {
-    var printPreviewView: some View {
-        let weightNum = Int(loadAxleItem.weightNum ?? "0")
-        let lines = if weightNum == 2 {
-            PrintLineBuilder.buildTwoStepRead(
-                loadAxleItem: loadAxleItem,
-                dataViewModel: viewModel,
-                printViewModel: printViewModel
-            )
-        } else if weightNum == 3 {
-            PrintLineBuilder.buildBalanceRead(
-                loadAxleItem: loadAxleItem,
-                printViewModel: printViewModel)
-        } else {
-            PrintLineBuilder.buildRead(
-                loadAxleItem: loadAxleItem,
-                dataViewModel: viewModel,
-                printViewModel: printViewModel,
-                lang: languageManager
-            )
-        }
-        
-        return VStack(alignment: .leading, spacing: 4) {
-            ForEach(lines, id: \.self) { line in
-                Text(line)
-                    .font(.system(size: 14, design: .monospaced))
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .lineLimit(1)
-            }
-        }
-        .padding(.vertical, 4)
     }
 }
 

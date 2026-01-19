@@ -15,6 +15,7 @@ struct PrintButton: View {
 
     @Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var bleManager: BluetoothManager
+    @EnvironmentObject var language: LanguageManager
     
     @ObservedObject var viewModel: DataViewModel
     @ObservedObject var printViewModel: PrintFormSettingViewModel
@@ -37,7 +38,7 @@ struct PrintButton: View {
     var body: some View {
         VStack {
             
-            Button("PRINT") {
+            Button {
                 guard Int(bleManager.indicatorBatteryLevel ?? 0) > 2 else {
                     printAlert = true
                     return
@@ -49,23 +50,27 @@ struct PrintButton: View {
                 } else {
                     startPrintWithCopies()
                 }
-            }.frame(maxWidth: .infinity, maxHeight: 50)
-                .padding()
-                .background(
-                    isMain
-                    ? Color.gray.opacity(0.3)
-                    : (viewModel.selectedType == nil
-                       ? Color.gray.opacity(0.4)
-                       : Color.gray.opacity(0.2))
-                )
-                .cornerRadius(6)
-                .foregroundColor(
-                    isMain
-                    ? tint
-                    : (viewModel.selectedType == nil
-                       ? oppositionTint
-                       : tint)
-                )
+            } label: {
+                Text("PRINT")
+                    .frame(maxWidth: .infinity, maxHeight: 50)
+                    .padding()
+                    .background(
+                        isMain
+                        ? Color.gray.opacity(0.3)
+                        : (viewModel.selectedType == nil
+                           ? Color.gray.opacity(0.4)
+                           : Color.gray.opacity(0.2))
+                    )
+                    .cornerRadius(6)
+                    .foregroundColor(
+                        isMain
+                        ? tint
+                        : (viewModel.selectedType == nil
+                           ? oppositionTint
+                           : tint)
+                    )
+                    .contentShape(Rectangle())
+            }
         }.onReceive(bleManager.$printResponse){ newVelue in
             DispatchQueue.main.async {
                 printResponse = newVelue
@@ -185,10 +190,11 @@ struct PrintButton: View {
         viewModel.printingNumber = index + 1
         
         let info = infos[index]
-        let lines = PrintLineBuilder.buildLines(
+        let lines = PrintLineBuilder.buildPrintLinesPrinter(
             info: info,
             dataViewModel: viewModel,
-            printViewModel: printViewModel
+            printViewModel: printViewModel,
+            lang: language
         )
         
         sendLines(lines) {

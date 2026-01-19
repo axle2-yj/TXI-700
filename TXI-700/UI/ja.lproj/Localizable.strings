@@ -27,6 +27,8 @@
 "VehicleNumSearch" = "車両番号検索";
 "ClientSearch" = "顧客検索";
 "ProductSearch" = "品目検索";
+"Search" = "検索";
+"Clear" = "クリア";
 "Input" = "入力";
 "InspectorInput" = "検査官の名前を入力";
 

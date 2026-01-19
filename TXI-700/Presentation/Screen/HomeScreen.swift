@@ -57,7 +57,7 @@ struct HomeScreen: View {
                                 bleManager.devices.removeAll()
                             }
                     }
-                Button(bluetoothConnected ? "Start" : "Data") {
+                Button {
                     if bluetoothConnected {
                         goToMain = true
                         goToData = false
@@ -65,44 +65,60 @@ struct HomeScreen: View {
                         goToData = true
                         goToMain = false
                     }
+                } label: {
+                    Text(bluetoothConnected ? "Start" : "Data")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.gray.opacity(0.3))
+                        .cornerRadius(6)
+                        .foregroundColor(tint)
+                        .contentShape(Rectangle())
                 }.navigationDestination(isPresented: $goToData) {
                     DataScreen(printViewModel: printViewModel, settingViewModel: settingViewModel)
                 }.navigationDestination(isPresented: $goToMain) {
                     MainScreen().environmentObject(bleManager)
-                }.frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.gray.opacity(0.3))
-                    .cornerRadius(6)
-                    .foregroundColor(tint)
+                }
                 
                 if bluetoothConnected {
-                    Button("Setting") {
+                    Button {
                         goToSetting = true
-                    }.frame(maxWidth: .infinity)
-                        .environmentObject(languageManager)
-                        .padding()
-                        .background(Color.gray.opacity(0.3))
-                        .cornerRadius(6)
-                        .foregroundColor(tint)
+                    } label: {
+                        Text("Setting")
+                            .frame(maxWidth: .infinity)
+                            .environmentObject(languageManager)
+                            .padding()
+                            .background(Color.gray.opacity(0.3))
+                            .cornerRadius(6)
+                            .foregroundColor(tint)
+                            .contentShape(Rectangle())
+                    }
                     
-                    Button("DisConnect") {
+                    Button{
                         bluetoothConnected = false
                         bleManager.disconnect()
+                    } label: {
+                        Text("DisConnect")
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.gray.opacity(0.3))
+                            .cornerRadius(6)
+                            .foregroundColor(tint)
+                            .contentShape(Rectangle())
                     }.navigationDestination(isPresented: $goToSetting) {
                         SettingScreen(viewModel: settingViewModel, printViewModel: printViewModel)
-                    }.frame(maxWidth: .infinity)
+                    }
+                }
+                Button {
+                    showAlert = true
+                } label: {
+                    Text("End")
+                        .frame(maxWidth: .infinity)
                         .padding()
                         .background(Color.gray.opacity(0.3))
                         .cornerRadius(6)
                         .foregroundColor(tint)
+                        .contentShape(Rectangle())
                 }
-                Button("End") {
-                    showAlert = true
-                }.frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.gray.opacity(0.3))
-                    .cornerRadius(6)
-                    .foregroundColor(tint)
             }.onReceive(bleManager.$rfMassage) { value in
                 if value.isEmpty { return }
                 switch value {
@@ -153,13 +169,17 @@ struct HomeScreen: View {
                         .font(.headline)
                     
                     HStack {
-                        Button("Confirmation".localized(languageManager.selectedLanguage)) {
+                        Button {
                             showUnapprovedModelAlert = false
-                        }.frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.gray.opacity(0.3))
-                            .cornerRadius(6)
-                            .foregroundColor(tint)
+                        } label: {
+                            Text("Confirmation".localized(languageManager.selectedLanguage))
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color.gray.opacity(0.3))
+                                .cornerRadius(6)
+                                .foregroundColor(tint)
+                                .contentShape(Rectangle())
+                        }
                     }
                 }
                 .frame(maxWidth: 250, maxHeight: 150)
@@ -184,42 +204,55 @@ struct HomeScreen: View {
                     Text("endProcess".localized(languageManager.selectedLanguage))
                         .font(.headline)
                     if bleManager.isDisconnected {
-                        Button("AppEnd".localized(languageManager.selectedLanguage)) {
+                        Button {
                             showAlert = false
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                                 UIApplication.shared.perform(#selector(NSXPCConnection.suspend))
                             }
                             bleManager.disconnect()
-                        }.frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.gray.opacity(0.3))
-                            .cornerRadius(6)
-                            .foregroundColor(tint)
+                        } label: {
+                            Text("AppEnd".localized(languageManager.selectedLanguage))
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color.gray.opacity(0.3))
+                                .cornerRadius(6)
+                                .foregroundColor(tint)
+                                .contentShape(Rectangle())
+                        }
                     } else {
                         HStack {
-                            Button("AllEnd".localized(languageManager.selectedLanguage)) {
+                            Button {
                                 showAlert = false
                                 bleManager.sendCommand(.btp, log: "Power Off Send")
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                                     UIApplication.shared.perform(#selector(NSXPCConnection.suspend))
                                 }
-                            }.frame(maxWidth: .infinity)
-                                .padding()
-                                .background(Color.gray.opacity(0.3))
-                                .cornerRadius(6)
-                                .foregroundColor(tint)
+                            } label: {
+                                Text("AllEnd".localized(languageManager.selectedLanguage))
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
+                                    .background(Color.gray.opacity(0.3))
+                                    .cornerRadius(6)
+                                    .foregroundColor(tint)
+                                    .contentShape(Rectangle())
+                            }
                             
-                            Button("AppEnd".localized(languageManager.selectedLanguage)) {
+                            
+                            Button {
                                 showAlert = false
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                                     UIApplication.shared.perform(#selector(NSXPCConnection.suspend))
                                 }
                                 bleManager.disconnect()
-                            }.frame(maxWidth: .infinity)
-                                .padding()
-                                .background(Color.gray.opacity(0.3))
-                                .cornerRadius(6)
-                                .foregroundColor(tint)
+                            } label: {
+                                Text("AppEnd".localized(languageManager.selectedLanguage))
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
+                                    .background(Color.gray.opacity(0.3))
+                                    .cornerRadius(6)
+                                    .foregroundColor(tint)
+                                    .contentShape(Rectangle())
+                            }
                         }
                     }
                 }

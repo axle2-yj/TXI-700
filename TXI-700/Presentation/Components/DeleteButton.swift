@@ -25,22 +25,25 @@ struct DeleteButton: View {
     var onRequestDelete: () -> Void
     
     var body: some View {
-        Button("DELETE") {
+        Button {
             onRequestDelete()
+        } label: {
+            Text("DELETE")
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(
+                    viewModel.selectedType == nil
+                    ? Color.gray.opacity(0.4)
+                    : Color.gray.opacity(0.2)
+                )
+                .cornerRadius(6)
+                .foregroundColor(
+                    viewModel.selectedType == nil
+                    ? oppositionTint
+                    : tint
+                )
+                .disabled(viewModel.selectedType == nil)
+                .contentShape(Rectangle())
         }
-        .frame(maxWidth: .infinity)
-        .padding()
-        .background(
-            viewModel.selectedType == nil
-            ? Color.gray.opacity(0.4)
-            : Color.gray.opacity(0.2)
-        )
-        .cornerRadius(6)
-        .foregroundColor(
-            viewModel.selectedType == nil
-            ? oppositionTint
-            : tint
-        )
-        .disabled(viewModel.selectedType == nil)
     }
 }

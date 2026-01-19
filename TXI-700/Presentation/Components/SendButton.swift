@@ -23,21 +23,24 @@ struct SendButton: View {
     }
     
     var body: some View {
-        Button("SEND") {
+        Button {
             onSendRequest()
-        }.frame(maxWidth: .infinity)
-            .padding()
-            .background(
-                viewModel.selectedType == nil
-                ? Color.gray.opacity(0.4)
-                : Color.gray.opacity(0.2)
-            )
-            .cornerRadius(6)
-            .foregroundColor(
-                viewModel.selectedType == nil
-                ? oppositionTint
-                : tint
-            )
-            .disabled(viewModel.selectedType == nil)
+        } label: {
+            Text("SEND").frame(maxWidth: .infinity)
+                .padding()
+                .background(
+                    viewModel.selectedType == nil
+                    ? Color.gray.opacity(0.4)
+                    : Color.gray.opacity(0.2)
+                )
+                .cornerRadius(6)
+                .foregroundColor(
+                    viewModel.selectedType == nil
+                    ? oppositionTint
+                    : tint
+                )
+                .disabled(viewModel.selectedType == nil)
+                .contentShape(Rectangle())
+        }
     }
 }

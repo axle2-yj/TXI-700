@@ -141,7 +141,7 @@ extension BluetoothManager: CBCentralManagerDelegate {
     func sendCommand(_ command: BLECommand, log: String? = nil) -> Bool {
         let result = send(command)
         if let log {
-            print("🔥 \(log): \(result)")
+//            print("🔥 \(log): \(result)")
         }
         return result
     }

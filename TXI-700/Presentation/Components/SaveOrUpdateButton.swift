@@ -14,8 +14,11 @@ struct SaveOrUpdateButton: View {
     var onButton: () -> Void
     
     var body: some View {
-        Button(title) {
+        Button {
             onButton()
+        } label: {
+            Text(title)
+                .contentShape(Rectangle())
         }
     }
 }

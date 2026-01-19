@@ -17,13 +17,18 @@ struct ZeroButton: View {
     }
     
     var body: some View {
-        Button("ZERO") {
+        Button {
             bleManager.sendCommand(.btz, log: "ZeroButton")
-        }.frame(maxWidth: .infinity) // 화면 절반 차지
-            .padding()
-            .background(Color.gray.opacity(0.3))
-            .cornerRadius(6)
-            .foregroundColor(tint)
+        } label: {
+            Text("ZERO")
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color.gray.opacity(0.3))
+                .cornerRadius(6)
+                .foregroundColor(tint)
+                .contentShape(Rectangle())
+        }
+        
     }
 }
 

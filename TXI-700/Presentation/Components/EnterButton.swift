@@ -25,22 +25,26 @@ struct EnterButton: View {
        
     var body: some View {
         VStack {
-            Button("ENTER") {
+            Button {
                 if (bleManager.axles[1]?.leftWeight ?? 0) < 0 || (bleManager.axles[1]?.rightWeight ?? 0) < 0 {
                     onEnterMassege()
                     return
                 }
                 bleManager.sendCommand(.bte, log: "Enter")
                 onEnter()
-            }.frame(maxWidth: .infinity, maxHeight: 50)
-                .padding()
-                .background(Color.gray.opacity(0.3))
-                .cornerRadius(6)
-                .foregroundColor(tint)
-                .disabled(viewModel.modeName == "Auto Inmotion" || !hasChanged)
-                .opacity(viewModel.modeName == "Auto Inmotion" ? 0.4 :(hasChanged ? 1.0 : 0.4))
-                .onChange(of: bleManager.axles[1]?.leftWeight) { _, _ in detectChange() }
-                .onChange(of: bleManager.axles[1]?.rightWeight) { _, _ in detectChange() }
+            } label: {
+                Text("ENTER")
+                    .frame(maxWidth: .infinity, maxHeight: 50)
+                    .padding()
+                    .background(Color.gray.opacity(0.3))
+                    .cornerRadius(6)
+                    .foregroundColor(tint)
+                    .disabled(viewModel.modeName == "Auto Inmotion" || !hasChanged)
+                    .opacity(viewModel.modeName == "Auto Inmotion" ? 0.4 :(hasChanged ? 1.0 : 0.4))
+                    .onChange(of: bleManager.axles[1]?.leftWeight) { _, _ in detectChange() }
+                    .onChange(of: bleManager.axles[1]?.rightWeight) { _, _ in detectChange() }
+                    .contentShape(Rectangle())
+            }
         }
 //        .onReceive(bleManager.$isEnter) { newValue in
 //            if newValue {

@@ -14,12 +14,16 @@ public struct SendOrTwoStepButton: View {
     let tint: Color
     
     public var body: some View {
-        Button(title, action: action)
-            .padding()
-            .background(Color.gray.opacity(0.3))
-            .cornerRadius(6)
-            .foregroundColor(tint)
-            .disabled(isDisabled)
-            .opacity(isDisabled ? 0.4 : 1.0)
+        Button {
+            action()
+        } label: {
+            Text(title).padding()
+                .background(Color.gray.opacity(0.3))
+                .cornerRadius(6)
+                .foregroundColor(tint)
+                .disabled(isDisabled)
+                .opacity(isDisabled ? 0.4 : 1.0)
+                .contentShape(Rectangle())
+        }
     }
 }

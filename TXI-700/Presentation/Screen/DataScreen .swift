@@ -93,6 +93,7 @@ struct DataScreen: View {
                             .rotationEffect(.degrees(showFilterBar ? 270 : 90))
                             .animation(.easeInOut(duration: 0.2), value: showFilterBar)
                     }.frame(height: 30)
+                        .contentShape(Rectangle())
                 }
                 if showFilterBar {
                     DataSerchBottomBar(viewModel: datePickerViewModel, dataViewModel: viewModel)

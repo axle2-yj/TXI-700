@@ -88,6 +88,7 @@ struct SettingScreen: View {
                                     bleManager.modeChangeResponse = false
                                 }
                             }
+                            .contentShape(Rectangle())
                     }.padding()
                         .frame(maxWidth: .infinity)
                         .background(Color.yellow.opacity(0.8))
@@ -112,6 +113,7 @@ struct SettingScreen: View {
                             .background(Color.gray.opacity(0.3))
                             .foregroundStyle(tint)
                             .cornerRadius(6)
+                            .contentShape(Rectangle())
                     }.padding()
                         .frame(maxWidth: .infinity)
                         .background(Color.yellow.opacity(0.8))

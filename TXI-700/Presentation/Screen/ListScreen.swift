@@ -65,10 +65,13 @@ struct ListScreen: View {
                             }
                         ).padding(.trailing)
                         if productViewModel.selectedProduct != nil {
-                            Button("Cancel") {
+                            Button {
                                 productViewModel.clearSelection()
+                            } label: {
+                                Text("Cancel")
+                                    .foregroundColor(.red)
+                                    .contentShape(Rectangle())
                             }
-                            .foregroundColor(.red)
                         }
                     case .client:
                         CustomPlaceholderTextField(
@@ -96,10 +99,13 @@ struct ListScreen: View {
                             }
                         ).padding(.trailing)
                         if clientViewModel.selectedClient != nil {
-                            Button("Cancel") {
+                            Button {
                                 clientViewModel.clearSelection()
+                            } label: {
+                                Text("Cancel")
+                                    .foregroundColor(.red)
+                                    .contentShape(Rectangle())
                             }
-                            .foregroundColor(.red)
                         }
                     case .vehicle:
                         VehicleRegionDropdown(viewModel: vehicleViewModel, activeAlert: $activeAlert)
@@ -149,10 +155,10 @@ struct ListScreen: View {
                                                         .foregroundColor(.red)
                                                 }
                                                 .buttonStyle(BorderlessButtonStyle())
+                                                .contentShape(Rectangle())
                                             }
                                         }
                                         .padding(8)
-                                        .contentShape(Rectangle())
                                     }
                                     .buttonStyle(.plain)
                                 }
@@ -201,10 +207,10 @@ struct ListScreen: View {
                                                         .foregroundColor(.red)
                                                 }
                                                 .buttonStyle(BorderlessButtonStyle())
+                                                .contentShape(Rectangle())
                                             }
                                         }
                                         .padding(8)
-                                        .contentShape(Rectangle())
                                     }
                                     .buttonStyle(.plain)
                                 }
@@ -254,10 +260,10 @@ struct ListScreen: View {
                                                         .foregroundColor(.red)
                                                 }
                                                 .buttonStyle(.borderless)
+                                                .contentShape(Rectangle())
                                             }
                                         }
                                         .padding(8)
-                                        .contentShape(Rectangle())
                                     }
                                     .buttonStyle(.plain)
                                 }

@@ -21,35 +21,39 @@ struct SumButton: View {
     var body: some View {
         var isSum = false
         if !isSum {
-            Button("SUM") {
+            Button{
                 isSum = true
                 performEnterAction()
-            }.frame(maxWidth: .infinity, maxHeight: 50)
-                .padding()
-                .background(Color.gray.opacity(0.3))
-                .cornerRadius(6)
-                .foregroundColor(tint)
-                .onChange(of: bleManager.indicatorState) { state, _ in
-                    switch state {
-                    case IndicatorState.sum:
-                        if !isSum {
-                            isSum = true
-                            preformIndicatorAction()
-                        } else {
-                            isSum = false
+            } label: {
+                Text("SUM")
+                    .frame(maxWidth: .infinity, maxHeight: 50)
+                    .padding()
+                    .background(Color.gray.opacity(0.3))
+                    .cornerRadius(6)
+                    .foregroundColor(tint)
+                    .onChange(of: bleManager.indicatorState) { state, _ in
+                        switch state {
+                        case IndicatorState.sum:
+                            if !isSum {
+                                isSum = true
+                                preformIndicatorAction()
+                            } else {
+                                isSum = false
+                            }
+                        default:
+                            break
                         }
-                    default:
-                        break
                     }
-                }
-//                .onReceive(bleManager.$isSum) { newValue in
-//                    if newValue {
-//                        isSum = false
-//                        preformIndicatorAction()
-//                    } else {
-//                        isSum = true
-//                    }
-//                }
+                    .contentShape(Rectangle())
+    //                .onReceive(bleManager.$isSum) { newValue in
+    //                    if newValue {
+    //                        isSum = false
+    //                        preformIndicatorAction()
+    //                    } else {
+    //                        isSum = true
+    //                    }
+    //                }
+            }
         }
     }
     
