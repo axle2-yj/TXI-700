@@ -59,7 +59,7 @@ struct SettingScreen: View {
                 HStack {
                     VStack(spacing: 8) {
                         SettingLineText("ModeChange")
-                        Button(String(viewModel.modeName)) {
+                        Button {
                             viewModel.disableButton()
                             switch viewModel.modeInt {
                             case 0:
@@ -74,21 +74,24 @@ struct SettingScreen: View {
                             default :
                                 break
                             }
-                        }.padding()
-                            .lineLimit(1)
-                            .truncationMode(.tail)
-                            .frame(maxWidth: .infinity)
-                            .background(Color.gray.opacity(0.3))
-                            .cornerRadius(6)
-                            .foregroundStyle(tint)
-                            .disabled(viewModel.isModeButtonDisabled)
-                            .onReceive(bleManager.$modeChangeResponse) { success in
-                                if success {
-                                    viewModel.enableButton()
-                                    bleManager.modeChangeResponse = false
+                        } label: {
+                            Text(String(viewModel.modeName))
+                                .padding()
+                                .lineLimit(1)
+                                .truncationMode(.tail)
+                                .frame(maxWidth: .infinity)
+                                .background(Color.gray.opacity(0.3))
+                                .cornerRadius(6)
+                                .foregroundStyle(tint)
+                                .disabled(viewModel.isModeButtonDisabled)
+                                .onReceive(bleManager.$modeChangeResponse) { success in
+                                    if success {
+                                        viewModel.enableButton()
+                                        bleManager.modeChangeResponse = false
+                                    }
                                 }
-                            }
-                            .contentShape(Rectangle())
+                                .contentShape(Rectangle())
+                        }
                     }.padding()
                         .frame(maxWidth: .infinity)
                         .background(Color.yellow.opacity(0.8))
@@ -102,18 +105,22 @@ struct SettingScreen: View {
                     
                     VStack(spacing: 8) {
                         SettingLineText("PrintForm")
-                        Button("Edit") {
+                        Button {
                             goToPrintFormSetting = true
-                        }.navigationDestination(isPresented: $goToPrintFormSetting){
+                        } label: {
+                            Text("Edit")
+                                .padding()
+                                .lineLimit(1)
+                                .truncationMode(.tail)
+                                .frame(maxWidth: .infinity)
+                                .background(Color.gray.opacity(0.3))
+                                .foregroundStyle(tint)
+                                .cornerRadius(6)
+                                .contentShape(Rectangle())
+                        }
+                        .navigationDestination(isPresented: $goToPrintFormSetting){
                             PrintFormSettingScreen(viewModel: printViewModel)
-                        }.padding()
-                            .lineLimit(1)
-                            .truncationMode(.tail)
-                            .frame(maxWidth: .infinity)
-                            .background(Color.gray.opacity(0.3))
-                            .foregroundStyle(tint)
-                            .cornerRadius(6)
-                            .contentShape(Rectangle())
+                        }
                     }.padding()
                         .frame(maxWidth: .infinity)
                         .background(Color.yellow.opacity(0.8))
