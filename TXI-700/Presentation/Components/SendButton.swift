@@ -24,7 +24,9 @@ struct SendButton: View {
     
     var body: some View {
         Button {
-            onSendRequest()
+            if viewModel.selectedType != nil {
+                onSendRequest()
+            }
         } label: {
             Text("SEND").frame(maxWidth: .infinity)
                 .padding()

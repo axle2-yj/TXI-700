@@ -26,7 +26,9 @@ struct DeleteButton: View {
     
     var body: some View {
         Button {
-            onRequestDelete()
+            if viewModel.selectedType != nil {
+                onRequestDelete()
+            }
         } label: {
             Text("DELETE")
                 .frame(maxWidth: .infinity)

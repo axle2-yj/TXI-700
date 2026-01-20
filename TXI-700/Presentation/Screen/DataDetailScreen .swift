@@ -100,7 +100,7 @@ struct DataDetailScreen: View {
                                 isAlertShowing = true
                                 activeAlert = .deleteConfirm
                             }
-                        })
+                        }).disabled(viewModel.selectedType == nil)
                     
                     if !bleManager.isDisconnected {
                         let twoStepWight = Int(loadAxleItem.weightNum ?? "0") == 2
@@ -140,7 +140,7 @@ struct DataDetailScreen: View {
                             offPrint: {
                                 isPrinting = false
                             }
-                        )
+                        ).disabled(viewModel.selectedType == nil)
                     }
                     
                     SendButton(
@@ -151,7 +151,7 @@ struct DataDetailScreen: View {
                                 activeAlert = .sendConfirm
                             }
                         }
-                    )
+                    ).disabled(viewModel.selectedType == nil)
                 }
                 .frame(height: 25)
                 .padding(.top, 10)
@@ -305,6 +305,10 @@ struct DataDetailScreen: View {
                     )
                 }
             }.onAppear{
+                isAlertShowing = false
+                activeAlert = nil
+            }.onDisappear {
+                viewModel.selectedType = nil
                 isAlertShowing = false
                 activeAlert = nil
             }
