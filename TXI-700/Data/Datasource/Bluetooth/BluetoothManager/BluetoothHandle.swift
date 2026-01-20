@@ -111,6 +111,7 @@ extension BluetoothManager: BLEEventHandling {
         IndicatorModelNum = part0
         equipmentVer = part1
         equipmentNumber = part2
+        equipmentSubNumber = part3
         print("🔥 Equipment Model Num → \(part0)")
         print("🔥 Equipment Version → \(part1)")
         print("🔥 Equipment S/N → \(part2)")

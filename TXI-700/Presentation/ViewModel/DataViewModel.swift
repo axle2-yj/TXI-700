@@ -443,6 +443,7 @@ class DataViewModel: ObservableObject {
                 serialNumber: item.serialNumber ?? "",
                 vehicleNumber: item.vehicle ?? "",
                 equipmentNumber: item.equipmentNumber ?? "",
+                equipmentSubNum: item.equipmentSubNum ?? "",
                 loadAxle: decodeLoadAxleData(item.loadAxleData ?? Data()),
                 weight: item.weightNum ?? "",
                 total: String(total),

@@ -375,6 +375,7 @@ extension DataDetailScreen {
             serialNumber: loadAxleItem.serialNumber ?? "",
             vehicleNumber: loadAxleItem.vehicle ?? "",
             equipmentNumber: loadAxleItem.equipmentNumber ?? "",
+            equipmentSubNum: loadAxleItem.equipmentSubNum ?? "",
             loadAxle: viewModel.decodeLoadAxleData(loadAxleItem.loadAxleData ?? Data()),
             weight: loadAxleItem.weightNum ?? "",
             total: String(total),

@@ -15,7 +15,7 @@ struct PrintPayload: Codable {
     let serialNumber: String
     let vehicleNumber: String
     let equipmentNumber: String
-    //    let subNum: String
+    let equipmentSubNum: String // 장비 서브번호
     let loadAxle: [Int]
     let weight: String         // 0, 1, 2, 3
     let total: String

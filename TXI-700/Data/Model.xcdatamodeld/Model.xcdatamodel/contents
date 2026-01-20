@@ -9,6 +9,7 @@
     <entity name="LoadAxleInfo" representedClassName="LoadAxleInfo" syncable="YES" codeGenerationType="class">
         <attribute name="client" optional="YES" attributeType="String" defaultValueString=""/>
         <attribute name="equipmentNumber" optional="YES" attributeType="String"/>
+        <attribute name="equipmentSubNum" optional="YES" attributeType="String"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="loadAxleData" optional="YES" attributeType="Binary"/>
         <attribute name="product" optional="YES" attributeType="String" defaultValueString=""/>

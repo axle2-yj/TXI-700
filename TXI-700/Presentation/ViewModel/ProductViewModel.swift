@@ -88,6 +88,7 @@ class ProductViewModel: ObservableObject {
     func deleteProduct(item: ProductInfo) {
         productManager.delete(item: item)
         fetchProductItems()
+        reorderNum()
     }
     
     // MARK: - Reorder (롱클릭 이동)

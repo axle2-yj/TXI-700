@@ -65,6 +65,7 @@ class ClientViewModel: ObservableObject {
     func deleteClient(item: ClientInfo) {
         clientManager.delete(item: item)
         fetchClientItems()
+        reorderNum()
     }
     
     // MARK: - Reorder (롱클릭 이동)

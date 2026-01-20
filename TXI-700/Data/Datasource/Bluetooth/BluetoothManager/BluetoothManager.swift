@@ -46,6 +46,7 @@ final class BluetoothManager: NSObject, ObservableObject {
     @Published var IndicatorModelNum = ""
     @Published var equipmentVer: String = ""
     @Published var equipmentNumber: String = ""
+    @Published var equipmentSubNumber: String = ""
     @Published var rfMassage: String = ""
     @Published var isAuthenticated = false
     @Published var lastResponse: BLEResponse?
