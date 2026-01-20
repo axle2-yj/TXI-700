@@ -386,14 +386,14 @@ struct MainScreen: View {
                                     action: handleFirstWeight,
                                     isDisabled: isTwoStep ? true : !isMainSum,
                                     tint: tint
-                                )
+                                ).disabled(isTwoStep ? true : !isMainSum)
                             } else if settingViewModel.weightingMethod == 1 {
                                 SendOrTwoStepButton(
                                     title: "Save".localized(languageManager.selectedLanguage),
                                     action: { vehicleViewModel.save(vehicleNum: vehicleNum) },
                                     isDisabled: vehicleNum.isEmpty,
                                     tint: tint
-                                )
+                                ).disabled(vehicleNum.isEmpty)
                                 .onReceive(vehicleViewModel.$saveSuccessMessage) { message in
                                     guard let message else { return }
                                     activeAlert = .saveSuccess(message)
@@ -411,7 +411,7 @@ struct MainScreen: View {
                                     },
                                     isDisabled: vehicleNum.isEmpty,
                                     tint: tint
-                                )
+                                ).disabled(vehicleNum.isEmpty)
                             }
                         }
                         let productTitle = productViewModel.selectedProduct?.name ?? mainViewModel.saveProduct ?? "ITEM <<"
@@ -638,9 +638,6 @@ struct MainScreen: View {
                                         serialNumber : "\(mainViewModel.sn)",               // 시리얼 넘버 비교 저장 필요
                                         equipmentNumber : bleManager.equipmentNumber,       // 추후 진짜 장치 고유번호 정식 번호 저장 필요
                                         weightNum : String(settingViewModel.weightingMethod),
-                                        onSave: {
-                                            isTwoStep = false
-                                        }
                                     )
                                 } else {
                                     SaveButton(
@@ -654,7 +651,6 @@ struct MainScreen: View {
                                         serialNumber : "\(mainViewModel.sn)",               // 시리얼 넘버 비교 저장 필요
                                         equipmentNumber : bleManager.equipmentNumber,       // 추후 진짜 장치 고유번호 정식 번호 저장 필요
                                         weightNum : String(settingViewModel.weightingMethod),
-                                        onSave: {}
                                     )
                                 }
                             }

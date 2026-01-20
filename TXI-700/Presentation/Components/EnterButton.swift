@@ -44,7 +44,7 @@ struct EnterButton: View {
                     .onChange(of: bleManager.axles[1]?.leftWeight) { _, _ in detectChange() }
                     .onChange(of: bleManager.axles[1]?.rightWeight) { _, _ in detectChange() }
                     .contentShape(Rectangle())
-            }
+            }.disabled(viewModel.modeName == "Auto Inmotion" || !hasChanged)
         }
 //        .onReceive(bleManager.$isEnter) { newValue in
 //            if newValue {

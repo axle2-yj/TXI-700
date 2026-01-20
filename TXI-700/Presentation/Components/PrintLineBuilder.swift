@@ -420,14 +420,11 @@ struct PrintLineBuilder {
             ? lang.localized(dataViewModel.clientTitle!)
             : lang.localized("Client")
         
-        if printViewModel.isOn(6) {
-            if printViewModel.isOn(6) {lines.append( CommonPrintFormatter.threeColRowLift(productTitle, ":", "\(loadAxleItem.product ?? "N/A")") )}
-        }
+        if printViewModel.isOn(6) {lines.append( CommonPrintFormatter.threeColRowLift(productTitle, ":", "\(loadAxleItem.product ?? "N/A")") )}
         
-        if printViewModel.isOn(7) {
-            lines.append("\(dataViewModel.clientTitle ?? "Client") : \(loadAxleItem.client ?? "N/A")")
-            if printViewModel.isOn(7) { lines.append( CommonPrintFormatter.threeColRowLift(clientTitle, ":", "\(loadAxleItem.client ?? "N/A")") )}
-        }
+        
+        if printViewModel.isOn(7) { lines.append( CommonPrintFormatter.threeColRowLift(clientTitle, ":", "\(loadAxleItem.client ?? "N/A")") )}
+        
         if printViewModel.isOn(8) { lines.append( CommonPrintFormatter.threeColRowLift(lang.localized("S/N"), ":", "\(loadAxleItem.serialNumber ?? "N/A")") )}
         if printViewModel.isOn(9) { lines.append( CommonPrintFormatter.threeColRowLift(lang.localized("Vehicle"), ":", "\(loadAxleItem.vehicle ?? "N/A")") )}
         if printViewModel.isOn(10) { lines.append(String(localized: "Line")) }

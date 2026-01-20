@@ -125,12 +125,12 @@ struct CommonPrintFormatter {
         return "\((one))\(two)\(three)\(four)\(five)"
     }
     
-    static func threeColumnLine(_ col1: String, _ col2: String, _ col3: String) -> String {
-        return
-        col1.fitToPrintWidth(9) +
-        col2.fitToPrintWidth(3) +
-        col3.fitToPrintWidth(18)
-    }
+//    static func threeColumnLine(_ col1: String, _ col2: String, _ col3: String) -> String {
+//        return
+//        col1.fitToPrintWidth(9) +
+//        col2.fitToPrintWidth(3) +
+//        col3.fitToPrintWidth(18)
+//    }
     
     static func oneColRowRight(_ text: String) -> String {
         text.rightAlignedPrint(width: fullWidth + 1)

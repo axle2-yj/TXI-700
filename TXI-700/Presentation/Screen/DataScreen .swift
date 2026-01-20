@@ -96,7 +96,7 @@ struct DataScreen: View {
                         .contentShape(Rectangle())
                 }
                 if showFilterBar {
-                    DataSerchBottomBar(viewModel: datePickerViewModel, dataViewModel: viewModel)
+                    DataSearchBottomBar(viewModel: datePickerViewModel, dataViewModel: viewModel)
                         .transition(.move(edge: .top).combined(with: .opacity))
                         .animation(.easeInOut(duration: 0.3), value: showFilterBar)
                 }

@@ -9,7 +9,7 @@ import SwiftUI
 import Combine
 import Foundation
 
-struct DataSerchBottomBar: View {
+struct DataSearchBottomBar: View {
     @State private var showModal = false
     
     @ObservedObject var viewModel: DatePickerViewModel
@@ -46,7 +46,7 @@ struct DataSerchBottomBar: View {
                     .frame(width: 80, alignment: .leading)
                 CustomPlaceholderTextField(
                     placeholder: "VehicleNumSearch".localized(languageManager.selectedLanguage),
-                    text: $dataViewModel.filterVehicle)
+                    text: $dataViewModel.inputVehicle)
             }
             
             HStack {
@@ -54,7 +54,7 @@ struct DataSerchBottomBar: View {
                     .frame(width: 80, alignment: .leading)
                 CustomPlaceholderTextField(
                     placeholder: "ClientSearch".localized(languageManager.selectedLanguage),
-                    text: $dataViewModel.filterClient)
+                    text: $dataViewModel.inputClient)
             }
             
             HStack {
@@ -62,7 +62,7 @@ struct DataSerchBottomBar: View {
                     .frame(width: 80, alignment: .leading)
                 CustomPlaceholderTextField(
                     placeholder: "ProductSearch".localized(languageManager.selectedLanguage),
-                    text: $dataViewModel.filterProduct)
+                    text: $dataViewModel.inputProduct)
             }
             HStack {
                 Button {
@@ -77,7 +77,6 @@ struct DataSerchBottomBar: View {
                         .foregroundColor(tint)
                         .contentShape(Rectangle())
                 }
-                
                 
                 Button {
                     dataViewModel.applyFilters(startDate: viewModel.startDate,

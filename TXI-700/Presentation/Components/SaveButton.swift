@@ -17,7 +17,6 @@ struct SaveButton: View {
     var serialNumber: String
     var equipmentNumber: String
     var weightNum: String
-    var onSave: () -> Void
     
     @Environment(\.colorScheme) var colorScheme
     
@@ -45,7 +44,6 @@ struct SaveButton: View {
     }
     
     private func saveData() {
-        onSave()
         for status in loadAxleStatus {
             LoadAxleDataManager.shared.addLoadAxle(
                 serialNumber: serialNumber,
