@@ -60,6 +60,8 @@ struct BLEParser {
         case (0x42, 0x53, 0x54):
             let payload = Array(bytes.dropFirst(3))
             return .settingCall(payload)
+        case (0x42, 0x54, 0x58):
+            return .setTime
         default: return .unknown(bytes)
         }
     }

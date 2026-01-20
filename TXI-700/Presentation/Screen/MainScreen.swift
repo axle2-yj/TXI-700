@@ -160,44 +160,49 @@ struct MainScreen: View {
                             }
                         }
                     } else {
-                        GeometryReader { geo in
-                            ScrollView {
-                                if settingViewModel.balanceAxisNuberCount == 0 {
-                                    WeightBalanceOverAxleView(
-                                        axles: [
-                                            Axle(left: CGFloat(left1), right: CGFloat(right1)),
-                                            Axle(left: CGFloat(left2), right: CGFloat(right2)),
-                                        ],
-                                        isEdgeTotals: settingViewModel.balanceWeight,
-                                        viewModel: settingViewModel
-                                    )
-                                    .frame(maxHeight: geo.size.height - 25)
-                                } else if settingViewModel.balanceAxisNuberCount == 1 {
-                                    WeightBalanceOverAxleView(
-                                        axles: [
-                                            Axle(left: CGFloat(left1), right: CGFloat(right1)),
-                                            Axle(left: CGFloat(left2), right: CGFloat(right2)),
-                                            Axle(left: CGFloat(left3), right: CGFloat(right3))
-                                        ],
-                                        isEdgeTotals: settingViewModel.balanceWeight,
-                                        viewModel: settingViewModel
-                                    )
-                                    .frame(maxHeight: geo.size.height - 25)
-                                } else {
-                                    WeightBalanceOverAxleView(
-                                        axles: [
-                                            Axle(left: CGFloat(left1), right: CGFloat(right1)),
-                                            Axle(left: CGFloat(left2), right: CGFloat(right2)),
-                                            Axle(left: CGFloat(left3), right: CGFloat(right3)),
-                                            Axle(left: CGFloat(left4), right: CGFloat(right4))
-                                        ],
-                                        isEdgeTotals: settingViewModel.balanceWeight,
-                                        viewModel: settingViewModel
-                                    )
-                                    .frame(maxHeight: geo.size.height - 25)
+                        if keyboard.keyboardHeight == 0 {
+                            GeometryReader { geo in
+                                HStack {
+                                    Spacer()
+                                    if settingViewModel.balanceAxisNuberCount == 0 {
+                                        WeightBalanceOverAxleView(
+                                            axles: [
+                                                Axle(left: CGFloat(left1), right: CGFloat(right1)),
+                                                Axle(left: CGFloat(left2), right: CGFloat(right2)),
+                                            ],
+                                            isEdgeTotals: settingViewModel.balanceWeight,
+                                            viewModel: settingViewModel
+                                        )
+                                        .aspectRatio(1, contentMode: .fill)
+                                    } else if settingViewModel.balanceAxisNuberCount == 1 {
+                                        WeightBalanceOverAxleView(
+                                            axles: [
+                                                Axle(left: CGFloat(left1), right: CGFloat(right1)),
+                                                Axle(left: CGFloat(left2), right: CGFloat(right2)),
+                                                Axle(left: CGFloat(left3), right: CGFloat(right3))
+                                            ],
+                                            isEdgeTotals: settingViewModel.balanceWeight,
+                                            viewModel: settingViewModel
+                                        )
+                                        .aspectRatio(1, contentMode: .fill)
+                                    } else {
+                                        WeightBalanceOverAxleView(
+                                            axles: [
+                                                Axle(left: CGFloat(left1), right: CGFloat(right1)),
+                                                Axle(left: CGFloat(left2), right: CGFloat(right2)),
+                                                Axle(left: CGFloat(left3), right: CGFloat(right3)),
+                                                Axle(left: CGFloat(left4), right: CGFloat(right4))
+                                            ],
+                                            isEdgeTotals: settingViewModel.balanceWeight,
+                                            viewModel: settingViewModel
+                                        )
+                                        .aspectRatio(1, contentMode: .fill)
+                                    }
+                                    Spacer()
                                 }
-                            }
-                        }.scrollDisabled(keyboard.keyboardHeight == 0)
+                            }.offset(y: -65)
+                        }
+                        
                         let weightingMethodInt = settingViewModel.weightingMethod
                         let balanceCellNum = settingViewModel.balanceAxisNuberCount
                         let vehicle = String(vehicleNum).isEmpty ? "N/A" : String(vehicleNum)
@@ -308,6 +313,7 @@ struct MainScreen: View {
                         mainViewModel.loadProduct()
                         mainViewModel.loadClient()
                         mainViewModel.startTimer(bleManager: bleManager)
+                        mainViewModel.dateTime = clockManager.currentDataTime
                     }
                     mainViewModel.loadSn()
                     settingViewModel.loadLanguage()
