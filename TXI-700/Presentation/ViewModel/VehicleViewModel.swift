@@ -88,6 +88,7 @@ class VehicleViewModel: ObservableObject {
     func deleteVehicleItem(item: VehicleInfo) {
         vehicleManger.delete(item: item)
         fetchVehicleItems()
+        reorderNum()
     }
     
     func moveVechile(from source: IndexSet, to destination: Int) {

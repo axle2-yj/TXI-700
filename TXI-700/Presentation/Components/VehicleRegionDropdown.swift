@@ -144,6 +144,9 @@ struct VehicleRegionDropdown: View {
         }
         .onAppear {
             viewModel.updateLanguage(languageManager.selectedLanguage)
+            viewModel.saveSuccessMessage = nil
+        }.onDisappear {
+            viewModel.saveSuccessMessage = nil
         }
     }
 }
