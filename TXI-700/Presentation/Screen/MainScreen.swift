@@ -308,6 +308,7 @@ struct MainScreen: View {
                         mainViewModel.loadProduct()
                         mainViewModel.loadClient()
                         mainViewModel.startTimer(bleManager: bleManager)
+                        mainViewModel.dateTime = clockManager.currentDataTime
                     }
                     mainViewModel.loadSn()
                     settingViewModel.loadLanguage()

@@ -11,10 +11,12 @@ import Foundation
 
 class ClockManager: ObservableObject {
     @Published var currentTime: String = ""
+    @Published var currentDataTime : String = ""
     private var timer: Timer?
     
     init() {
         updateTime()
+        time()
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
             self.updateTime()
         }
@@ -24,6 +26,12 @@ class ClockManager: ObservableObject {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy/MM/dd HH:mm:ss"
         currentTime = formatter.string(from: Date())
+    }
+    
+    private func time() {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HHmmss"
+        currentDataTime = formatter.string(from: Date())
     }
     
     deinit {

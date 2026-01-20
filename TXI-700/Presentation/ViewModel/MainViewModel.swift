@@ -51,6 +51,7 @@ class MainViewModel: ObservableObject {
     @Published var saveProduct: String? = nil
     @Published var saveClient: String? = nil
     @Published var sn: Int = 0
+    @Published var dateTime : String = ""
     private var batteryTimer: Timer?
     // Mac Address 호출
     func loadDeviceMac() {
@@ -94,6 +95,9 @@ class MainViewModel: ObservableObject {
                     if bleManager.IndicatorModelNum != "A0100" {
                         bleManager.isUnapprovedModel = true
                         bleManager.disconnect()
+                    } else {
+                        print(self.dateTime)
+                        bleManager.sendCommand(.btx(self.dateTime), log: "Indictoar time setting")
                     }
                 }
             }

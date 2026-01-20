@@ -31,4 +31,5 @@ enum BLEResponse {
     case rf([UInt8])
     case dataCall([UInt8])
     case settingCall([UInt8])
+    case setTime
 }
