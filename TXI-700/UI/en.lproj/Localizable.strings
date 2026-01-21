@@ -31,6 +31,7 @@
 "Clear" = "Clear";
 "Input" = "Input";
 "InspectorInput" = "Inspector Name";
+"overInput" = "Enter the overload value";
 
 "Close" = "Close";
 "Cancel" = "Cancel";

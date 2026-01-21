@@ -45,9 +45,10 @@ struct CommonPrintFormatter {
     static let width9 = 9
     static let width10 = 10
     static let width11 = 11
+    static let width12 = 12
+    static let width14 = 14
     static let width16 = 16
     static let width17 = 17
-    static let width14 = 14
     static let width20 = 20
     static let width22 = 22
     
@@ -134,6 +135,12 @@ struct CommonPrintFormatter {
     
     static func oneColRowRight(_ text: String) -> String {
         text.rightAlignedPrint(width: fullWidth + 1)
+    }
+    
+    static func twoColRowLeft(_ text: String) -> String {
+        let l = text.leftAlignedPrint(width: width12)
+        let r = ":".centerAligned(width: width4)
+        return "\(l)\(r)"
     }
 }
 

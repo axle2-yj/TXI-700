@@ -10,6 +10,7 @@ import Combine
 
 @MainActor
 class SettingViewModel: ObservableObject {
+    @AppStorage("hasLaunchedBefore") private var hasLaunchedBefore: Bool = false
     @Published var title: String = NSLocalizedString("SettingsScreenTitle", comment: "")
     @Published var language = 0
     @Published var weightingMethod = 0
@@ -31,6 +32,10 @@ class SettingViewModel: ObservableObject {
     @Published var isMainSelectSum: Bool = false
     func reset() {
         
+    }
+    
+    init() {
+        setInitialValuesIfNeeded()
     }
     
     // 0 = 영어, 1 = 일어, 2 = 한국어
@@ -185,5 +190,16 @@ class SettingViewModel: ObservableObject {
     
     func loadSafetyNumberSetting() {
         safety = StorageManager.shared.loadSafetyNumber()
+    }
+    
+    private func setInitialValuesIfNeeded() {
+        guard !hasLaunchedBefore else { return }
+        
+        // ✅ 최초 실행 시에만 초기값
+        saveDangerousNumberSetting(dangerous)
+        saveCautionNumberSetting(caution)
+        saveSafetyNumberSetting(safety)
+        // 이후 실행 방지
+        hasLaunchedBefore = true
     }
 }

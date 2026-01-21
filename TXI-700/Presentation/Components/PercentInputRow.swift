@@ -14,6 +14,7 @@ struct PercentInputRow: View {
     
     @FocusState private var isFocused: Bool
     @Environment(\.colorScheme) var colorScheme
+    @EnvironmentObject var lang: LanguageManager
     
     private var tint: Color {
         colorScheme == .dark ? .white : .black
@@ -21,7 +22,11 @@ struct PercentInputRow: View {
     
     var body: some View {
         HStack {
-            Text("\(title) : ")
+            if lang.selectedLanguage == "en" {
+                Text(CommonPrintFormatter.twoColRowLeft(lang.localized(title)))
+            } else {
+                Text("\(title) : ")
+            }
             CustomPlacholderNumberTextField(placeholder: "\(title) 입력", text: $text)
                 .onChange(of: isFocused) { focused, _ in
                     if !focused {

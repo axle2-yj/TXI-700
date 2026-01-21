@@ -123,9 +123,24 @@ struct PrintFormSettingScreen: View {
                             lineText("Line")
                             
                             simpleRow("Total".localized(languageManager.selectedLanguage) + " : ", "9980kg")
-                            
-                            if viewModel.isOn(14) {
-                                simpleRow("over".localized(languageManager.selectedLanguage) + " : ", "900kg")
+                            if isAddMode {
+                                if viewModel.isOn(14) {
+                                    HStack{
+                                        Text("over".localized(languageManager.selectedLanguage) + " : ")
+                                        Spacer()
+                                        CustomPlaceholderTextField(
+                                            placeholder: "overInput".localized(languageManager.selectedLanguage),
+                                            text: Binding(
+                                                get: {String(viewModel.overValue)},
+                                                set: {viewModel.overValue = Int($0) ?? 0}
+                                            ))
+                                        Spacer()
+                                    }.frame(maxWidth: .infinity, alignment: .leading).lineLimit(1)
+                                }
+                            } else {
+                                if viewModel.isOn(14) {
+                                    simpleRow("over".localized(languageManager.selectedLanguage) + " : ", "900kg")
+                                }
                             }
                             
                             if viewModel.isOn(15) {
@@ -154,8 +169,9 @@ struct PrintFormSettingScreen: View {
                                     }.frame(maxWidth: .infinity, alignment: .leading).lineLimit(1)
                                 }
                             } else {
+                                let inspector = (viewModel.inspectorNameText?.isEmpty == false) ? viewModel.inspectorNameText ?? "\(String(describing: viewModel.inspectorNameText))" : ""
                                 if viewModel.isOn(18) {
-                                    UnderlineFieldRow("Inspector".localized(languageManager.selectedLanguage) + " : ", "", 8)
+                                    UnderlineFieldRow("Inspector".localized(languageManager.selectedLanguage) + " : ", inspector, 8)
                                 }
                             }
                             
@@ -204,12 +220,14 @@ struct PrintFormSettingScreen: View {
                 viewModel.loadClientTitle()
                 viewModel.loadProductTitle()
                 viewModel.loadInspectorName()
+                viewModel.loadOverValue()
             }
             .safeAreaInset(edge: .top) {
                 CustomListTopBar(title: viewModel.text, onBack: {
                     viewModel.saveClientTitle(viewModel.clientTitle ?? "Clent".localized(languageManager.selectedLanguage))
                     viewModel.saveProductTitle(viewModel.productTitle ?? "Item".localized(languageManager.selectedLanguage))
                     viewModel.saveInspectorName(viewModel.inspectorNameText ?? "")
+                    viewModel.saveOverValue(viewModel.overValue)
                     presentationMode.wrappedValue.dismiss()
                 }, onChange: {
                     newMode in
@@ -217,6 +235,7 @@ struct PrintFormSettingScreen: View {
                     viewModel.saveClientTitle(viewModel.clientTitle ?? "Clent".localized(languageManager.selectedLanguage))
                     viewModel.saveProductTitle(viewModel.productTitle ?? "Item".localized(languageManager.selectedLanguage))
                     viewModel.saveInspectorName(viewModel.inspectorNameText ?? "")
+                    viewModel.saveOverValue(viewModel.overValue)
                     print("현재 모드:", newMode ? "X" : "Add")
                 })
             }
