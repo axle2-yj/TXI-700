@@ -31,6 +31,7 @@
 "Clear" = "クリア";
 "Input" = "入力";
 "InspectorInput" = "検査官の名前を入力";
+"overInput" = "超過荷重値を入力";
 
 "Close" = "閉じる";
 "Cancel" = "キャンセル";

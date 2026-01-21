@@ -68,7 +68,9 @@ struct PrintLineBuilder {
            let loadAxles = try? JSONDecoder().decode([Int].self, from: data) {
             let rowCount = (loadAxles.count + 1) / 2
             let totalSum = loadAxles.reduce(0, +)
-            
+            let over = printViewModel.overValue - totalSum
+            let overWeight = over < 0 ? over : 0
+
             for rowIndex in 0..<rowCount {
                 let firstIndex = rowIndex * 2
                 let secondIndex = firstIndex + 1
@@ -118,7 +120,7 @@ struct PrintLineBuilder {
             lines.append( String(localized: "Line"))
             lines.append( CommonPrintFormatter.threeColRowLift(lang.localized("Total"), ":", "\(totalSum)kg") )
             
-            if printViewModel.isOn(14) { lines.append( CommonPrintFormatter.threeColRowLift(lang.localized("OverWeight"), ":", "\(totalSum)kg") )}
+            if printViewModel.isOn(14) { lines.append( CommonPrintFormatter.threeColRowLift(lang.localized("OverWeight"), ":", "\(overWeight)kg") )}
             
             if printViewModel.isOn(15) { lines.append(CommonPrintFormatter.threeColRowLift(lang.localized("leftWeight"), ":", "\(left)kg") )}
             
@@ -127,16 +129,20 @@ struct PrintLineBuilder {
         let inspector = (printViewModel.inspectorNameText?.isEmpty == false)
         ? printViewModel.inspectorNameText ?? ""
         : "------------"
-        
         if printViewModel.isOn(17) { lines.append(String(localized: "Line")) }
+        lines.append("  ")
         if printViewModel.isOn(18) {
-            lines.append( CommonPrintFormatter.twoColRowLeftInspector(lang.localized("Inspector"), ":") )
-            lines.append( CommonPrintFormatter.oneColRowEndInspector(inspector) )
-            
+            if printViewModel.inspectorNameText?.isEmpty == false {
+                lines.append( CommonPrintFormatter.threeColumnLine(lang.localized("Inspector"), ":", inspector) )
+            } else {
+                lines.append( CommonPrintFormatter.twoColRowLeftInspector(lang.localized("Inspector"), ":") )
+                lines.append( CommonPrintFormatter.oneColRowEndDriver(inspector) )
+            }
         }
         if printViewModel.isOn(19) {
+            lines.append("  ")
             lines.append( CommonPrintFormatter.twoColRowLeftInspector(lang.localized("Driver"), ":") )
-            lines.append( CommonPrintFormatter.oneColRowEndInspector("------------") )
+            lines.append( CommonPrintFormatter.oneColRowEndDriver("------------") )
         }
         lines.append("  ")
         lines.append("  ")
@@ -203,6 +209,8 @@ struct PrintLineBuilder {
                 
                 let loadAxles = axleStatus.loadAxlesData
                 let totalSum = axleStatus.total
+                let over = printViewModel.overValue - totalSum
+                let overWeight = over < 0 ? over : 0
                 let rowCount = (loadAxles.count + 1) / 2
                 
                 for rowIndex in 0..<rowCount {
@@ -252,7 +260,7 @@ struct PrintLineBuilder {
                 lines.append( CommonPrintFormatter.threeColRowLift(lang.localized("Total"), ":", "\(totalSum)kg") )
 
                 if printViewModel.isOn(14) {
-                    lines.append( CommonPrintFormatter.threeColRowLift(lang.localized("OverWeight"), ":", "\(second-first)kg") )
+                    lines.append( CommonPrintFormatter.threeColRowLift(lang.localized("OverWeight"), ":", "\(overWeight)kg") )
                 }
                 if printViewModel.isOn(15) {
                     lines.append( CommonPrintFormatter.threeColRowLift(lang.localized("leftWeight"), ":", "\(left)kg") )
@@ -267,13 +275,19 @@ struct PrintLineBuilder {
         ? printViewModel.inspectorNameText ?? ""
         : "------------"
         if printViewModel.isOn(17) { lines.append(String(localized: "Line")) }
+        lines.append("  ")
         if printViewModel.isOn(18) {
-            lines.append( CommonPrintFormatter.twoColRowLeftInspector(lang.localized("Inspector"), ":") )
-            lines.append( CommonPrintFormatter.oneColRowEndInspector(inspector) )
+            if printViewModel.inspectorNameText?.isEmpty == false {
+                lines.append( CommonPrintFormatter.threeColumnLine(lang.localized("Inspector"), ":", inspector) )
+            } else {
+                lines.append( CommonPrintFormatter.twoColRowLeftInspector(lang.localized("Inspector"), ":") )
+                lines.append( CommonPrintFormatter.oneColRowEndDriver(inspector) )
+            }
         }
         if printViewModel.isOn(19) {
+            lines.append("  ")
             lines.append( CommonPrintFormatter.twoColRowLeftInspector(lang.localized("Driver"), ":") )
-            lines.append( CommonPrintFormatter.oneColRowEndInspector("------------") )
+            lines.append( CommonPrintFormatter.oneColRowEndDriver("------------") )
         }
         lines.append("  ")
         lines.append("  ")
@@ -336,6 +350,7 @@ struct PrintLineBuilder {
         let itemCheck = if dataViewModel.productTitle == item { "N/A" } else { item }
         let clientCheck = if dataViewModel.clientTitle == client { "N/A" } else { client }
         let vehicleCheck = if vehicle.isEmpty { "N/A" } else { vehicle }
+        let overWeight = printViewModel.overValue - (weighting1st+weighting2nd)
         
         if printViewModel.isOn(6) {lines.append( CommonPrintFormatter.threeColRowLift(productTitle, ":", itemCheck) )}
         if printViewModel.isOn(7) { lines.append( CommonPrintFormatter.threeColRowLift(clientTitle, ":", clientCheck) )}
@@ -350,22 +365,28 @@ struct PrintLineBuilder {
         lines.append( CommonPrintFormatter.threeColRowLift(lang.localized("NetWeight"), ":", "\(netWeight)kg") )
         lines.append( String(localized: "Line") )
         lines.append( CommonPrintFormatter.threeColRowLift(lang.localized("Total"), ":", "\(weighting1st+weighting2nd)kg") )
-              
+        
         if printViewModel.isOn(14) {
-            lines.append( CommonPrintFormatter.threeColRowLift(lang.localized("OverWeight"), ":", "\(weighting2nd-weighting1st)kg") )
+            lines.append( CommonPrintFormatter.threeColRowLift(lang.localized("OverWeight"), ":", "\(overWeight)kg") )
         }
         
         let inspector = (printViewModel.inspectorNameText?.isEmpty == false)
         ? printViewModel.inspectorNameText ?? ""
         : "------------"
         if printViewModel.isOn(17) { lines.append(String(localized: "Line")) }
+        lines.append("  ")
         if printViewModel.isOn(18) {
-            lines.append( CommonPrintFormatter.twoColRowLeftInspector(lang.localized("Inspector"), ":") )
-            lines.append( CommonPrintFormatter.oneColRowEndInspector(inspector) )
+            if printViewModel.inspectorNameText?.isEmpty == false {
+                lines.append( CommonPrintFormatter.threeColumnLine(lang.localized("Inspector"), ":", inspector) )
+            } else {
+                lines.append( CommonPrintFormatter.twoColRowLeftInspector(lang.localized("Inspector"), ":") )
+                lines.append( CommonPrintFormatter.oneColRowEndDriver(inspector))
+            }
         }
         if printViewModel.isOn(19) {
+            lines.append("  ")
             lines.append( CommonPrintFormatter.twoColRowLeftInspector(lang.localized("Driver"), ":") )
-            lines.append( CommonPrintFormatter.oneColRowEndInspector("------------") )
+            lines.append( CommonPrintFormatter.oneColRowEndDriver("------------") )
         }
         lines.append("  ")
         lines.append("  ")
@@ -436,6 +457,8 @@ struct PrintLineBuilder {
             let weighting2nd = loadAxles.last ?? 0
             let netWeight = weighting1st - weighting2nd
             let total = weighting1st + weighting2nd
+            let over = printViewModel.overValue - total
+            let overWeight = over < 0 ? over : 0
             let left = loadAxles
                 .enumerated()
                 .filter { $0.offset % 2 == 0 }
@@ -455,7 +478,7 @@ struct PrintLineBuilder {
             lines.append( CommonPrintFormatter.threeColRowLift(lang.localized("Total"), ":", "\(total)kg") )
             
             if printViewModel.isOn(14) {
-                lines.append( CommonPrintFormatter.threeColRowLift(lang.localized("OverWeight"), ":", "\(weighting2nd-weighting1st)kg") )
+                lines.append( CommonPrintFormatter.threeColRowLift(lang.localized("OverWeight"), ":", "\(overWeight)kg") )
             }
             if printViewModel.isOn(15) {
                 lines.append( CommonPrintFormatter.threeColRowLift(lang.localized("leftWeight"), ":", "\(left)kg") )
@@ -466,18 +489,26 @@ struct PrintLineBuilder {
             }
         }
         let inspector = (printViewModel.inspectorNameText?.isEmpty == false)
-        ? printViewModel.inspectorNameText ?? ""
+        ? printViewModel.inspectorNameText! + "     "
         : "------------"
         
         if printViewModel.isOn(17) { lines.append(String(localized: "Line")) }
+        lines.append("  ")
         if printViewModel.isOn(18) {
-            lines.append( CommonPrintFormatter.twoColRowLeftInspector(lang.localized("Inspector"), ":") )
-            lines.append( CommonPrintFormatter.oneColRowEndInspector(inspector) )
+            if printViewModel.inspectorNameText?.isEmpty == false {
+                lines.append( CommonPrintFormatter.threeColumnLine(lang.localized("Inspector"), ":", inspector) )
+            } else {
+                lines.append("  ")
+                lines.append( CommonPrintFormatter.twoColRowLeftInspector(lang.localized("Inspector"), ":") )
+                lines.append( CommonPrintFormatter.oneColRowEndDriver(inspector) )
+            }
         }
         if printViewModel.isOn(19) {
             lines.append( CommonPrintFormatter.twoColRowLeftInspector(lang.localized("Driver"), ":") )
-            lines.append( CommonPrintFormatter.oneColRowEndInspector("------------") )
+            lines.append( CommonPrintFormatter.oneColRowEndDriver("------------") )
         }
+        lines.append("  ")
+        lines.append("  ")
         lines.append("  ")
         lines.append("  ")
         return lines
@@ -559,8 +590,9 @@ struct PrintLineBuilder {
                 let weighting1st = loadAxles.first ?? 0
                 let weighting2nd = loadAxles.last ?? 0
                 let netWeight = weighting1st - weighting2nd
-                let overWeight = weighting2nd - weighting1st
                 let total = weighting1st + weighting2nd
+                let over = printViewModel.overValue - total
+                let overWeight = over < 0 ? over : 0
                 let left = loadAxles
                     .enumerated()
                     .filter { $0.offset % 2 == 0 }
@@ -649,17 +681,22 @@ struct PrintLineBuilder {
         }
         
         let inspector = (printViewModel.inspectorNameText?.isEmpty == false)
-        ? printViewModel.inspectorNameText ?? "\(String(describing: printViewModel.inspectorNameText))" : "------------"
+        ? printViewModel.inspectorNameText! + "     " : "------------"
         
         if printViewModel.isOn(17) { lines.append(String(localized: "Line")) }
+        lines.append("  ")
         if printViewModel.isOn(18) {
-            lines.append( CommonPrintFormatter.twoColRowLeftInspector(lang.localized("Inspector"), ":") )
-            lines.append( CommonPrintFormatter.oneColRowEndInspector(inspector) )
-            
+            if printViewModel.inspectorNameText?.isEmpty == false {
+                lines.append( CommonPrintFormatter.threeColumnLine(lang.localized("Inspector"), ":", inspector) )
+            } else {
+                lines.append( CommonPrintFormatter.twoColRowLeftInspector(lang.localized("Inspector"), ":") )
+                lines.append( CommonPrintFormatter.oneColRowEndDriver(inspector) )
+            }
         }
         if printViewModel.isOn(19) {
+            lines.append("  ")
             lines.append( CommonPrintFormatter.twoColRowLeftInspector(lang.localized("Driver"), ":") )
-            lines.append( CommonPrintFormatter.oneColRowEndInspector("------------") )
+            lines.append( CommonPrintFormatter.oneColRowEndDriver("------------") )
         }
         
         lines.append("  ")
@@ -793,13 +830,17 @@ struct PrintLineBuilder {
         lines.append(String(localized: "Line"))
         
         let inspector = (printViewModel.inspectorNameText?.isEmpty == false)
-        ? printViewModel.inspectorNameText ?? "\(String(describing: printViewModel.inspectorNameText))" : "------------"
+        ? printViewModel.inspectorNameText! + "     " : "------------"
         
         lines.append("  ")
-        lines.append( CommonPrintFormatter.twoColRowLeftInspector(lang.localized("Inspector"), ":") )
-        lines.append( CommonPrintFormatter.oneColRowEndInspector(inspector) )
+        if printViewModel.inspectorNameText?.isEmpty == false {
+            lines.append( CommonPrintFormatter.threeColumnLine(lang.localized("Inspector"), ":", inspector) )
+        } else {
+            lines.append( CommonPrintFormatter.twoColRowLeftInspector(lang.localized("Inspector"), ":") )
+            lines.append( CommonPrintFormatter.oneColRowEndDriver(inspector) )
+        }
         lines.append( CommonPrintFormatter.twoColRowLeftInspector(lang.localized("Driver"), ":") )
-        lines.append( CommonPrintFormatter.oneColRowEndInspector("------------") )
+        lines.append( CommonPrintFormatter.oneColRowEndDriver("------------") )
         lines.append("  ")
         lines.append("  ")
         lines.append("  ")
@@ -934,13 +975,18 @@ struct PrintLineBuilder {
             lines.append(String(localized: "Line"))
         }
         let inspector = (printViewModel.inspectorNameText?.isEmpty == false)
-        ? printViewModel.inspectorNameText ?? "\(String(describing: printViewModel.inspectorNameText))" : "------------"
+        ? printViewModel.inspectorNameText! + "     " : "------------"
         
         lines.append("  ")
-        lines.append( CommonPrintFormatter.twoColRowLeftInspector(lang.localized("Inspector"), ":") )
-        lines.append( CommonPrintFormatter.oneColRowEndInspector(inspector) )
+        if printViewModel.inspectorNameText?.isEmpty == false {
+            lines.append( CommonPrintFormatter.threeColumnLine(lang.localized("Inspector"), ":", inspector) )
+        } else {
+            lines.append("  ")
+            lines.append( CommonPrintFormatter.twoColRowLeftInspector(lang.localized("Inspector"), ":") )
+            lines.append( CommonPrintFormatter.oneColRowEndDriver(inspector) )
+        }
         lines.append( CommonPrintFormatter.twoColRowLeftInspector(lang.localized("Driver"), ":") )
-        lines.append( CommonPrintFormatter.oneColRowEndInspector("------------") )
+        lines.append( CommonPrintFormatter.oneColRowEndDriver("------------") )
         lines.append("  ")
         lines.append("  ")
         lines.append("  ")

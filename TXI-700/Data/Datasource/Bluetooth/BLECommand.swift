@@ -56,7 +56,7 @@ extension BLECommand {
         case .bdc : return ascii("BDC")
         case .wps(let text) : return ascii("WPS") + ascii(text) + [0x0D, 0x0A]
         case .wpe(let text) : return ascii("WPE") + ascii(text) + [0x0D, 0x0A]
-        case .wpt(let text) : return ascii("WPT") + ascii(text) + [0x0D, 0x0A]
+        case .wpt(let text) : return ascii("WPT") + ascii(text) + [0x0D, 0x0D, 0x0D, 0x0D, 0x0D, 0x0D, 0x0D, 0x0A]
         case .btx(let time) : return ascii("BTX") + ascii(time)
         case .xxx(let text) : return ascii("XXX") + ascii(text) + end()
         }

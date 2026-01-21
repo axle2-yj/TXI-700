@@ -91,13 +91,14 @@ struct PreviewBasicView: View {
         let second = loadAxles.dropFirst(half).reduce(0, +)
         let left = loadAxles.enumerated().filter { $0.offset % 2 == 0 }.map(\.element).reduce(0, +)
         let right = loadAxles.enumerated().filter { $0.offset % 2 == 1 }.map(\.element).reduce(0, +)
-
+        let over = printViewModel.overValue
+        
         return AxleSummary(
             first: first,
             second: second,
             net: first - second,
             total: loadAxles.reduce(0, +),
-            over: second - first,
+            over: over - (first + second),
             left: left,
             right: right
         )
@@ -154,9 +155,9 @@ struct PreviewBasicView: View {
 
             Text(String(localized: "Line"))
             PrintPreviewLine(title: lang.localized("Total"), value: "\(summary.total)kg")
-
+            let overWight = summary.over < 0 ? summary.over : 0
             if printViewModel.isOn(14) {
-                PrintPreviewLine(title: lang.localized("OverWeight"), value: "\(summary.over)kg")
+                PrintPreviewLine(title: lang.localized("OverWeight"), value: "\(overWight)kg")
             }
             if printViewModel.isOn(15) {
                 PrintPreviewLine(title: lang.localized("leftWeight"), value: "\(summary.left)kg")
@@ -270,19 +271,21 @@ struct PreviewTwoStepView: View {
         let second = loadAxles.dropFirst(half).reduce(0, +)
         let left = loadAxles.enumerated().filter { $0.offset % 2 == 0 }.map(\.element).reduce(0, +)
         let right = loadAxles.enumerated().filter { $0.offset % 2 == 1 }.map(\.element).reduce(0, +)
+        let over = printViewModel.overValue
 
         return AxleSummary(
             first: first,
             second: second,
             net: first - second,
             total: loadAxles.reduce(0, +),
-            over: second - first,
+            over: over - ( second + first ),
             left: left,
             right: right
         )
     }
 
     // MARK: - View
+
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -311,9 +314,10 @@ struct PreviewTwoStepView: View {
 
             Text(String(localized: "Line"))
             PrintPreviewLine(title: lang.localized("Total"), value: "\(summary.total)kg")
+            let overWight = summary.over < 0 ? summary.over : 0
 
             if printViewModel.isOn(14) {
-                PrintPreviewLine(title: lang.localized("OverWeight"), value: "\(summary.over)kg")
+                PrintPreviewLine(title: lang.localized("OverWeight"), value: "\(overWight)kg")
             }
             if printViewModel.isOn(15) {
                 PrintPreviewLine(title: lang.localized("leftWeight"), value: "\(summary.left)kg")

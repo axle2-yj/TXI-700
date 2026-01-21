@@ -30,6 +30,7 @@ class StorageManager {
     private let dangerousNumber = "dangerousNumber"
     private let cautionNumber = "cautionNumber"
     private let safetyNumber = "safetyNumber"
+    private let overValue = "overValue"
     // MAC 저장
     func saveMacAddress(_ mac: String) {
         UserDefaults.standard.set(mac, forKey: macKey)
@@ -199,5 +200,14 @@ class StorageManager {
     
     func loadSafetyNumber() -> Int {
         return UserDefaults.standard.integer(forKey: safetyNumber)
+    }
+    
+    func saveOverValue(_ number: Int) {
+        UserDefaults.standard.set(number, forKey: overValue)
+    }
+    
+    func
+    loadOverValue() -> Int {
+        return UserDefaults.standard.integer(forKey: overValue)
     }
 }

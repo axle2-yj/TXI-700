@@ -37,6 +37,7 @@ struct CommonPrintFormatter {
     // print form Max 30
     //
     static let fullWidth = 30
+    static let width3 = 3
     static let width4 = 4
     static let width5 = 5
     static let width6 = 6
@@ -45,9 +46,10 @@ struct CommonPrintFormatter {
     static let width9 = 9
     static let width10 = 10
     static let width11 = 11
+    static let width12 = 12
+    static let width14 = 14
     static let width16 = 16
     static let width17 = 17
-    static let width14 = 14
     static let width20 = 20
     static let width22 = 22
     
@@ -105,7 +107,15 @@ struct CommonPrintFormatter {
         text.rightAlignedPrint(width: fullWidth + 1)
     }
     
-    static func oneColRowEndInspector(_ text: String) -> String {
+    static func oneColRowEndInspector(_ text: String, _ empty: Bool) -> String {
+        if empty {
+            text.rightAlignedInspectorPrint(width: fullWidth)
+        } else {
+            text.rightAlignedPrint(width: fullWidth)
+        }
+    }
+    
+    static func  oneColRowEndDriver(_ text: String) -> String {
         text.rightAlignedPrint(width: fullWidth)
     }
     
@@ -125,15 +135,21 @@ struct CommonPrintFormatter {
         return "\((one))\(two)\(three)\(four)\(five)"
     }
     
-//    static func threeColumnLine(_ col1: String, _ col2: String, _ col3: String) -> String {
-//        return
-//        col1.fitToPrintWidth(9) +
-//        col2.fitToPrintWidth(3) +
-//        col3.fitToPrintWidth(18)
-//    }
+    static func threeColumnLine(_ col1: String, _ col2: String, _ col3: String) -> String {
+        let l = col1.leftAlignedPrint(width: width9)
+        let M = col2.centerAligned(width: width6)
+        let r = col3.rightAlignedPrint(width: width10)
+        return "\(l)\(M)\(r)"
+    }
     
     static func oneColRowRight(_ text: String) -> String {
         text.rightAlignedPrint(width: fullWidth + 1)
+    }
+    
+    static func twoColRowLeft(_ text: String) -> String {
+        let l = text.leftAlignedPrint(width: width12)
+        let r = ":".centerAligned(width: width4)
+        return "\(l)\(r)"
     }
 }
 
@@ -161,6 +177,16 @@ extension String {
         let currentWidth = self.printWidth
         guard currentWidth < width else { return self }
         return String(repeating: " ", count: width - count) + self
+    }
+    
+    func rightAlignedInspectorPrint(width: Int) -> String {
+//        let currentWidth = self.printWidth
+        let rightMargin = 5
+        
+        let padding = width - rightMargin - count
+        guard padding > 0 else { return self }
+        
+        return String(repeating: " ", count: padding) + self
     }
     
     func rightAligned(width: Int) -> String {
@@ -200,12 +226,6 @@ extension String {
         return result
     }
     
-    //    var printWidth: Int {
-    //        unicodeScalars.reduce(0) { width, scalar in
-    //            width + (scalar.isASCII ? 1 : 2)
-    //        }
-    //    }
-    
     var printWidth: Int {
         self.reduce(0) { width, char in
             // CJK 범위 → 폭 2
@@ -242,6 +262,26 @@ extension String {
         
         if currentWidth < width {
             result += String(repeating: " ", count: width - currentWidth)
+        }
+        
+        return result
+    }
+    
+    var utf8ByteCount: Int {
+        lengthOfBytes(using: .utf8)
+    }
+    
+    func limitedToUTF8Bytes(_ maxBytes: Int) -> String {
+        var result = ""
+        var currentBytes = 0
+        
+        for char in self {
+            let charBytes = String(char).lengthOfBytes(using: .utf8)
+            if currentBytes + charBytes > maxBytes {
+                break
+            }
+            result.append(char)
+            currentBytes += charBytes
         }
         
         return result
@@ -366,4 +406,16 @@ struct PrintBalanceLine: View {
         }
         .font(.system(size: 14, design: .monospaced))
     }
+}
+
+func formatNumberSuffix(_ text: String) -> String {
+    guard text.count > 2 else { return text }
+
+    let index = text.index(text.endIndex, offsetBy: -2)
+    let char = text[index]
+
+    guard char.isNumber else {
+            return text
+        }
+    return text[..<index] + "-" + text[index...]
 }

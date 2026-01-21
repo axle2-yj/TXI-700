@@ -36,8 +36,7 @@ class VehicleViewModel: ObservableObject {
     }
     
     func saveOrUpdateVehicleItem() {
-        
-        let vehicleContent = (selectedRegion+vehicle).replacingOccurrences(of: " ", with: "")
+        let vehicleContent = languageManager.selectedLanguage == "ja" ? selectedRegion + formatNumberSuffix(vehicle) : (selectedRegion+vehicle).replacingOccurrences(of: " ", with: "")
         guard !vehicleContent.isEmpty else {
             print("pleaseEnterVehicleNum")
             saveFailedMessage = "pleaseEnterVehicleNum"

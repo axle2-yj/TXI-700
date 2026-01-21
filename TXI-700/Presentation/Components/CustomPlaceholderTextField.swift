@@ -17,6 +17,8 @@ struct CustomPlaceholderTextField: View {
     private var tint: Color {
         colorScheme == .dark ? .white : .black
     }
+    private let maxBytes = 30
+
     var body: some View {
         ZStack(alignment: .leading) {
             if text.isEmpty {
@@ -29,6 +31,11 @@ struct CustomPlaceholderTextField: View {
             TextField("", text: $text)
                 .foregroundColor(.black)
                 .padding(10)
+                .onChange(of: text) { newValue, _ in
+                    if newValue.utf8ByteCount > maxBytes {
+                        text = newValue.limitedToUTF8Bytes(maxBytes)
+                    }
+                }
         }
         .textFieldStyle(.plain)
         .background(Color.white)
@@ -55,6 +62,8 @@ struct CustomPlacholderNumberTextField: View {
     private var tint: Color {
         colorScheme == .dark ? .white : .black
     }
+    private let maxBytes = 30
+
     var body: some View {
         ZStack(alignment: .leading) {
             if text.isEmpty {
@@ -67,6 +76,11 @@ struct CustomPlacholderNumberTextField: View {
             TextField("", text: $text)
                 .foregroundColor(.black)
                 .padding(10)
+                .onChange(of: text) { newValue, _ in
+                    if newValue.utf8ByteCount > maxBytes {
+                        text = newValue.limitedToUTF8Bytes(maxBytes)
+                    }
+                }
         }
         .focused($isFocused)
         .keyboardType(.numberPad)
@@ -81,3 +95,4 @@ struct CustomPlacholderNumberTextField: View {
         .tint(.black)
     }
 }
+

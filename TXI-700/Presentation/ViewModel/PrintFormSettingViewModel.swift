@@ -10,12 +10,14 @@ import Combine
 
 @MainActor
 class PrintFormSettingViewModel: ObservableObject {
+    @AppStorage("hasLaunchedBefore") private var hasLaunchedBefore: Bool = false
     @Published var text: String = NSLocalizedString("SettingsDataScreenTitle", comment: "")
     @Published var printHeadLineText: String? = nil
     @Published var clientTitle: String? = nil
     @Published var productTitle: String? = nil
     @Published var toggles: [Bool] = []
     @Published var inspectorNameText: String? = nil
+    @Published var overValue: Int = 100000
     @Published var allItems: [LoadAxleInfo] = []
     @Published var isDelete = false
     /// labels는 템플릿 문자열
@@ -70,7 +72,8 @@ class PrintFormSettingViewModel: ObservableObject {
         loadClientTitle()
         loadPrintHeadLine()
         loadInspectorName()
-        
+        loadOverValue()
+        setInitialValuesIfNeeded()
         if let saved = StorageManager.shared.loadToggles(),
            saved.count == baseLabels.count {
             toggles = saved
@@ -193,6 +196,14 @@ class PrintFormSettingViewModel: ObservableObject {
         inspectorNameText = StorageManager.shared.loadInspecterName()
     }
     
+    func saveOverValue(_ weight: Int) {
+        StorageManager.shared.saveOverValue(weight)
+    }
+    
+    func loadOverValue() {
+        overValue = StorageManager.shared.loadOverValue()
+    }
+    
     func calculateCrossBalance(
         lefts: [Int],
         rights: [Int]
@@ -220,6 +231,16 @@ class PrintFormSettingViewModel: ObservableObject {
         let rfLr = frontRight + rearLeft   // RF + LR
         
         return (lfRr, rfLr)
+    }
+    
+    private func setInitialValuesIfNeeded() {
+        guard !hasLaunchedBefore else { return }
+        
+        // ✅ 최초 실행 시에만 초기값
+        saveOverValue(overValue)
+        
+        // 이후 실행 방지
+        hasLaunchedBefore = true
     }
 }
 

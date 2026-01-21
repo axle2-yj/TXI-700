@@ -139,31 +139,48 @@ struct PrintButton: View {
             return
         }
         
-        let delay: Double = 0.6
+        let firstDelay: Double = 0.8
+        let fastDelay: Double = 0.3
+        let slowDelay: Double = 0.6
+        let slowStartIndex = 20
         let lastIndex = lines.count - 1
         
+        var accumulatedDelay: Double = 0
+        
         for (index, line) in lines.enumerated() {
-            DispatchQueue.main.asyncAfter(deadline: .now() + delay * Double(index)) {
+            
+            let currentDelay: Double
+            if index == 0 {
+                currentDelay = firstDelay
+            } else if index < slowStartIndex {
+                currentDelay = fastDelay
+            } else {
+                currentDelay = slowDelay
+            }
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + accumulatedDelay) {
                 
                 switch index {
-                case 0: bleManager.sendCommand(.wps(line), log: "PrintOneLine Start Send Result")
-                case lastIndex: bleManager.sendCommand(.wpt(line), log: "PrintOneLine Last Send Result")
-                default: bleManager.sendCommand(.wpe(line), log: "PrintOneLine Send Result")
+                case 0:
+                    bleManager.sendCommand(.wps(line), log: "PrintOneLine Start Send Result")
+                case lastIndex:
+                    bleManager.sendCommand(.wpt(line), log: "PrintOneLine Last Send Result")
+                default:
+                    bleManager.sendCommand(.wpe(line), log: "PrintOneLine Send Result")
                 }
                 
-                //                print("Send[\(index)] after \(delay * Double(index))s → \(packet)")
-                //                print("Content[\(index)] Result: \(bleManager.sendData(packet))")
+                print("index: \(index), delay: \(currentDelay)s, line: \(line)")
             }
+            
+            accumulatedDelay += currentDelay
         }
         
-        DispatchQueue.main.asyncAfter(
-            deadline: .now() + delay * Double(lines.count + 1)
-        ) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + accumulatedDelay) {
             completion()
         }
     }
     
-    // MARK: - 연속 출력 데이터 묶음 나눔    
+    // MARK: - 연속 출력 데이터 묶음 나눔
     func printLoadAxleInfos(
         infos: [LoadAxleInfo],
         completion: @escaping () -> Void
@@ -206,24 +223,48 @@ struct PrintButton: View {
         _ lines: [String],
         completion: @escaping () -> Void
     ) {
-        let delay: Double = 0.5
+        guard !lines.isEmpty else {
+            completion()
+            return
+        }
+
+        let firstDelay: Double = 0.8
+        let fastDelay: Double = 0.3
+        let slowDelay: Double = 0.6
+        let slowStartIndex = 20
         let lastIndex = lines.count - 1
         
+        var accumulatedDelay: Double = 0
+        
         for (index, line) in lines.enumerated() {
-            DispatchQueue.main.asyncAfter(deadline: .now() + delay * Double(index)) {
-                switch index {
-                    
-                case 0: bleManager.sendCommand(.wps(line), log: "PrintOneLine Start Send Result")
-                case lastIndex: bleManager.sendCommand(.wpt(line), log: "PrintOneLine Last Send Result")
-                default: bleManager.sendCommand(.wpe(line), log: "PrintOneLine Send Result")
-                }
-                //                print("Content[\(index)] Result: \(self.bleManager.sendData(packet))")
+            
+            let currentDelay: Double
+            if index == 0 {
+                currentDelay = firstDelay
+            } else if index < slowStartIndex {
+                currentDelay = fastDelay
+            } else {
+                currentDelay = slowDelay
             }
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + accumulatedDelay) {
+                
+                switch index {
+                case 0:
+                    bleManager.sendCommand(.wps(line), log: "PrintOneLine Start Send Result")
+                case lastIndex:
+                    bleManager.sendCommand(.wpt(line), log: "PrintOneLine Last Send Result")
+                default:
+                    bleManager.sendCommand(.wpe(line), log: "PrintOneLine Send Result")
+                }
+                
+                print("index: \(index), delay: \(currentDelay)s, line: \(line)")
+            }
+            
+            accumulatedDelay += currentDelay
         }
         
-        DispatchQueue.main.asyncAfter(
-            deadline: .now() + delay * Double(lines.count + 1)
-        ) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + accumulatedDelay) {
             completion()
         }
     }

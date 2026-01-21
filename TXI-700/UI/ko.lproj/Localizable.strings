@@ -30,6 +30,7 @@
 "Clear" = "초기화";
 "Input" = "입력";
 "InspectorInput" = "검사관 이름 입력";
+"overInput" = "초과하중값을 입력";
 
 "Close" = "닫기";
 "Cancel" = "취소";
