@@ -23,6 +23,7 @@ enum BLEResponse {
     case printing
     case printErrorPaper
     case printSuccess
+    case saveSuccess
     case itemCall([UInt8])
     case clientCall([UInt8])
     case vehicle([UInt8])

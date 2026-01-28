@@ -71,6 +71,10 @@ extension BluetoothManager: BLEEventHandling {
                 self.printResponse = "Print Success"
                 self.indicatorState = .printSuccess
                 
+            case .saveSuccess:
+                self.indicatorState = .saveSuccess
+                self.sendCommand(.bsn, log: "Save S/n")
+                
             case .printErrorCommunication:
                 self.printResponse = "Print Error Communication"
                 self.indicatorState = .printError(.communication)

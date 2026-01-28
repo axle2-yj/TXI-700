@@ -91,7 +91,7 @@ class MainViewModel: ObservableObject {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             Task { @MainActor in
                 bleManager.sendCommand(.btb, log: "BatteryCheck start")
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
                     if bleManager.IndicatorModelNum != "A0100" {
                         bleManager.isUnapprovedModel = true
                         bleManager.disconnect()

@@ -21,7 +21,7 @@ struct DataDetailScreen: View {
     @State private var isPrinting: Bool = false
     @State private var selectPrintConditions : Int = 0
     @State private var isAlertShowing : Bool = false
-    
+    @State private var isSave = false
     @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject var bleManager: BluetoothManager
     @EnvironmentObject var languageManager: LanguageManager
@@ -127,6 +127,7 @@ struct DataDetailScreen: View {
                         }
                         PrintButton(
                             isMain: false,
+                            isSave: $isSave,
                             seletedType: $selectPrintConditions,
                             viewModel: viewModel,
                             printViewModel: printViewModel,

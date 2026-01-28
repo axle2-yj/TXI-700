@@ -60,9 +60,9 @@ extension BluetoothManager: CBPeripheralDelegate {
             } else {
                 print("Data write succeeded for characteristic: \(characteristic.uuid)")
                 sendCommand(.btm, log: "ModeCall")
-                sendCommand(.bsn, log: "S/n")
                 sendCommand(.bcf, log: "EquipmentNumber Call Send Result")
             }
+            sendCommand(.bsn, log: "S/n")
         }
     }
     

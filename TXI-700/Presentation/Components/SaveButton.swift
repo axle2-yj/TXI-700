@@ -19,7 +19,7 @@ struct SaveButton: View {
     var weightNum: String
     
     @Environment(\.colorScheme) var colorScheme
-    
+    @EnvironmentObject var bleManager: BluetoothManager
     @State private var isSaved: Bool = false
     private var tint: Color {
         colorScheme == .dark ? .white : .black
@@ -30,6 +30,7 @@ struct SaveButton: View {
             beforeSave?()
             saveData()
             isSaved = true
+            
         } label: {
             Text("SAVE")
                 .frame(maxWidth: .infinity, maxHeight: 50)
@@ -55,6 +56,7 @@ struct SaveButton: View {
                 loadAxleStatus: status.loadAxlesData
             )
         }
+        bleManager.sendCommand(.wpu(""), log: "Weight Data Save Send Result")
         print(loadAxleStatus)
         print("✅ All data saved")
     }

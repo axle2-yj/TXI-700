@@ -10,6 +10,7 @@ import Foundation
 
 struct PrintButton: View {
     @State var isMain = false
+    @Binding var isSave : Bool
     @State private var printAlert: Bool = false
     @Binding var seletedType : Int
 
@@ -43,6 +44,7 @@ struct PrintButton: View {
                     printAlert = true
                     return
                 }
+                print("isSave : \(isSave)")
                 printAlert = false
                 
                 if isMain {
@@ -164,7 +166,11 @@ struct PrintButton: View {
                 case 0:
                     bleManager.sendCommand(.wps(line), log: "PrintOneLine Start Send Result")
                 case lastIndex:
-                    bleManager.sendCommand(.wpt(line), log: "PrintOneLine Last Send Result")
+                    if !isSave&&isMain {
+                        bleManager.sendCommand(.wpu(line), log: "PrintOneLine Last Send Result S/N Up")
+                    } else {
+                        bleManager.sendCommand(.wpt(line), log: "PrintOneLine Last Send Result")
+                    }
                 default:
                     bleManager.sendCommand(.wpe(line), log: "PrintOneLine Send Result")
                 }
@@ -253,7 +259,11 @@ struct PrintButton: View {
                 case 0:
                     bleManager.sendCommand(.wps(line), log: "PrintOneLine Start Send Result")
                 case lastIndex:
-                    bleManager.sendCommand(.wpt(line), log: "PrintOneLine Last Send Result")
+                    if !isSave&&isMain {
+                        bleManager.sendCommand(.wpu(line), log: "PrintOneLine Last Send Result S/N Up")
+                    } else {
+                        bleManager.sendCommand(.wpt(line), log: "PrintOneLine Last Send Result")
+                    }
                 default:
                     bleManager.sendCommand(.wpe(line), log: "PrintOneLine Send Result")
                 }

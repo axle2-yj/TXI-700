@@ -245,6 +245,7 @@ struct MainScreen: View {
                             
                             PrintButton(
                                 isMain: true,
+                                isSave: $isSave,
                                 seletedType: $selectNum,
                                 viewModel: dataViewModel,
                                 printViewModel: printViewModel,
@@ -286,6 +287,12 @@ struct MainScreen: View {
                                         ) {
                                             isPrinting = false
                                             printInitial()
+                                        }
+                                    }
+                                    if settingViewModel.weightingMethod != 0 {
+                                        if mainViewModel.sn == bleManager.IndicatorSnNumber {
+                                            mainViewModel.saveSn(mainViewModel.sn + 1)
+                                            mainViewModel.loadSn()
                                         }
                                     }
                                 }).frame(height: 30)
@@ -559,6 +566,7 @@ struct MainScreen: View {
                                 let twoStepSum = isMainSum && weightingMethodInt == 2
                                 PrintButton(
                                     isMain: true,
+                                    isSave: $isSave,
                                     seletedType: $selectNum,
                                     viewModel: dataViewModel,
                                     printViewModel: printViewModel,
@@ -626,6 +634,12 @@ struct MainScreen: View {
                                                 printInitial()
                                             }
                                         }
+                                        if settingViewModel.weightingMethod != 0 {
+                                            if mainViewModel.sn == bleManager.IndicatorSnNumber {
+                                                mainViewModel.saveSn(mainViewModel.sn + 1)
+                                                mainViewModel.loadSn()
+                                            }
+                                        }
                                     }
                                 )
                                 .disabled(isTwoStep ?  twoStepSum : false)
@@ -645,7 +659,7 @@ struct MainScreen: View {
                                         client: "\(client)",
                                         product: "\(product)",
                                         vehicle: "\(vehicle)",
-                                        serialNumber : "\(mainViewModel.sn)",               // 시리얼 넘버 비교 저장 필요
+                                        serialNumber : "\(mainViewModel.sn)",
                                         equipmentNumber : bleManager.equipmentNumber,       // 추후 진짜 장치 고유번호 정식 번호 저장 필요
                                         weightNum : String(settingViewModel.weightingMethod),
                                     )
@@ -737,6 +751,13 @@ struct MainScreen: View {
                         right: right1
                     )
                 }
+            }.onReceive(bleManager.$IndicatorSnNumber) { checkSn in
+                print("checek sn: \(checkSn)")
+                guard checkSn != 0 else { return }
+                if checkSn > mainViewModel.sn {
+                    mainViewModel.saveSn(checkSn)
+                    mainViewModel.loadSn()
+                }
             }.onChange(of: bleManager.indicatorState) { state, _ in
                 switch state {
                 case IndicatorState.sum:
@@ -762,7 +783,9 @@ struct MainScreen: View {
                         isTwoStep = false
                         settingViewModel.isSum = false
                     }
-                    
+                case IndicatorState.saveSuccess:
+                    print("save success")
+                    isSave = true
                 default:
                     break
                 }

@@ -28,6 +28,7 @@ enum BLECommand {
     case wps(String)
     case wpe(String)
     case wpt(String)
+    case wpu(String)
     case btx(String)
     case xxx(String)
 }
@@ -57,6 +58,7 @@ extension BLECommand {
         case .wps(let text) : return ascii("WPS") + ascii(text) + [0x0D, 0x0A]
         case .wpe(let text) : return ascii("WPE") + ascii(text) + [0x0D, 0x0A]
         case .wpt(let text) : return ascii("WPT") + ascii(text) + [0x0D, 0x0D, 0x0D, 0x0D, 0x0D, 0x0D, 0x0D, 0x0A]
+        case .wpu(let text) : return ascii("WPU") + ascii(text) + [0x0D, 0x0D, 0x0D, 0x0D, 0x0D, 0x0D, 0x0D, 0x0A]
         case .btx(let time) : return ascii("BTX") + ascii(time)
         case .xxx(let text) : return ascii("XXX") + ascii(text) + end()
         }

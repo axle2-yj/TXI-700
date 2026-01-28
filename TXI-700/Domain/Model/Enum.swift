@@ -19,7 +19,7 @@ enum IndicatorState: Equatable {
     case printing
     case printSuccess
     case printError(PrintError)
-    
+    case saveSuccess
     // 설정/편집 상태
     case headlineSaved
     case headlineDeleted
